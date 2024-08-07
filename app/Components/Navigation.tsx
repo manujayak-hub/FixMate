@@ -42,6 +42,8 @@ const Navigation: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+    height: 60,  // Adjust this height as needed
+    justifyContent: 'flex-end',  // Ensure it’s positioned at the bottom
   },
   icon: {
     width: 24,
