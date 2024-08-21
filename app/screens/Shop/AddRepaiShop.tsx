@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getAuth } from 'firebase/auth';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../../Firebase_config';
+import { doc, setDoc, collection, addDoc } from 'firebase/firestore';
 import Navbar from '../../Components/NavigationFor_Business';
 import Shop_Header from '../../Components/Shop_Header';
 
@@ -12,22 +12,25 @@ const AddRepairShop: React.FC = () => {
   const [location, setLocation] = useState('');
   const [contact, setContact] = useState('');
   const navigation = useNavigation();
-  const auth = getAuth();
-  const db = getFirestore();
 
   const handleSubmit = async () => {
-    const user = auth.currentUser;
+    const user = FIREBASE_AUTH.currentUser;
     if (user) {
       try {
-        await addDoc(collection(db, 'repairShops'), {
+        // Create a reference to the repairShops collection
+        const shopRef = collection(FIREBASE_DB, 'repairShops');
+
+        // Add shop details with a unique ID
+        await addDoc(shopRef, {
           shopName,
           location,
           contact,
           userId: user.uid,
         });
+
         alert('Shop details added successfully!');
         navigation.goBack();
-      } catch (error:any) {
+      } catch (error: any) {
         alert('Error adding shop details: ' + error.message);
       }
     } else {
@@ -39,25 +42,25 @@ const AddRepairShop: React.FC = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <Shop_Header />
       <View style={{ flex: 1, margin: 20 }}>
-      <Text style={styles.label}>Shop Name</Text>
-      <TextInput
-        style={styles.input}
-        value={shopName}
-        onChangeText={setShopName}
-      />
-      <Text style={styles.label}>Location</Text>
-      <TextInput
-        style={styles.input}
-        value={location}
-        onChangeText={setLocation}
-      />
-      <Text style={styles.label}>Contact</Text>
-      <TextInput
-        style={styles.input}
-        value={contact}
-        onChangeText={setContact}
-      />
-      <Button title="Submit" onPress={handleSubmit} />
+        <Text style={styles.label}>Shop Name</Text>
+        <TextInput
+          style={styles.input}
+          value={shopName}
+          onChangeText={setShopName}
+        />
+        <Text style={styles.label}>Location</Text>
+        <TextInput
+          style={styles.input}
+          value={location}
+          onChangeText={setLocation}
+        />
+        <Text style={styles.label}>Contact</Text>
+        <TextInput
+          style={styles.input}
+          value={contact}
+          onChangeText={setContact}
+        />
+        <Button title="Submit" onPress={handleSubmit} />
       </View>
       <Navbar />
     </SafeAreaView>
