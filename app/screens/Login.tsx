@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, TextInput, ActivityIndicator, Button, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { FIREBASE_AUTH } from '../../Firebase_config';
+import { FIREBASE_AUTH } from '../../Firebase_Config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { FIREBASE_DB } from '../../Firebase_config';
+import { FIREBASE_DB } from '../../Firebase_Config';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -25,7 +25,9 @@ const LoginScreen = () => {
             navigation.navigate('Shop_User_Home', { user: userData });
         } else {
             Alert.alert('customer');
+
           navigation.navigate('Shop_Client', { user: userData });
+
         }
       } else {
         Alert.alert('Error', 'No user data found');
