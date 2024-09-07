@@ -1,13 +1,12 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import Input from '@ant-design/react-native/lib/input-item/Input'
-import { Link } from '@react-navigation/native'
+
 
 const Tut = () => {
   return (
     <View style={styles.layoutd}>
-      <Input style={styles.rectangle}
-      placeholder='Search DIY Tutorials'/>
+      
+      
       <Text style={styles.categoryText}>Category</Text>
       <TouchableOpacity style={styles.rectangle3}>
         <Text style={styles.homeApplianceText}>Home and Appliance</Text>

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, ScrollView } from 'react-native'
 import React ,{useEffect,useState}from 'react'
-import { FIREBASE_DB } from '../../../Firebase_config'
+import { FIREBASE_DB } from '../../../Firebase_Config'
 import { collection,doc,getDocs } from 'firebase/firestore'
 import { Card } from 'antd-mobile'
 
