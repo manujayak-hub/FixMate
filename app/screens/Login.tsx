@@ -22,6 +22,7 @@ const LoginScreen = () => {
         const userData = userDoc.data();
         if (userData.type === 'Business') {
             Alert.alert('Business');
+            navigation.navigate('Shop_User_Home', { user: userData });
         } else {
             Alert.alert('customer');
           //navigation.navigate('Page2', { user: userData });
