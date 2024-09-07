@@ -11,7 +11,6 @@ const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigation:any = useNavigation();
-  
 
   const signIn = async () => {
     setLoading(true);
