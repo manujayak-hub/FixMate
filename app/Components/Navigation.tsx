@@ -1,7 +1,7 @@
 import React from 'react';
-import { TabBar } from '@ant-design/react-native';
+import { TabBar } from 'antd-mobile';
 import { useNavigation } from '@react-navigation/native';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View ,TouchableOpacity,Text} from 'react-native';
 
 const homeicon = require('../../assets/home.png');
 const guideicon = require('../../assets/Guide.png');
@@ -13,28 +13,35 @@ const Navigation: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <TabBar>
-        <TabBar.Item
-          title="Home"
-          icon={<Image source={homeicon} style={styles.icon} />}
-          onPress={() => navigation.navigate('Home' as never)}
+
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Home' as never)}>
+        <Image source={homeicon} style={styles.icon}
         />
-        <TabBar.Item
-          title="Guide"
-          icon={<Image source={guideicon} style={styles.icon} />}
-          onPress={() => navigation.navigate('Guide' as never)}
+        <Text>Home</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Home' as never)}>
+        <Image source={homeicon} style={styles.icon}
         />
-        <TabBar.Item
-          title="Shop"
-          icon={<Image source={shopicon} style={styles.icon} />}
-          onPress={() => navigation.navigate('Shop' as never)}
+        <Text>Guide</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Home' as never)}>
+        <Image source={homeicon} style={styles.icon}
         />
-        <TabBar.Item
-          title="Profile"
-          icon={<Image source={profileicon} style={styles.icon} />}
-          onPress={() => navigation.navigate('Profile' as never)}
+        <Text>Shop</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Home' as never)}>
+        <Image source={homeicon} style={styles.icon}
         />
-      </TabBar>
+        <Text>Profile</Text>
+        </TouchableOpacity>
+
     </View>
   );
 };
@@ -42,8 +49,8 @@ const Navigation: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: 60,  // Adjust this height as needed
-    justifyContent: 'flex-end',  // Ensure it’s positioned at the bottom
+    height: 60,  
+    justifyContent: 'flex-end',  
   },
   icon: {
     width: 24,
