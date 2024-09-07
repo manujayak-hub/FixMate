@@ -25,8 +25,9 @@ const LoginScreen = () => {
             navigation.navigate('Shop_User_Home', { user: userData });
         } else {
             Alert.alert('customer');
-           // navigation.navigate('Tut');
-          //navigation.navigate('Page2', { user: userData });
+
+          navigation.navigate('Shop_Client', { user: userData });
+
         }
       } else {
         Alert.alert('Error', 'No user data found');
