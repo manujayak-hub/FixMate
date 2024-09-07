@@ -1,13 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, ScrollView } from 'react-native'
 import React ,{useEffect,useState}from 'react'
 import { FIREBASE_DB } from '../../../Firebase_config'
 import { collection,doc,getDocs } from 'firebase/firestore'
+import { Card } from 'antd-mobile'
 
 interface RepairShops{
-    id: String;
-    contact: String;
-    location: String;
-    shopName: String;
+    id: string;
+    contact: string;
+    location: string;
+    shopName: string;
 }
 
 const Shop_Client = () => {
@@ -28,9 +29,15 @@ const Shop_Client = () => {
         fetchRepairshop();
     },[])
   return (
-    <View>
-      <Text>Shop_Client</Text>
-    </View>
+    <ScrollView showsVerticalScrollIndicator={false}>
+      {repairShops.map((shop) => (
+        <Card key={shop.id}>
+            <Text>{shop.shopName}</Text>
+
+        </Card>
+      ))}
+
+    </ScrollView>
   )
 }
 

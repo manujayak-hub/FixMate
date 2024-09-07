@@ -11,6 +11,12 @@ const AddRepairShop: React.FC = () => {
   const [shopName, setShopName] = useState('');
   const [location, setLocation] = useState('');
   const [contact, setContact] = useState('');
+  const [category,setcategory] = useState('');
+  const [Shop_Des,setShop_Des] = useState('');
+  const [OwnerName,setOwnerName] = useState('');
+  const [Rph,setRph] = useState('');
+  const [shopTag,setShopTag] = useState('');
+  const [ImageUrl,setImageUrl] = useState('');
   const navigation = useNavigation();
 
   const handleSubmit = async () => {
@@ -23,8 +29,14 @@ const AddRepairShop: React.FC = () => {
         // Add shop details with a unique ID
         await addDoc(shopRef, {
           shopName,
+          category,
           location,
+          Shop_Des,
+          OwnerName,
+          Rph,
+          shopTag,
           contact,
+          ImageUrl,
           userId: user.uid,
         });
 

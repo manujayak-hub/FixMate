@@ -46,14 +46,14 @@ const Navigation: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: 60, // Slightly increased height for better touch area
-    backgroundColor: '#ffffff', // Light background for a clean look
+    height: 60, 
+    backgroundColor: '#ffffff', 
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    borderTopWidth: 1, // Add a subtle border on top
-    borderTopColor: '#e0e0e0', // Light grey color for the border
+    borderTopWidth: 1, 
+    borderTopColor: '#e0e0e0',
     borderCurve: 'circular',
     borderTopLeftRadius: 20 ,
     borderTopRightRadius: 20 ,
@@ -66,16 +66,16 @@ const styles = StyleSheet.create({
   iconContainer: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center', // Center icon and text vertically
+    justifyContent: 'center', 
   },
   icon: {
-    width: 28, // Slightly larger icons for better visibility
+    width: 28, 
     height: 28,
-    marginBottom: 5, // Space between the icon and the label
+    marginBottom: 5, 
   },
   iconLabel: {
-    fontSize: 12, // Small label text size
-    color: '#333', // Darker color for contrast
+    fontSize: 12, 
+    color: '#333', 
   },
 });
 
