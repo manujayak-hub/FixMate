@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FIREBASE_AUTH, FIREBASE_DB } from '../../../Firebase_config';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../../Firebase_Config';
 import { doc, setDoc, collection, addDoc } from 'firebase/firestore';
 import Navbar from '../../Components/NavigationFor_Business';
 import Shop_Header from '../../Components/Shop_Header';
