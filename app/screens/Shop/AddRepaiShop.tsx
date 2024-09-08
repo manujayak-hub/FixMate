@@ -23,10 +23,10 @@ const AddRepairShop: React.FC = () => {
     const user = FIREBASE_AUTH.currentUser;
     if (user) {
       try {
-        // Create a reference to the repairShops collection
+        
         const shopRef = collection(FIREBASE_DB, 'repairShops');
 
-        // Add shop details with a unique ID
+        
         await addDoc(shopRef, {
           shopName,
           category,
