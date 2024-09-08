@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import Input from '@ant-design/react-native/lib/input-item/Input'
+
 import { Link } from '@react-navigation/native'
 
 const Tut = () => {
