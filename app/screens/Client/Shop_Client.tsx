@@ -3,6 +3,7 @@ import { StyleSheet, Text, ScrollView, View,SafeAreaView } from "react-native";
 import { FIREBASE_DB } from "../../../Firebase_Config";
 import { collection, getDocs } from "firebase/firestore";
 import ClientHeader from "../../Components/ClientHeader";
+import useUserStore from '../../Store/userStore';
 
 
 interface RepairShops {
@@ -14,6 +15,7 @@ interface RepairShops {
 
 const Shop_Client = () => {
   const [repairShops, setRepairShops] = useState<RepairShops[]>([]);
+  const { user } = useUserStore();
 
   useEffect(() => {
     const fetchRepairshop = async () => {
@@ -46,6 +48,9 @@ const Shop_Client = () => {
               <Text>{shop.contact}</Text>
             </View>
           ))}
+
+<Text>Hello, {user?.name}</Text>
+<Text>Email: {user?.email}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
