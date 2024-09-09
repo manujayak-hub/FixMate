@@ -1,24 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, ScrollView, View,SafeAreaView } from "react-native";
+import { StyleSheet, Text, ScrollView, View, SafeAreaView, TouchableOpacity } from "react-native";
 import { FIREBASE_DB } from "../../../Firebase_Config";
 import { collection, getDocs } from "firebase/firestore";
 import ClientHeader from "../../Components/ClientHeader";
 import useUserStore from '../../Store/userStore';
-
+import { TextInput } from "react-native-paper";
 
 interface RepairShops {
   id: string;
   contact: string;
   location: string;
   shopName: string;
+  category: string; // Add category field to match the Firebase data
 }
+
+const categories = ['All', 'Electronics', 'Automobile', 'Home Appliances']; // Example categories
 
 const Shop_Client = () => {
   const [repairShops, setRepairShops] = useState<RepairShops[]>([]);
+  const [filteredShops, setFilteredShops] = useState<RepairShops[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const { user } = useUserStore();
 
   useEffect(() => {
-    const fetchRepairshop = async () => {
+    const fetchRepairShop = async () => {
       try {
         const fetchedShopDetails = await getDocs(
           collection(FIREBASE_DB, "repairShops")
@@ -28,29 +33,51 @@ const Shop_Client = () => {
           ...doc.data(),
         })) as unknown as RepairShops[];
         setRepairShops(rdetails);
+        setFilteredShops(rdetails); // Initialize filtered shops
       } catch (error) {
         console.error("Error fetching Repair shop details: ", error);
       }
     };
 
-    fetchRepairshop();
+    fetchRepairShop();
   }, []);
+
+  useEffect(() => {
+    if (selectedCategory === 'All') {
+      setFilteredShops(repairShops);
+    } else {
+      setFilteredShops(repairShops.filter(shop => shop.category === selectedCategory));
+    }
+  }, [selectedCategory, repairShops]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ClientHeader/>
+      <TextInput placeholder="Search Your Favorite Repair Shop" />
+
+      {/* Horizontal Category Scrolling */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
+        {categories.map((category) => (
+          <TouchableOpacity
+            key={category}
+            style={[styles.categoryButton, selectedCategory === category && styles.selectedCategory]}
+            onPress={() => setSelectedCategory(category)}
+          >
+            <Text style={styles.categoryText}>{category}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <Text>Shops</Text>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.gridContainer}>
-          {repairShops.map((shop) => (
+          {filteredShops.map((shop) => (
             <View key={shop.id} style={styles.gridItem}>
               <Text style={styles.title}>{shop.shopName}</Text>
               <Text>{shop.location}</Text>
               <Text>{shop.contact}</Text>
             </View>
           ))}
-
-<Text>Hello, {user?.name}</Text>
-<Text>Email: {user?.email}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -61,8 +88,8 @@ export default Shop_Client;
 
 const styles = StyleSheet.create({
   gridContainer: {
-    padding:10,
-    margin:10,
+    padding: 10,
+    margin: 10,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
@@ -84,5 +111,22 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "bold",
+  },
+  categoryScroll: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  categoryButton: {
+    backgroundColor: '#ddd',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  selectedCategory: {
+    backgroundColor: '#F96D2B',
+  },
+  categoryText: {
+    color: '#000',
   },
 });
