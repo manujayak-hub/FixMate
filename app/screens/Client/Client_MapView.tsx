@@ -75,6 +75,7 @@ const Client_MapView = () => {
       >
         {repairShops.map((shopmark) => (
           <Marker
+          key={shopmark.id} 
           coordinate={{ latitude: shopmark.ownerLocationLatitude, longitude: shopmark.ownerLocationLongitude }} 
           title={shopmark.shopName}
           description={shopmark.category}
