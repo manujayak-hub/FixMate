@@ -48,6 +48,7 @@ const LoginScreen = () => {
         <>
           <Button title='Login' onPress={signIn} />
           <Button title="Sign Up" onPress={() => navigation.navigate('SignUp')} />
+          <Button title="map" onPress={() => navigation.navigate('Client_MapView')} />
         </>
       )}
     </View>
