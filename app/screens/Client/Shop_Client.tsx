@@ -17,6 +17,10 @@ import { getDistance } from "geolib";
 import * as Location from "expo-location";
 import Navigation from "../../Components/Navigation";
 import { useNavigation } from "@react-navigation/native";
+import { Dimensions } from 'react-native';
+
+
+
 
 interface RepairShops {
   id: string;
@@ -41,6 +45,7 @@ const Shop_Client = () => {
   const [mylogitude, setmylogitude] = useState(null);
   const [mylatitude, setmylatitude] = useState(null);
   const navigation = useNavigation();
+  const { width } = Dimensions.get('window');
 
   useEffect(() => {
     const fetchRepairShop = async () => {
@@ -114,15 +119,19 @@ const Shop_Client = () => {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.gridContainer}>
-          {filteredShops.map((shop) => {
-            const distance = getDistance(
-              { latitude: mylatitude, longitude: mylogitude },
-              {
-                latitude: shop.ownerLocationLatitude,
-                longitude: shop.ownerLocationLongitude,
-              },
-              1
-            );
+        {filteredShops.map((shop) => {
+            // Ensure that location data is available before calculating distance
+            const distance =
+              mylatitude && mylogitude
+                ? getDistance(
+                    { latitude: mylatitude, longitude: mylogitude },
+                    {
+                      latitude: shop.ownerLocationLatitude,
+                      longitude: shop.ownerLocationLongitude,
+                    },
+                    1
+                  )
+                : null; // If location is null, set distance as null
 
             return (
               <TouchableOpacity
@@ -137,7 +146,11 @@ const Shop_Client = () => {
                 <Text>{shop.Rph}</Text>
                 <Text>{shop.shopTag}</Text>
                 <Text>{shop.ImageUrl}</Text>
-                <Text>{distance / 1000} KM</Text>
+                {distance !== null ? (
+                  <Text>{distance / 1000} KM</Text>
+                ) : (
+                  <Text>Location not available</Text>
+                )}
                 <Image source={{ uri: shop.ImageUrl }} style={styles.image} />
 
                 <View style={styles.infoContainer}>
