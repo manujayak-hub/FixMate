@@ -9,12 +9,21 @@ import { TextInput } from "react-native-paper";
 interface RepairShops {
   id: string;
   contact: string;
-  location: string;
   shopName: string;
-  category: string; // Add category field to match the Firebase data
+  category: string; 
+  Shop_Des: string;
+  OwnerName: string;
+  Rph: string;
+  shopTag: string;
+  ImageUrl: string;
+  ownerLocationLongitude:number
+  ownerLocationLatitude:number
+         
+          
+          
 }
 
-const categories = ['All', 'Electronics', 'Automobile', 'Home Appliances']; // Example categories
+const categories = ['All', 'Electronics', 'Automobile', 'Home Appliances']; 
 
 const Shop_Client = () => {
   const [repairShops, setRepairShops] = useState<RepairShops[]>([]);
@@ -33,16 +42,15 @@ const Shop_Client = () => {
           ...doc.data(),
         })) as unknown as RepairShops[];
         setRepairShops(rdetails);
-        setFilteredShops(rdetails); // Initialize filtered shops
+        setFilteredShops(rdetails);
       } catch (error) {
         console.error("Error fetching Repair shop details: ", error);
       }
     };
 
     fetchRepairShop();
-  }, []);
 
-  useEffect(() => {
+
     if (selectedCategory === 'All') {
       setFilteredShops(repairShops);
     } else {
@@ -50,12 +58,14 @@ const Shop_Client = () => {
     }
   }, [selectedCategory, repairShops]);
 
+  
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ClientHeader/>
       <TextInput placeholder="Search Your Favorite Repair Shop" />
 
-      {/* Horizontal Category Scrolling */}
+    
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
         {categories.map((category) => (
           <TouchableOpacity
@@ -74,8 +84,16 @@ const Shop_Client = () => {
           {filteredShops.map((shop) => (
             <View key={shop.id} style={styles.gridItem}>
               <Text style={styles.title}>{shop.shopName}</Text>
-              <Text>{shop.location}</Text>
-              <Text>{shop.contact}</Text>
+              
+              <Text>{shop.category}</Text>
+              <Text>{shop.Shop_Des}</Text>
+              <Text>{shop.OwnerName}</Text>
+              <Text>{shop.Rph}</Text>
+              <Text>{shop.shopTag}</Text>
+              <Text>{shop.ImageUrl}</Text>
+              
+          
+          
             </View>
           ))}
         </View>
@@ -95,7 +113,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   gridItem: {
-    width: "48%", // Two items per row
+    width: "48%", 
     backgroundColor: "#f8f8f8",
     marginBottom: 15,
     padding: 15,
