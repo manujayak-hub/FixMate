@@ -19,9 +19,6 @@ import Navigation from "../../Components/Navigation";
 import { useNavigation } from "@react-navigation/native";
 import { Dimensions } from 'react-native';
 
-
-
-
 interface RepairShops {
   id: string;
   contact: string;
@@ -120,7 +117,6 @@ const Shop_Client = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.gridContainer}>
         {filteredShops.map((shop) => {
-            // Ensure that location data is available before calculating distance
             const distance =
               mylatitude && mylogitude
                 ? getDistance(
@@ -131,13 +127,12 @@ const Shop_Client = () => {
                     },
                     1
                   )
-                : null; // If location is null, set distance as null
+                : null;
 
             return (
               <TouchableOpacity
                 style={styles.card}
                 key={shop.id}
-                //onPress={() => navigation.navigate('ShopDetails', { shop })} // <-- Navigate to details page
               >
                 <Text style={styles.title}>{shop.shopName}</Text>
                 <Text>{shop.category}</Text>
@@ -145,9 +140,8 @@ const Shop_Client = () => {
                 <Text>{shop.OwnerName}</Text>
                 <Text>{shop.Rph}</Text>
                 <Text>{shop.shopTag}</Text>
-                <Text>{shop.ImageUrl}</Text>
                 {distance !== null ? (
-                  <Text>{distance / 1000} KM</Text>
+                  <Text>{(distance / 1000).toFixed(2)} KM</Text>
                 ) : (
                   <Text>Location not available</Text>
                 )}
@@ -203,8 +197,8 @@ const styles = StyleSheet.create({
   },
   categoryScroll: {
     paddingVertical: 10,
-    paddingHorizontal: 15,
-    height: 5,
+    paddingHorizontal: 5,
+    height: 80, // Adjusted height for proper display
   },
   categoryButton: {
     backgroundColor: "#ddd",
@@ -213,6 +207,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 10,
     height: 40,
+    justifyContent: "center", // Ensure the text is vertically centered
   },
   selectedCategory: {
     backgroundColor: "#F96D2B",
