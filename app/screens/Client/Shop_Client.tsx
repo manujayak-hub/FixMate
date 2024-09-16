@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   categoryScroll: {
     paddingVertical: 10,
     paddingHorizontal: 5,
-    height: 80, // Adjusted height for proper display
+    height: 80, 
   },
   categoryButton: {
     backgroundColor: "#ddd",
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 10,
     height: 40,
-    justifyContent: "center", // Ensure the text is vertically centered
+    justifyContent: "center", 
   },
   selectedCategory: {
     backgroundColor: "#F96D2B",
@@ -224,12 +224,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    width: 180, // Adjust to your desired width
+    width: 180, 
     marginBottom: 20,
   },
   image: {
     width: "100%",
-    height: 100, // Adjust this for image height
+    height: 100, 
     resizeMode: "cover",
   },
   infoContainer: {
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   shopName: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#F96D2B", // The orange color in the text
+    color: "#F96D2B",
     marginBottom: 5,
   },
   infoRow: {
