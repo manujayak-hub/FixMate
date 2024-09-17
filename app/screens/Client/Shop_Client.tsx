@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Alert,
-  Image
+  Image,
 } from "react-native";
 import { FIREBASE_DB } from "../../../Firebase_Config";
 import { collection, getDocs } from "firebase/firestore";
@@ -17,7 +17,8 @@ import { getDistance } from "geolib";
 import * as Location from "expo-location";
 import Navigation from "../../Components/Navigation";
 import { useNavigation } from "@react-navigation/native";
-import { Dimensions } from 'react-native';
+import { Dimensions } from "react-native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"; // Import NativeStackNavigationProp
 
 interface RepairShops {
   id: string;
@@ -33,16 +34,27 @@ interface RepairShops {
   ownerLocationLatitude: number;
 }
 
+// Define navigation parameters
+export type RootStackParamList = {
+  ShopDetails: { shop: RepairShops };
+};
+
+// Navigation prop type
+type ShopClientScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ShopDetails"
+>;
+
 const categories = ["All", "Electronics", "Automobile", "Home Appliances"];
 
 const Shop_Client = () => {
   const [repairShops, setRepairShops] = useState<RepairShops[]>([]);
   const [filteredShops, setFilteredShops] = useState<RepairShops[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [mylogitude, setmylogitude] = useState(null);
-  const [mylatitude, setmylatitude] = useState(null);
-  const navigation = useNavigation();
-  const { width } = Dimensions.get('window');
+  const [mylogitude, setmylogitude] = useState<number | null>(null);
+  const [mylatitude, setmylatitude] = useState<number | null>(null);
+  const navigation = useNavigation<ShopClientScreenNavigationProp>(); // Use the navigation prop type here
+  const { width } = Dimensions.get("window");
 
   useEffect(() => {
     const fetchRepairShop = async () => {
@@ -53,7 +65,7 @@ const Shop_Client = () => {
         const rdetails = fetchedShopDetails.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        })) as unknown as RepairShops[];
+        })) as RepairShops[];
         setRepairShops(rdetails);
         setFilteredShops(rdetails);
       } catch (error) {
@@ -116,7 +128,7 @@ const Shop_Client = () => {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.gridContainer}>
-        {filteredShops.map((shop) => {
+          {filteredShops.map((shop) => {
             const distance =
               mylatitude && mylogitude
                 ? getDistance(
@@ -124,8 +136,7 @@ const Shop_Client = () => {
                     {
                       latitude: shop.ownerLocationLatitude,
                       longitude: shop.ownerLocationLongitude,
-                    },
-                    1
+                    }
                   )
                 : null;
 
@@ -133,6 +144,7 @@ const Shop_Client = () => {
               <TouchableOpacity
                 style={styles.card}
                 key={shop.id}
+                onPress={() => navigation.navigate("ShopDetails", { shop })} // Pass the shop data here
               >
                 <Text style={styles.title}>{shop.shopName}</Text>
                 <Text>{shop.category}</Text>
@@ -198,7 +210,7 @@ const styles = StyleSheet.create({
   categoryScroll: {
     paddingVertical: 10,
     paddingHorizontal: 5,
-    height: 80, 
+    height: 90,
   },
   categoryButton: {
     backgroundColor: "#ddd",
@@ -207,7 +219,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 10,
     height: 40,
-    justifyContent: "center", 
+    justifyContent: "center",
   },
   selectedCategory: {
     backgroundColor: "#F96D2B",
@@ -224,12 +236,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    width: 180, 
+    width: "48%", // Adjust width to fit two columns with spacing
     marginBottom: 20,
   },
   image: {
     width: "100%",
-    height: 100, 
+    height: 100,
     resizeMode: "cover",
   },
   infoContainer: {
