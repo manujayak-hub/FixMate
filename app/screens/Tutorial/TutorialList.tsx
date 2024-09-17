@@ -18,6 +18,7 @@ interface Tutorial {
 // Define the type for the navigation prop (assuming you have a "RootStackParamList" defined elsewhere)
 type RootStackParamList = {
   EditTutorial: { tutorialId: string };
+  STView: { tutorialId: string };
 };
 
 const TutorialList: React.FC = () => {
@@ -107,9 +108,15 @@ const TutorialList: React.FC = () => {
     navigation.navigate('EditTutorial', { tutorialId: id });
   };
 
+  const handleView = (id: string) => {
+    navigation.navigate('STView', { tutorialId: id }); // Navigate to STView
+  };
+
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {tutorials.map(tutorial => (
+        <TouchableOpacity key={tutorial.id} onPress={() => handleView(tutorial.id)}>
         <View key={tutorial.id} style={styles.tutorialCard}>
           <Image source={{ uri: tutorial.imageUrl }} style={styles.image} />
           <View style={styles.infoContainer}>
@@ -133,6 +140,7 @@ const TutorialList: React.FC = () => {
             </View>
           </View>
         </View>
+        </TouchableOpacity>
       ))}
     </ScrollView>
   );

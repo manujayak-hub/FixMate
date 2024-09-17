@@ -7,10 +7,10 @@ import { Video ,ResizeMode } from 'expo-av';
 
 // Define the types for the route params
 type RootStackParamList = {
-  TutorialDoc: { tutorialId: string };
+  STView: { tutorialId: string };
 };
 
-type TutorialDocRouteProp = RouteProp<RootStackParamList, 'TutorialDoc'>;
+type STViewRouteProp = RouteProp<RootStackParamList, 'STView'>;
 
 // Define the types for the tutorial data structure
 interface TutorialData {
@@ -19,11 +19,13 @@ interface TutorialData {
   tools:String;
   description: string;
   videoUrl?: string;
+  category:String;
+  timeDuration:String;
 }
 
-const TutorialDoc: React.FC = () => {
+const STView: React.FC = () => {
   const [tutorial, setTutorial] = useState<TutorialData | null>(null);
-  const route = useRoute<TutorialDocRouteProp>(); // Get the route params
+  const route = useRoute<STViewRouteProp>(); // Get the route params
   const { tutorialId } = route.params; // Extract the tutorialId from route params
 
   useEffect(() => {
@@ -57,7 +59,10 @@ const TutorialDoc: React.FC = () => {
         source={{ uri: tutorial.imageUrl }} // Ensure `imageUrl` is a valid URL string
         style={styles.image}
       />
-      
+
+        <Text style={styles.txt}>Category:</Text>
+        <Text style={styles.description}>{tutorial.category}</Text>
+            
       <Text style={styles.txt}>How to do:</Text>
       <Text style={styles.description}>{tutorial.description}</Text>
       
@@ -74,6 +79,10 @@ const TutorialDoc: React.FC = () => {
           isLooping
         />
       )}
+
+        <Text style={styles.txt}>Time Duartion:</Text>
+        <Text style={styles.description}>{tutorial.timeDuration}</Text>
+
     </ScrollView>
     </SafeAreaView>
   );
@@ -121,4 +130,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TutorialDoc;
+export default STView;
