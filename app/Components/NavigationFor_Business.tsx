@@ -1,5 +1,4 @@
 import React from 'react';
-import { TabBar } from 'antd-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { Image, StyleSheet, View ,TouchableOpacity,Text} from 'react-native';
 
