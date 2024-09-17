@@ -1,78 +1,227 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
-
+import React, { useState, useEffect } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import { FIREBASE_DB } from '../../../Firebase_Config'; // Adjust import according to your file structure
 
 const Tut = () => {
-  return (
-    <View style={styles.layoutd}>
-      
-      
-      <Text style={styles.categoryText}>Category</Text>
-      <TouchableOpacity style={styles.rectangle3}>
-        <Text style={styles.homeApplianceText}>Home and Appliance</Text>
-        <Text>Repair</Text>
-      </TouchableOpacity>
-    </View>
-  )
-}
+  const [tutorials, setTutorials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
-export default Tut
+  useEffect(() => {
+    const tutorialsCollection = collection(FIREBASE_DB, 'Tutorial');
+    
+    // Setup real-time listener
+    const tutorialsQuery = query(
+      tutorialsCollection,
+      orderBy('uploadTime', 'desc'),
+      limit(7)
+    );
+    
+    const unsubscribe = onSnapshot(
+      tutorialsQuery,
+      snapshot => {
+        const tutorialsData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setTutorials(tutorialsData);
+        setLoading(false); // Stop loading when data is fetched
+      },
+      error => {
+        Alert.alert('Error', 'Failed to load tutorials');
+        console.error('Error fetching tutorials:', error);
+        setLoading(false); // Stop loading on error
+      }
+    );
+
+    // Cleanup listener on unmount
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FF6100" />
+        <Text style={styles.loadingText}>Loading tutorials...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView vertical contentContainerStyle={styles.layoutd}>
+      <Text style={styles.categoryText}>Category</Text>
+      <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.subView}
+        >
+          <TouchableOpacity
+            style={styles.rectangle1}
+            onPress={() => navigation.navigate('TutorialList', { category: 'Home and Appliance Repair' })}
+          >
+            <Text style={styles.homeApplianceText}>Home and Appliance</Text>
+            <Text style={styles.homeApplianceText1}>Repair</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.rectangle1}
+            onPress={() => navigation.navigate('CatTutorial', { category: 'Automotive Repair' })}
+          >
+            <Text style={styles.homeApplianceText}>Automotive Repair</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.rectangle1}
+            onPress={() => navigation.navigate('CatTutorial', { category: 'Electronic Repair' })}
+          >
+            <Text style={styles.homeApplianceText}>Electronic Repair</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.rectangle1}
+            onPress={() => navigation.navigate('CatTutorial', { category: 'Furniture Repair' })}
+          >
+            <Text style={styles.homeApplianceText}>Furniture Repair</Text>
+          </TouchableOpacity>
+        </ScrollView>
+
+      <Text style={styles.diyText}>DIY Tutorials</Text>
+      {tutorials.length === 0 ? (
+        <Text style={styles.noTutorialText}>No tutorials available at the moment.</Text>
+      ) : (
+        tutorials.map(tutorial => (
+          <TouchableOpacity
+            key={tutorial.id}
+            style={styles.imageButton}
+            onPress={() => {
+              navigation.navigate('TutorialDoc', { tutorialId: tutorial.id });
+              console.log('Image button pressed');
+            }}
+          >
+            <View style={styles.imageContainer}>
+              {tutorial.imageUrl ? (
+                <Image
+                  source={{ uri: tutorial.imageUrl }} // Ensure `imageUrl` is a valid URL string
+                  style={styles.img1}
+                />
+              ) : (
+                <View style={styles.imagePlaceholder}>
+                  <Text style={styles.imagePlaceholderText}>No Image</Text>
+                </View>
+              )}
+              <Text style={styles.imageText}>{tutorial.title}</Text>
+              <Text style={styles.imageText1}>Duration: {tutorial.timeDuration || 'N/A'}</Text>
+            </View>
+          </TouchableOpacity>
+        ))
+      )}
+    </ScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
-    layoutd:{
-        display: 'flex',
-        flexDirection: 'column',
-        width: 400,
-        height:'auto',
-        padding:10,
-        justifyContent:'space-between',
-        backgroundColor:'#EEEEEE' ,
-    },
-    rectangle: {
-        position: 'absolute',
-        width: 315,
-        height: 46,
-        left: '50%',
-        marginLeft: -157.5, // Half of the width to center the element
-        top: 94,
-        backgroundColor: '#F5F5F5', // Equivalent to the color you used
-        borderRadius: 10,
-      },
-      categoryText: {
-        position: 'absolute',
-        width: 71,
-        height: 21.39,
-        left: 35,
-        top: 163.56,
-       
-        fontStyle: 'normal',
-        fontWeight: '700',
-        fontSize: 10,
-        lineHeight: 12,
-        color: '#000000', // Hex value for black
-      },
-      homeApplianceText: {
-        position: 'absolute',
-        width: 203,
-        height: 60,
-        left: 11.64,
-        top: 19.12,
-        
-        fontStyle: 'normal',
-        fontWeight: '700',
-        fontSize: 20,
-        lineHeight: 24,
-        color: '#000000', // Use standard hex color
-        transform: [{ rotate: '0.61deg' }], // Rotate by 0.61 degrees
-      },
-      rectangle3: {
-        position: 'absolute',
-        width: 224,
-        height: 74,
-        left: 25,
-        top: 188,
-        backgroundColor: 'rgba(255, 97, 0, 0.7)', // Equivalent to the RGBA color with transparency
-        borderRadius: 15,
-        transform: [{ rotate: '0.61deg' }], // Apply rotation
-      },
-})
+  layoutd: {
+    flexDirection: 'column',
+    padding: 10,
+    backgroundColor: '#EEEEEE',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#EEEEEE',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    color: '#FF6100',
+  },
+  categoryText: {
+    fontWeight: '700',
+    fontSize: 24,
+    color: '#000000',
+    marginBottom: 10,
+  },
+  homeApplianceText: {
+    fontWeight: '700',
+    fontSize: 16,
+    color: '#000000',
+  },
+  homeApplianceText1: {
+    fontWeight: '700',
+    fontSize: 14,
+    color: '#000000',
+  },
+  rectangle1: {
+    width: 224,
+    height: 74,
+    backgroundColor: 'rgba(255, 97, 0, 0.7)',
+    borderRadius: 15,
+    marginRight: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  subView: {
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  diyText: {
+    fontWeight: '700',
+    fontSize: 24,
+    color: '#000000',
+    marginBottom: 10,
+  },
+  imageButton: {
+    marginBottom: 20,
+    marginHorizontal: 20,
+  },
+  img1: {
+    borderRadius: 20,
+    width: '100%',
+    height: 200,
+  },
+  imageText: {
+    position: 'absolute',
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    top: 10,
+    left: 10,
+    padding: 5,
+    borderRadius: 5,
+  },
+  imageText1: {
+    position: 'absolute',
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    bottom: 10,
+    left: 10,
+  },
+  imagePlaceholder: {
+    width: '100%',
+    height: 200,
+    backgroundColor: '#E0E0E0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    marginBottom: 10,
+  },
+  imagePlaceholderText: {
+    fontSize: 18,
+    color: '#808080',
+  },
+  noTutorialText: {
+    fontSize: 16,
+    color: '#808080',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+});
+
+export default Tut;
