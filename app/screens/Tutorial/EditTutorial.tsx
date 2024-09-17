@@ -1,25 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { FIREBASE_DB, FIREBASE_STORAGE } from '../../../Firebase_Config'; // Adjust according to your project structure
 import * as ImagePicker from 'expo-image-picker';
 import { AntDesign } from '@expo/vector-icons';
-import { Video } from 'expo-av';
+import { Video,ResizeMode } from 'expo-av';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { Picker } from '@react-native-picker/picker';
 
-const EditTutorial = () => {
+
+// Define all route names and their params
+type RootStackParamList = {
+  EditTutorial: { tutorialId: string };
+  TutorialDoc: { tutorialId: string };
+  // Add other routes here if needed
+};
+
+// Define route props for EditTutorial
+type EditTutorialRouteProp = RouteProp<RootStackParamList, 'EditTutorial'>;
+type EditTutorialNavigationProp = StackNavigationProp<RootStackParamList, 'EditTutorial'>;
+
+const EditTutorial: React.FC = () => {
   const [tutorialData, setTutorialData] = useState({
     title: '',
     description: '',
     timeDuration: '',
     imageUrl: '',
     videoUrl: '',
+    tools:'',
+    category:'',
   });
-  const [newImageUri, setNewImageUri] = useState(null);
-  const [newVideoUri, setNewVideoUri] = useState(null);
-  const route = useRoute();
-  const navigation = useNavigation();
+  const [newImageUri, setNewImageUri] = useState<string | null>(null);
+  const [newVideoUri, setNewVideoUri] = useState<string | null>(null);
+  const route = useRoute<EditTutorialRouteProp>(); // Get route parameters
+  const navigation = useNavigation<EditTutorialNavigationProp>(); // Get navigation prop
   const { tutorialId } = route.params; // Get the tutorialId from the route params
 
   useEffect(() => {
@@ -29,7 +45,7 @@ const EditTutorial = () => {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          setTutorialData(docSnap.data());
+          setTutorialData(docSnap.data() as any); // Cast to 'any' to avoid type errors
         } else {
           console.log('No such document!');
         }
@@ -137,6 +153,8 @@ const EditTutorial = () => {
         title: tutorialData.title,
         description: tutorialData.description,
         timeDuration: tutorialData.timeDuration,
+        tools:tutorialData.tools,
+        category:tutorialData.category,
         imageUrl: updatedImageUrl,
         videoUrl: updatedVideoUrl,
       });
@@ -158,18 +176,35 @@ const EditTutorial = () => {
         onChangeText={(text) => setTutorialData({ ...tutorialData, title: text })}
       />
 
+        <Text style={styles.label}>Category</Text>
+        <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={tutorialData.category}
+              style={styles.picker}
+              onValueChange={(text) => setTutorialData({ ...tutorialData, category: text })}
+            >
+              <Picker.Item label="Select Category" value="" />
+              <Picker.Item label="Home and Appliance Repair" value="Home and Appliance Repair" />
+              <Picker.Item label="Automotive Repair" value="Automotive Repair" />
+              <Picker.Item label="Electronic Repair" value="Electronic Repair" />
+              <Picker.Item label="Furniture Repair" value="Furniture Repair" />
+            </Picker>
+          </View>
+
       <Text style={styles.label}>Description</Text>
       <TextInput
         style={styles.input}
         value={tutorialData.description}
+        numberOfLines={6}
+        textAlignVertical="top"
         onChangeText={(text) => setTutorialData({ ...tutorialData, description: text })}
       />
 
-      <Text style={styles.label}>Time Duration</Text>
+      <Text style={styles.label}>Recommended Tools</Text>
       <TextInput
         style={styles.input}
-        value={tutorialData.timeDuration}
-        onChangeText={(text) => setTutorialData({ ...tutorialData, timeDuration: text })}
+        value={tutorialData.tools}
+        onChangeText={(text) => setTutorialData({ ...tutorialData, tools: text })}
       />
 
       {/* Display Current or Newly Selected Image */}
@@ -191,7 +226,7 @@ const EditTutorial = () => {
           source={{ uri: tutorialData.videoUrl }}
           useNativeControls
           style={styles.videoPreview}
-          resizeMode="contain"
+          resizeMode={ResizeMode.CONTAIN}
         />
       ) : (
         <Text>No video available for this tutorial</Text>
@@ -202,6 +237,14 @@ const EditTutorial = () => {
         <AntDesign name="pluscircleo" size={40} color="#FF6100" style={{ alignSelf: 'center' }} />
       </TouchableOpacity>
       <Text style={styles.svideo}>Select New Video</Text>
+
+      <Text style={styles.label}>Time Duration</Text>
+      <TextInput
+        style={styles.input}
+        value={tutorialData.timeDuration}
+        keyboardType="numeric"
+        onChangeText={(text) => setTutorialData({ ...tutorialData, timeDuration: text })}
+      />
 
       <TouchableOpacity onPress={handleUpdate} style={styles.uploadButton}>
         <Text style={styles.uploadButtonText}>Update Tutorial</Text>
@@ -256,6 +299,19 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     marginVertical: 10,
+  },
+  pickerContainer: {
+    width: '99%',
+    borderWidth: 1,
+    borderColor: '#DDDDDD',
+    borderRadius: 4,
+    alignSelf: 'center',
+    marginBottom: 15,
+    backgroundColor: '#F9F9F9',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
   },
 });
 

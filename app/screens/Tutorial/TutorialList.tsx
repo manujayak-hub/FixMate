@@ -6,9 +6,18 @@ import { FIREBASE_DB, FIREBASE_STORAGE } from '../../../Firebase_Config'; // Adj
 import { ref, deleteObject } from 'firebase/storage';
 import { AntDesign } from '@expo/vector-icons';
 
-const TutorialList = () => {
-  const [tutorials, setTutorials] = useState([]);
-  const navigation = useNavigation();
+// Define types for tutorial data
+interface Tutorial {
+  id: string;
+  imageUrl: string;
+  title: string;
+  videoUrl: string;
+  timeDuration: string;
+}
+
+const TutorialList: React.FC = () => {
+  const [tutorials, setTutorials] = useState<Tutorial[]>([]);
+  const navigation = useNavigation<any>();
 
   useEffect(() => {
     const tutorialsCollection = collection(FIREBASE_DB, 'Tutorial');
@@ -16,9 +25,9 @@ const TutorialList = () => {
     const unsubscribe = onSnapshot(
       tutorialsCollection,
       snapshot => {
-        const tutorialsData = snapshot.docs.map(doc => ({
+        const tutorialsData: Tutorial[] = snapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data()
+          ...(doc.data() as Omit<Tutorial, 'id'>) // Type assertion to omit the 'id' from the data
         }));
         setTutorials(tutorialsData);
       },
@@ -32,7 +41,7 @@ const TutorialList = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleDelete = async (id, videoUrl, imageUrl) => {
+  const handleDelete = async (id: string, videoUrl: string, imageUrl: string) => {
     try {
       // Confirm deletion action
       Alert.alert(
@@ -90,7 +99,7 @@ const TutorialList = () => {
     }
   };
   
-  const handleEdit = (id) => {
+  const handleEdit = (id: string) => {
     navigation.navigate('EditTutorial', { tutorialId: id });
   };
 
