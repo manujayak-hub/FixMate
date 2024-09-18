@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, TextInput, StyleSheet, Text, View, Alert, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { 
+  SafeAreaView, 
+  TextInput, 
+  StyleSheet, 
+  Text, 
+  View, 
+  Alert, 
+  ScrollView, 
+  TouchableOpacity, 
+  Image 
+} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { FIREBASE_DB, FIREBASE_STORAGE } from '../../../Firebase_Config';
 import { collection, addDoc } from 'firebase/firestore';
@@ -7,18 +17,41 @@ import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker'; // Import Picker
+import { DocumentReference } from 'firebase/firestore';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+// Define types for your state variables
+interface Tutorial {
+  title: string;
+  category: string;
+  timeDuration: string;
+  tools: string;
+  description: string;
+  videoUrl: string;
+  imageUrl: string;
+  uploadTime: string;
+}
+
+// Define your stack parameter list
+type RootStackParamList = {
+  TutorialList: undefined;
+  // Add other routes if necessary
+};
+
+// Type for navigation prop
+type AddTutorialNavigationProp = StackNavigationProp<RootStackParamList, 'TutorialList'>;
 
 const AddTutorial = () => {
-  const [videoUri, setVideoUri] = useState(null);
-  const [imageUri, setImageUri] = useState(null);
-  const [isVideoSelected, setIsVideoSelected] = useState(false);
-  const [isImageSelected, setIsImageSelected] = useState(false);
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
-  const [timeDuration, setTimeDuration] = useState('');
-  const [tools, setTools] = useState('');
-  const [description, setDescription] = useState('');
-  const navigation = useNavigation();
+  const [videoUri, setVideoUri] = useState<string | null>(null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [isVideoSelected, setIsVideoSelected] = useState<boolean>(false);
+  const [isImageSelected, setIsImageSelected] = useState<boolean>(false);
+  const [title, setTitle] = useState<string>('');
+  const [category, setCategory] = useState<string>('');
+  const [timeDuration, setTimeDuration] = useState<string>('');
+  const [tools, setTools] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const navigation = useNavigation<AddTutorialNavigationProp>();
 
   useEffect(() => {
     (async () => {
@@ -90,22 +123,22 @@ const AddTutorial = () => {
       Alert.alert('Missing Data', 'Please select an image.');
       return;
     }
-  
+
     try {
       const videoResponse = await fetch(videoUri);
       const videoBlob = await videoResponse.blob();
       const videoRef = ref(FIREBASE_STORAGE, `tutorials/videos/${Date.now()}.mp4`);
-  
+
       const imageResponse = await fetch(imageUri);
       const imageBlob = await imageResponse.blob();
       const imageRef = ref(FIREBASE_STORAGE, `tutorials/images/${Date.now()}.jpg`);
-  
+
       // Start both uploads in parallel
       const videoUploadTask = uploadBytesResumable(videoRef, videoBlob);
       const imageUploadTask = uploadBytesResumable(imageRef, imageBlob);
-  
+
       // Handle video upload
-      const videoUploadPromise = new Promise((resolve, reject) => {
+      const videoUploadPromise = new Promise<string>((resolve, reject) => {
         videoUploadTask.on(
           'state_changed',
           (snapshot) => {
@@ -124,9 +157,9 @@ const AddTutorial = () => {
           }
         );
       });
-  
+
       // Handle image upload
-      const imageUploadPromise = new Promise((resolve, reject) => {
+      const imageUploadPromise = new Promise<string>((resolve, reject) => {
         imageUploadTask.on(
           'state_changed',
           (snapshot) => {
@@ -145,10 +178,10 @@ const AddTutorial = () => {
           }
         );
       });
-  
+
       // Wait for both uploads to finish
       const [videoUrl, imageUrl] = await Promise.all([videoUploadPromise, imageUploadPromise]);
-  
+
       // Save to Firestore
       try {
         await addDoc(collection(FIREBASE_DB, 'Tutorial'), {
@@ -161,10 +194,10 @@ const AddTutorial = () => {
           imageUrl,
           uploadTime: new Date().toISOString(),
         });
-  
+
         Alert.alert('Upload successful!', 'Tutorial has been saved to Firestore.');
         navigation.navigate('TutorialList');
-  
+
         // Reset form
         setVideoUri(null);
         setImageUri(null);
@@ -184,7 +217,6 @@ const AddTutorial = () => {
       Alert.alert('Conversion failed', error.message);
     }
   };
-  
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -211,28 +243,22 @@ const AddTutorial = () => {
               <Picker.Item label="Furniture Repair" value="Furniture Repair" />
             </Picker>
           </View>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Time Duration"
-            value={timeDuration}
-            onChangeText={setTimeDuration}
-            keyboardType="numeric" 
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Recommended Tools"
-            value={tools}
-            onChangeText={setTools}
-          />
+          
           <TextInput
             style={styles.input1}
             placeholder="Enter Tutorial Description"
             value={description}
             onChangeText={setDescription}
-            multiline={true} // Allow multiline input
-  numberOfLines={6} // Set a default number of lines
-  textAlignVertical="top"
+            multiline={true}
+            numberOfLines={6}
+            textAlignVertical="top"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Recommended Tools"
+            value={tools}
+            onChangeText={setTools}
           />
 
           <TouchableOpacity onPress={pickVideo}>
@@ -244,6 +270,14 @@ const AddTutorial = () => {
           ) : (
             <Text style={styles.videoUri}>No video selected</Text>
           )}
+
+          <TextInput
+            style={styles.input}
+            placeholder="Time Duration"
+            value={timeDuration}
+            onChangeText={setTimeDuration}
+            keyboardType="numeric"
+          />
 
           <TouchableOpacity onPress={pickImage}>
             <AntDesign name="picture" size={40} color="#FF6100" style={{ alignSelf: 'center' }} />

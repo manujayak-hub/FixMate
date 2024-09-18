@@ -1,41 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, limit,QuerySnapshot, DocumentData, DocumentSnapshot  } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config'; // Adjust import according to your file structure
+import { StackNavigationProp } from '@react-navigation/stack';
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 
-const Tut = () => {
-  const [tutorials, setTutorials] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const navigation = useNavigation();
+
+// Define type for navigation
+type RootStackParamList = {
+  TutorialList: { category: string };
+  CatTutorial: { category: string };
+  TutorialDoc: { tutorialId: string };
+};
+
+type NavigationProp = StackNavigationProp<RootStackParamList, 'TutorialList'>;
+
+// Define type for tutorial object
+interface Tutorial {
+  id: string;
+  title: string;
+  imageUrl?: string;
+  timeDuration?: string;
+}
+
+const Tut: React.FC = () => {
+  const [tutorials, setTutorials] = useState<Tutorial[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const navigation = useNavigation<NavigationProp>();
 
   useEffect(() => {
     const tutorialsCollection = collection(FIREBASE_DB, 'Tutorial');
-    
+  
     // Setup real-time listener
-    const tutorialsQuery = query(
-      tutorialsCollection,
-      orderBy('uploadTime', 'desc'),
-      limit(7)
-    );
-    
+    const tutorialsQuery = query(tutorialsCollection, orderBy('uploadTime', 'desc'), limit(7));
+  
     const unsubscribe = onSnapshot(
       tutorialsQuery,
-      snapshot => {
-        const tutorialsData = snapshot.docs.map(doc => ({
+      (snapshot: QuerySnapshot<DocumentData>) => {
+        const tutorialsData = snapshot.docs.map((doc: DocumentSnapshot<DocumentData>) => ({
           id: doc.id,
-          ...doc.data()
-        }));
+          ...doc.data(),
+        })) as Tutorial[]; // Cast the result to the Tutorial type
         setTutorials(tutorialsData);
         setLoading(false); // Stop loading when data is fetched
       },
-      error => {
+      (error) => {
         Alert.alert('Error', 'Failed to load tutorials');
         console.error('Error fetching tutorials:', error);
         setLoading(false); // Stop loading on error
       }
     );
-
+  
     // Cleanup listener on unmount
     return () => unsubscribe();
   }, []);
@@ -50,69 +66,65 @@ const Tut = () => {
   }
 
   return (
-    <ScrollView vertical contentContainerStyle={styles.layoutd}>
+    <ScrollView  contentContainerStyle={styles.layoutd}>
       <Text style={styles.categoryText}>Category</Text>
       <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.subView}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.subView}
+      >
+        <TouchableOpacity
+          style={styles.rectangle1}
+          onPress={() => navigation.navigate('TutorialList', { category: 'Home and Appliance Repair' })}
         >
-          <TouchableOpacity
-            style={styles.rectangle1}
-            onPress={() => navigation.navigate('TutorialList', { category: 'Home and Appliance Repair' })}
-          >
-            <Text style={styles.homeApplianceText}>Home and Appliance</Text>
-            <Text style={styles.homeApplianceText1}>Repair</Text>
-          </TouchableOpacity>
+          <Text style={styles.homeApplianceText}>Home and Appliance</Text>
+          <Text style={styles.homeApplianceText1}>Repair</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.rectangle1}
-            onPress={() => navigation.navigate('CatTutorial', { category: 'Automotive Repair' })}
-          >
-            <Text style={styles.homeApplianceText}>Automotive Repair</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.rectangle1}
+          onPress={() => navigation.navigate('CatTutorial', { category: 'Automotive Repair' })}
+        >
+          <Text style={styles.homeApplianceText}>Automotive Repair</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.rectangle1}
-            onPress={() => navigation.navigate('CatTutorial', { category: 'Electronic Repair' })}
-          >
-            <Text style={styles.homeApplianceText}>Electronic Repair</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.rectangle1}
+          onPress={() => navigation.navigate('CatTutorial', { category: 'Electronic Repair' })}
+        >
+          <Text style={styles.homeApplianceText}>Electronic Repair</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.rectangle1}
-            onPress={() => navigation.navigate('CatTutorial', { category: 'Furniture Repair' })}
-          >
-            <Text style={styles.homeApplianceText}>Furniture Repair</Text>
-          </TouchableOpacity>
-        </ScrollView>
+        <TouchableOpacity
+          style={styles.rectangle1}
+          onPress={() => navigation.navigate('CatTutorial', { category: 'Furniture Repair' })}
+        >
+          <Text style={styles.homeApplianceText}>Furniture Repair</Text>
+        </TouchableOpacity>
+      </ScrollView>
 
       <Text style={styles.diyText}>DIY Tutorials</Text>
       {tutorials.length === 0 ? (
         <Text style={styles.noTutorialText}>No tutorials available at the moment.</Text>
       ) : (
-        tutorials.map(tutorial => (
+        tutorials.map((tutorial) => (
           <TouchableOpacity
             key={tutorial.id}
             style={styles.imageButton}
-            onPress={() => {
-              navigation.navigate('TutorialDoc', { tutorialId: tutorial.id });
-              console.log('Image button pressed');
-            }}
+            onPress={() => navigation.navigate('TutorialDoc', { tutorialId: tutorial.id })}
           >
-            <View style={styles.imageContainer}>
+            <View >
               {tutorial.imageUrl ? (
-                <Image
-                  source={{ uri: tutorial.imageUrl }} // Ensure `imageUrl` is a valid URL string
-                  style={styles.img1}
-                />
+                <Image source={{ uri: tutorial.imageUrl }} style={styles.img1} />
               ) : (
                 <View style={styles.imagePlaceholder}>
                   <Text style={styles.imagePlaceholderText}>No Image</Text>
                 </View>
               )}
               <Text style={styles.imageText}>{tutorial.title}</Text>
-              <Text style={styles.imageText1}>Duration: {tutorial.timeDuration || 'N/A'}</Text>
+              <Text style={styles.imageText1}>
+                Duration: {tutorial.timeDuration || 'N/A'}
+              </Text>
             </View>
           </TouchableOpacity>
         ))
@@ -125,7 +137,7 @@ const styles = StyleSheet.create({
   layoutd: {
     flexDirection: 'column',
     padding: 10,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: '#fff3e6',
   },
   loadingContainer: {
     flex: 1,

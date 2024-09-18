@@ -27,7 +27,7 @@ const LoginScreen = () => {
         } else {
             Alert.alert('customer');
 
-          navigation.navigate('Tut', { user: userData });
+          navigation.navigate('Shop_Client', { user: userData });
 
         }
       } else {

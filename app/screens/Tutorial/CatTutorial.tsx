@@ -1,14 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, QuerySnapshot, DocumentData } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-const CatTutorial = () => {
-  const [tutorials, setTutorials] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const route = useRoute(); // Get the passed category
-  const navigation = useNavigation(); // For navigation
+// Define your navigation and route parameter types
+type RootStackParamList = {
+  TutorialDoc: { tutorialId: string };
+  CatTutorial: { category: string }; // Add category route param here
+};
+
+type CatTutorialRouteProp = RouteProp<RootStackParamList, 'CatTutorial'>;
+type CatTutorialNavigationProp = StackNavigationProp<RootStackParamList, 'CatTutorial'>;
+
+interface Tutorial {
+  id: string;
+  title: string;
+  imageUrl?: string;
+  timeDuration?: string;
+}
+
+const CatTutorial: React.FC = () => {
+  const [tutorials, setTutorials] = useState<Tutorial[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const route = useRoute<CatTutorialRouteProp>(); // Get the passed category
+  const navigation = useNavigation<CatTutorialNavigationProp>(); // For navigation
   const { category } = route.params; // Extract category from route parameters
 
   useEffect(() => {
@@ -18,10 +35,10 @@ const CatTutorial = () => {
           collection(FIREBASE_DB, 'Tutorial'),
           where('category', '==', category) // Query based on the selected category
         );
-        const querySnapshot = await getDocs(q);
-        const tutorialsList = querySnapshot.docs.map(doc => ({
+        const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(q);
+        const tutorialsList: Tutorial[] = querySnapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data(),
+          ...(doc.data() as Tutorial),
         }));
         setTutorials(tutorialsList);
       } catch (error) {
@@ -86,7 +103,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff3e6'
   },
   title: {
     fontSize: 24,
