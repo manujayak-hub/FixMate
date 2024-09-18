@@ -6,7 +6,7 @@ import SignUp from "./app/screens/SignUp";
 import Shop_User_Home from "./app/screens/Shop/Shop_User_Home";
 import AddRepairShop from "./app/screens/Shop/AddRepaiShop"
 import Shop_Client from "./app/screens/Client/Shop_Client"
-
+import EditShopDetails from "./app/screens/Shop/EditShopDetails";
 import Tut from "./app/screens/Tutorial/Tut";
 import TutVideo from "./app/screens/Tutorial/TutVideo";
 import TutorialDoc from "./app/screens/Tutorial/TutorialDoc";
@@ -30,6 +30,8 @@ export default function App() {
         <Stack.Screen name="SignUp" component={SignUp} options={{headerShown:false}}/>
         <Stack.Screen name="Shop_User_Home" component={Shop_User_Home} options={{headerShown:false}}/>
         <Stack.Screen name="AddRepairShop" component={AddRepairShop} options={{headerShown:false}} />
+        
+        <Stack.Screen name="EditShopDetails" component={EditShopDetails} options={{headerShown:false}} />
        
         <Stack.Screen name="Shop_Client" component={Shop_Client} options={{headerShown:false}} />
 

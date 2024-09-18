@@ -43,6 +43,7 @@ const Shop_Client = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [mylogitude, setmylogitude] = useState(null);
   const [mylatitude, setmylatitude] = useState(null);
+  
   const navigation = useNavigation();
   const { width } = Dimensions.get("window");
 
