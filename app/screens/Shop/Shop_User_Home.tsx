@@ -55,7 +55,7 @@ const Shop_User_Home: React.FC = () => {
             <Text style={styles.buttonText}>Availability </Text>
             <Text style={styles.buttonText}>Update </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.gridItem}>
+          <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('Complaintmanage')}>
             <Image
               source={uos} // Replace with your image URL
               style={styles.buttonImage}

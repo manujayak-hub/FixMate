@@ -18,6 +18,15 @@ import STView from "./app/screens/Tutorial/STView";
 
 import Client_MapView from "./app/screens/Client/Client_MapView";
 
+import UserProfile from './app/screens/UserProfile';
+import EditProfile from "./app/screens/EditProfile";
+import complainlist from "./app/screens/Complaint/ComplaintList";
+import ordertracking from "./app/screens/OrderTracking/OrderTrack";
+import Complaintmanage from "./app/screens/Complaint/ComplaintDashboard";
+import addcomplaint from "./app/screens/Complaint/AddComplaint";
+import AboutUs from "./app/screens/Feedback/AboutUs";
+import shopfeedback from "./app/screens/Feedback/ShopFeedback";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +52,16 @@ export default function App() {
         <Stack.Screen name="STView" component={STView} options={{headerShown:false}} />
 
         <Stack.Screen name="Client_MapView" component={Client_MapView} options={{headerShown:false}} />
+
+
+        <Stack.Screen name="Profile" component={UserProfile} options={{headerShown:false}} />
+        <Stack.Screen name="EditProfile" component={EditProfile} options={{headerShown:false}} />
+        <Stack.Screen name="complainlist" component={complainlist} options={{headerShown:false}} />
+        <Stack.Screen name="ordertracking" component={ordertracking} options={{headerShown:false}} />
+        <Stack.Screen name="Complaintmanage" component={Complaintmanage} options={{headerShown:false}} />
+        <Stack.Screen name="addcomplaint" component={addcomplaint} options={{headerShown:false}} />
+        <Stack.Screen name="aboutus" component={AboutUs} options={{headerShown:false}} />
+        <Stack.Screen name="shopfeedbacklist" component={shopfeedback} options={{headerShown:false}} />
 
       </Stack.Navigator>
     </NavigationContainer>
