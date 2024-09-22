@@ -37,7 +37,7 @@ const Shop_User_Home: React.FC = () => {
             
           </TouchableOpacity>
          
-          <TouchableOpacity style={styles.gridItem}>
+          <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('EditShopDetails')}>
             <Image
               source={eysd} // Replace with your image URL
               style={styles.buttonImage}
