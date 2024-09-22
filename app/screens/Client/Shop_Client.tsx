@@ -20,6 +20,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Dimensions } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"; // Import NativeStackNavigationProp
 
+
 interface RepairShops {
   id: string;
   contact: string;
@@ -37,6 +38,7 @@ interface RepairShops {
 // Define navigation parameters
 export type RootStackParamList = {
   ShopDetails: { shop: RepairShops };
+  Appointment: { shop: RepairShops };
 };
 
 // Navigation prop type
@@ -51,10 +53,10 @@ const Shop_Client = () => {
   const [repairShops, setRepairShops] = useState<RepairShops[]>([]);
   const [filteredShops, setFilteredShops] = useState<RepairShops[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [mylogitude, setmylogitude] = useState<number | null>(null);
-  const [mylatitude, setmylatitude] = useState<number | null>(null);
-  const navigation = useNavigation<ShopClientScreenNavigationProp>(); // Use the navigation prop type here
+  const [mylogitude, setmylogitude] = useState(null);
+  const [mylatitude, setmylatitude] = useState(null);
   const { width } = Dimensions.get("window");
+  const navigation = useNavigation<ShopClientScreenNavigationProp>(); // Use the navigation prop type here
 
   useEffect(() => {
     const fetchRepairShop = async () => {
@@ -65,7 +67,7 @@ const Shop_Client = () => {
         const rdetails = fetchedShopDetails.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        })) as RepairShops[];
+        })) as unknown as RepairShops[];
         setRepairShops(rdetails);
         setFilteredShops(rdetails);
       } catch (error) {
@@ -105,30 +107,33 @@ const Shop_Client = () => {
       <ClientHeader />
       <TextInput placeholder="Search Your Favorite Repair Shop" />
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoryScroll}
-      >
-        {categories.map((category) => (
-          <TouchableOpacity
-            key={category}
-            style={[
-              styles.categoryButton,
-              selectedCategory === category && styles.selectedCategory,
-            ]}
-            onPress={() => setSelectedCategory(category)}
-          >
-            <Text style={styles.categoryText}>{category}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoryScroll}
+        >
+          {categories.map((category) => (
+            <TouchableOpacity
+              key={category}
+              style={[
+                styles.categoryButton,
+                selectedCategory === category && styles.selectedCategory,
+              ]}
+              onPress={() => setSelectedCategory(category)}
+            >
+              <Text style={styles.categoryText}>{category}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
       <Text>Shops</Text>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.gridContainer}>
           {filteredShops.map((shop) => {
+            // Ensure that location data is available before calculating distance
             const distance =
               mylatitude && mylogitude
                 ? getDistance(
@@ -136,9 +141,10 @@ const Shop_Client = () => {
                     {
                       latitude: shop.ownerLocationLatitude,
                       longitude: shop.ownerLocationLongitude,
-                    }
+                    },
+                    1
                   )
-                : null;
+                : null; // If location is null, set distance as null
 
             return (
               <TouchableOpacity
@@ -146,22 +152,14 @@ const Shop_Client = () => {
                 key={shop.id}
                 onPress={() => navigation.navigate("ShopDetails", { shop })} // Pass the shop data here
               >
-                <Text style={styles.title}>{shop.shopName}</Text>
-                <Text>{shop.category}</Text>
-                <Text>{shop.Shop_Des}</Text>
-                <Text>{shop.OwnerName}</Text>
-                <Text>{shop.Rph}</Text>
-                <Text>{shop.shopTag}</Text>
-                {distance !== null ? (
-                  <Text>{(distance / 1000).toFixed(2)} KM</Text>
-                ) : (
-                  <Text>Location not available</Text>
-                )}
                 <Image source={{ uri: shop.ImageUrl }} style={styles.image} />
-
                 <View style={styles.infoContainer}>
                   <Text style={styles.shopName}>{shop.shopName}</Text>
-
+                  {distance !== null ? (
+                    <Text>{distance / 1000} KM</Text>
+                  ) : (
+                    <Text>Location not available</Text>
+                  )}
                   <View style={styles.infoRow}>
                     <Text style={styles.price}>{shop.Rph} Per Hr</Text>
                     <View style={styles.ratingContainer}>
@@ -206,11 +204,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "bold",
+    textAlign: "center", // Center the text horizontally
+    width: "100%",
   },
   categoryScroll: {
     paddingVertical: 10,
-    paddingHorizontal: 5,
-    height: 90,
+    paddingHorizontal: 15,
+    minHeight: 40,
   },
   categoryButton: {
     backgroundColor: "#ddd",
@@ -219,7 +219,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 10,
     height: 40,
-    justifyContent: "center",
   },
   selectedCategory: {
     backgroundColor: "#F96D2B",
@@ -236,12 +235,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    width: "48%", // Adjust width to fit two columns with spacing
+    width: 180, // Adjust to your desired width
     marginBottom: 20,
   },
   image: {
     width: "100%",
-    height: 100,
+    height: 100, // Adjust this for image height
     resizeMode: "cover",
   },
   infoContainer: {
@@ -250,7 +249,7 @@ const styles = StyleSheet.create({
   shopName: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#F96D2B",
+    color: "#F96D2B", // The orange color in the text
     marginBottom: 5,
   },
   infoRow: {

@@ -1,16 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
-import { RouteProp } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from './Shop_Client'; // Make sure the path is correct
-import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from './Shop_Client'; // Ensure the path is correct
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Import vector icons
 
-type ShopDetailsScreenRouteProp = RouteProp<RootStackParamList, 'ShopDetails'>;
 type ShopDetailsScreenProps = NativeStackScreenProps<RootStackParamList, 'ShopDetails'>;
 
-const ShopDetails = ({ route }: ShopDetailsScreenProps) => {
+const ShopDetails = ({ route, navigation }: ShopDetailsScreenProps) => {
   const { shop } = route.params;
-  const navigation = useNavigation();
 
   const handleBookNowPress = () => {
     navigation.navigate('Appointment', { shop });
@@ -18,15 +15,34 @@ const ShopDetails = ({ route }: ShopDetailsScreenProps) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <Image source={{ uri: shop.ImageUrl }} style={styles.image} />
+
         <View style={styles.detailsContainer}>
           <Text style={styles.shopName}>{shop.shopName}</Text>
           <Text style={styles.category}>{shop.category}</Text>
+
+          {/* Hardcoded rating */}
+          <View style={styles.ratingContainer}>
+            <Icon name="star" size={20} color="#FFCC00" />
+            <Text style={styles.ratingText}>4.5</Text>
+          </View>
+
           <Text style={styles.description}>{shop.Shop_Des}</Text>
-          <Text style={styles.owner}>Owner: {shop.OwnerName}</Text>
-          <Text style={styles.rph}>Rate: {shop.Rph} Per Hour</Text>
-          <Text style={styles.tag}>Tag: {shop.shopTag}</Text>
+
+          {/* Display Phone Number */}
+          <View style={styles.contactContainer}>
+            <Icon name="phone" size={20} color="#FF6F00" />
+            <Text style={styles.contactText}>{shop.contact}</Text>
+          </View>
+
+          {/* Display Location */}
+          <View style={styles.locationContainer}>
+            <Icon name="location-on" size={20} color="#FF6F00" />
+            <Text style={styles.locationText}>{shop.OwnerName}'s Location</Text>
+          </View>
+
+          <Text style={styles.rph}>Rate: LKR {shop.Rph} Per Hour</Text>
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.inquireButton}>
@@ -45,70 +61,131 @@ const ShopDetails = ({ route }: ShopDetailsScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    backgroundColor: '#F9F9F9',
+  },
+  scrollContent: {
+    padding: 16,
   },
   image: {
     width: '100%',
-    height: 200,
+    height: 250,
+    borderRadius: 15,
+    marginBottom: 20,
     resizeMode: 'cover',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   detailsContainer: {
-    padding: 10,
+    backgroundColor: '#FFF',
+    borderRadius: 15,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
+    marginBottom: 20,
   },
   shopName: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
   },
   category: {
     fontSize: 18,
-    color: '#888',
+    color: '#666',
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  ratingText: {
+    fontSize: 16,
+    color: '#FF6F00',
+    marginLeft: 5,
   },
   description: {
     fontSize: 16,
-    marginVertical: 10,
+    color: '#444',
+    lineHeight: 22,
+    marginBottom: 15,
   },
-  owner: {
+  contactContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  contactText: {
     fontSize: 16,
+    color: '#333',
+    marginLeft: 5,
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  locationText: {
+    fontSize: 16,
+    color: '#333',
+    marginLeft: 5,
   },
   rph: {
-    fontSize: 16,
-    marginVertical: 5,
-  },
-  tag: {
-    fontSize: 16,
-    color: '#F96D2B',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FF6F00',
+    marginBottom: 20,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
+    marginTop: 10,
   },
   inquireButton: {
-    backgroundColor: '#C7C3C3',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+    backgroundColor: '#E0E0E0',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
     flex: 1,
     marginRight: 10,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   inquireButtonText: {
-    color: '#F96D2B',
+    color: '#333',
     fontSize: 16,
+    fontWeight: 'bold',
   },
   bookNowButton: {
-    backgroundColor: '#F96D2B',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+    backgroundColor: '#FF6F00',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   bookNowButtonText: {
-    color: 'white',
+    color: '#FFF',
     fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
