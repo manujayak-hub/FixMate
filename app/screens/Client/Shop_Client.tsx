@@ -65,8 +65,6 @@ const Shop_Client = () => {
   const navigation = useNavigation<ShopClientScreenNavigationProp>(); // Use the navigation prop type here
 
   
-  const navigation = useNavigation();
-  const { width } = Dimensions.get("window");
 
   useEffect(() => {
     const fetchRepairShop = async () => {
@@ -151,7 +149,7 @@ const Shop_Client = () => {
       </View>
 
 
-      <Text>Shops</Text>
+      
 
 <View style={styles.topics}>
 <Image style={styles.rect} source={rect}></Image>
