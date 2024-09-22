@@ -18,6 +18,10 @@ import STView from "./app/screens/Tutorial/STView";
 
 import Client_MapView from "./app/screens/Client/Client_MapView";
 
+import ShopDetails from "./app/screens/Client/ShopDetails"; 
+import Appointment from "./app/screens/Booking/Appointment";
+import Payment from "./app/screens/Booking/Payment";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +49,12 @@ export default function App() {
         <Stack.Screen name="STView" component={STView} options={{headerShown:false}} />
 
         <Stack.Screen name="Client_MapView" component={Client_MapView} options={{headerShown:false}} />
+
+
+        <Stack.Screen name="ShopDetails" component={ShopDetails} options={{headerShown:false}} />
+        <Stack.Screen name="Appointment" component={Appointment} options={{headerShown:false}} />
+        <Stack.Screen name="Payment" component={Payment} options={{headerShown:false}} />
+
 
       </Stack.Navigator>
     </NavigationContainer>

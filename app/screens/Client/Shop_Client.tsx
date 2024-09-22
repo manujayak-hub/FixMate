@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   Image,
-  TextInput
+  TextInput,
 } from "react-native";
 import { FIREBASE_DB } from "../../../Firebase_Config";
 import { collection, getDocs } from "firebase/firestore";
@@ -18,8 +18,13 @@ import * as Location from "expo-location";
 import Navigation from "../../Components/Navigation";
 import { useNavigation } from "@react-navigation/native";
 import { Dimensions } from "react-native";
+
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"; // Import NativeStackNavigationProp
+
+
 const rect = require('../../../assets/rect56.png')
 const serachicon = require('../../../assets/searchicon.png')
+
 
 interface RepairShops {
   id: string;
@@ -35,6 +40,18 @@ interface RepairShops {
   ownerLocationLatitude: number;
 }
 
+// Define navigation parameters
+export type RootStackParamList = {
+  ShopDetails: { shop: RepairShops };
+  Appointment: { shop: RepairShops };
+};
+
+// Navigation prop type
+type ShopClientScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ShopDetails"
+>;
+
 const categories = ["All", "Electronics", "Automobile", "Home Appliances"];
 
 const Shop_Client = () => {
@@ -43,6 +60,10 @@ const Shop_Client = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [mylogitude, setmylogitude] = useState(null);
   const [mylatitude, setmylatitude] = useState(null);
+
+  const { width } = Dimensions.get("window");
+  const navigation = useNavigation<ShopClientScreenNavigationProp>(); // Use the navigation prop type here
+
   
   const navigation = useNavigation();
   const { width } = Dimensions.get("window");
@@ -103,6 +124,7 @@ const Shop_Client = () => {
   <Image source={serachicon} style={styles.searchIcon} />
 </View>
 
+
       <View style={styles.topics}>
 <Image style={styles.rect} source={rect}></Image>
 <Text>Category</Text>
@@ -127,6 +149,10 @@ const Shop_Client = () => {
           ))}
         </ScrollView>
       </View>
+
+
+      <Text>Shops</Text>
+
 <View style={styles.topics}>
 <Image style={styles.rect} source={rect}></Image>
 <Text>Shops</Text>
@@ -152,7 +178,7 @@ const Shop_Client = () => {
               <TouchableOpacity
                 style={styles.card}
                 key={shop.id}
-                //onPress={() => navigation.navigate('ShopDetails', { shop })} // <-- Navigate to details page
+                onPress={() => navigation.navigate("ShopDetails", { shop })} // Pass the shop data here
               >
                 <Image source={{ uri: shop.ImageUrl }} style={styles.image} />
                 <View style={styles.infoContainer}>
@@ -277,6 +303,8 @@ const styles = StyleSheet.create({
     marginRight: 5,
     color: "#444",
   },
+
+
   rect:{
     margin:10,
     maxWidth:20
