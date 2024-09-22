@@ -7,20 +7,19 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Alert,
-  Image
+  Image,
+  TextInput
 } from "react-native";
 import { FIREBASE_DB } from "../../../Firebase_Config";
 import { collection, getDocs } from "firebase/firestore";
 import ClientHeader from "../../Components/ClientHeader";
-import { TextInput } from "react-native-paper";
 import { getDistance } from "geolib";
 import * as Location from "expo-location";
 import Navigation from "../../Components/Navigation";
 import { useNavigation } from "@react-navigation/native";
-import { Dimensions } from 'react-native';
-
-
-
+import { Dimensions } from "react-native";
+const rect = require('../../../assets/rect56.png')
+const serachicon = require('../../../assets/searchicon.png')
 
 interface RepairShops {
   id: string;
@@ -44,8 +43,9 @@ const Shop_Client = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [mylogitude, setmylogitude] = useState(null);
   const [mylatitude, setmylatitude] = useState(null);
+  
   const navigation = useNavigation();
-  const { width } = Dimensions.get('window');
+  const { width } = Dimensions.get("window");
 
   useEffect(() => {
     const fetchRepairShop = async () => {
@@ -94,32 +94,47 @@ const Shop_Client = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ClientHeader />
-      <TextInput placeholder="Search Your Favorite Repair Shop" />
+      <View style={styles.searchiconview}>
+  <TextInput
+    style={styles.search}
+    placeholder="Search Your Favorite Repair Shop"
+    underlineColorAndroid="transparent"
+  />
+  <Image source={serachicon} style={styles.searchIcon} />
+</View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoryScroll}
-      >
-        {categories.map((category) => (
-          <TouchableOpacity
-            key={category}
-            style={[
-              styles.categoryButton,
-              selectedCategory === category && styles.selectedCategory,
-            ]}
-            onPress={() => setSelectedCategory(category)}
-          >
-            <Text style={styles.categoryText}>{category}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      <Text>Shops</Text>
+      <View style={styles.topics}>
+<Image style={styles.rect} source={rect}></Image>
+<Text>Category</Text>
+</View>
+      <View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoryScroll}
+        >
+          {categories.map((category) => (
+            <TouchableOpacity
+              key={category}
+              style={[
+                styles.categoryButton,
+                selectedCategory === category && styles.selectedCategory,
+              ]}
+              onPress={() => setSelectedCategory(category)}
+            >
+              <Text style={styles.categoryText}>{category}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+<View style={styles.topics}>
+<Image style={styles.rect} source={rect}></Image>
+<Text>Shops</Text>
+</View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.gridContainer}>
-        {filteredShops.map((shop) => {
+          {filteredShops.map((shop) => {
             // Ensure that location data is available before calculating distance
             const distance =
               mylatitude && mylogitude
@@ -139,23 +154,14 @@ const Shop_Client = () => {
                 key={shop.id}
                 //onPress={() => navigation.navigate('ShopDetails', { shop })} // <-- Navigate to details page
               >
-                <Text style={styles.title}>{shop.shopName}</Text>
-                <Text>{shop.category}</Text>
-                <Text>{shop.Shop_Des}</Text>
-                <Text>{shop.OwnerName}</Text>
-                <Text>{shop.Rph}</Text>
-                <Text>{shop.shopTag}</Text>
-                <Text>{shop.ImageUrl}</Text>
-                {distance !== null ? (
-                  <Text>{distance / 1000} KM</Text>
-                ) : (
-                  <Text>Location not available</Text>
-                )}
                 <Image source={{ uri: shop.ImageUrl }} style={styles.image} />
-
                 <View style={styles.infoContainer}>
                   <Text style={styles.shopName}>{shop.shopName}</Text>
-
+                  {distance !== null ? (
+                    <Text>{distance / 1000} KM</Text>
+                  ) : (
+                    <Text>Location not available</Text>
+                  )}
                   <View style={styles.infoRow}>
                     <Text style={styles.price}>{shop.Rph} Per Hr</Text>
                     <View style={styles.ratingContainer}>
@@ -183,6 +189,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
+  
   gridItem: {
     width: "48%",
     backgroundColor: "#f8f8f8",
@@ -200,11 +207,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "bold",
+    textAlign: "center", // Center the text horizontally
+    width: "100%",
   },
   categoryScroll: {
     paddingVertical: 10,
     paddingHorizontal: 15,
-    height: 5,
+    minHeight: 40,
   },
   categoryButton: {
     backgroundColor: "#ddd",
@@ -233,9 +242,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   image: {
-    width: "100%",
-    height: 100, // Adjust this for image height
+    padding:10,
+    margin:10,
+    marginBottom:-2,
+    width: "90%",
+    height: 100, 
     resizeMode: "cover",
+    borderRadius:10
   },
   infoContainer: {
     padding: 10,
@@ -264,4 +277,40 @@ const styles = StyleSheet.create({
     marginRight: 5,
     color: "#444",
   },
+  rect:{
+    margin:10,
+    maxWidth:20
+  },
+  topics:{
+    flexDirection:'row',
+    alignItems:'center',
+    fontWeight:'bold'
+  },
+  searchiconview: {
+    position: 'relative', // Parent container needs relative positioning
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: -10,
+  },
+  
+  search: {
+    height: 50,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    backgroundColor: '#ffffff',
+    paddingLeft: 20,
+    paddingRight: 40, // Padding on the right to avoid overlap with the icon
+  },
+  
+  searchIcon: {
+    position: 'absolute',
+    top: 15, // Adjust vertically within the TextInput
+    right: 15, // Align to the right of the TextInput
+    width: 20,
+    height: 20,
+    resizeMode: 'contain',
+  },
+  
 });
