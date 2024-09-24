@@ -18,6 +18,19 @@ import * as Location from "expo-location";
 import Navbar from "../../Components/NavigationFor_Business";
 import Shop_Header from "../../Components/Shop_Header";
 
+
+const categories = [
+  { value: "Electronics", label: "Electronic Repair Shop" },
+  { value: "Appliances", label: "Home appliances Repair Shop" },
+  { value: "Cloathing", label: "Cloathing and Textile Making Shop" },
+  { value: "GardenEquipment", label: "Home & Garden Tools Repair Shop" },
+  { value: "MusicalInstruments", label: "Musical instruments repair shop" },
+  { value: "JwelleryWatches", label: "Jewelry and watches Repair shop" },
+  { value: "Automotive", label: "Automative Repair Shop" },
+  { value: "Furniture", label: "Furniture Repair Shop" },
+  { value: "Computers", label: "Computer Repair Shop" },
+  { value: "Other", label: "Any Other Repair Shop" },
+];
 const AddRepairShop: React.FC = () => {
   const [shopName, setShopName] = useState("");
   const [contact, setContact] = useState("");
@@ -100,23 +113,16 @@ const AddRepairShop: React.FC = () => {
 
         <Text style={styles.label}>Category</Text>
         <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={category}
-            onValueChange={(itemValue) => setCategory(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Select Category" value="Select Category" />
-            <Picker.Item label="Auto Repair" value="Auto Repair" />
-            <Picker.Item
-              label="Electronics Repair"
-              value="Electronics Repair"
-            />
-            <Picker.Item
-              label="Home Appliances Repair"
-              value="Home Appliances Repair"
-            />
-            <Picker.Item label="Mobile Repair" value="Mobile Repair" />
-          </Picker>
+        <Picker
+          selectedValue={category}
+          onValueChange={(itemValue) => setCategory(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Select Category" value="Select Category" />
+          {categories.map((cat) => (
+            <Picker.Item key={cat.value} label={cat.label} value={cat.value} />
+          ))}
+        </Picker>
         </View>
 
         <Text style={styles.label}>Description</Text>
