@@ -1,9 +1,12 @@
 import React, { useState,useEffect} from 'react';
-import MapView, { LatLng, Marker } from 'react-native-maps';
-import { StyleSheet, View, Button } from 'react-native';
+import MapView, {  Marker } from 'react-native-maps';
+import { StyleSheet, View, Button ,SafeAreaView,TouchableOpacity,Image} from 'react-native';
 import { FIREBASE_DB } from "../../../Firebase_Config";
 import { getDocs,collection } from 'firebase/firestore';
+import Navigation from '../../Components/Navigation';
 
+const zoomin = require("../../../assets/zoomin.png")
+const zoomout = require("../../../assets/zoomout.png")
 interface RepairShops {
   id: string;
   contact: string;
@@ -40,10 +43,10 @@ const Client_MapView = () => {
   }, []);
 
   const [region, setRegion] = useState({
-    latitude: 7.8731, // Latitude for Sri Lanka
-    longitude: 80.7718, // Longitude for Sri Lanka
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
+    latitude: 7.8731, // Latitude for the center of Sri Lanka
+    longitude: 80.7718, // Longitude for the center of Sri Lanka
+    latitudeDelta: 4.0, // Increased delta to zoom out and show whole Sri Lanka
+    longitudeDelta: 4.0, // Increased delta to zoom out and show whole Sri Lanka
   });
 
   
@@ -66,6 +69,7 @@ const Client_MapView = () => {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <View style={styles.container}>
       <MapView
         initialRegion={region}
@@ -94,10 +98,17 @@ const Client_MapView = () => {
       </MapView>
 
       <View style={styles.buttonContainer}>
-        <Button title="Zoom In" onPress={zoomIn} />
-        <Button title="Zoom Out" onPress={zoomOut} />
+        <TouchableOpacity onPress={zoomOut}>
+          <Image source={zoomout} style={styles.image} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={zoomIn}>
+          <Image source={zoomin} style={styles.image}/>
+          </TouchableOpacity>
+        
       </View>
     </View>
+    <Navigation/>
+    </SafeAreaView>
   );
 };
 
@@ -109,11 +120,22 @@ const styles = StyleSheet.create({
   },
   map: {
     width: '100%',
-    height: '90%', 
+    height: '100%',
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 10,
+    position: 'absolute',
+    right: 10, // Position to the right side
+    top: '40%', // Centered vertically
+    backgroundColor: 'rgba(255, 255, 255, 0.7)', // White transparent box
+    borderRadius: 10, // Rounded corners
+    padding: 10, // Padding inside the box
+    justifyContent: 'center', // Align items in the center of the container
+    alignItems: 'center',
+  },
+  image: {
+    width: 40,
+    height: 40,
+    marginVertical: 10, // Space between the zoom in and zoom out buttons
   },
 });
+

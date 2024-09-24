@@ -62,6 +62,7 @@ const AddRepairShop: React.FC = () => {
           ImageUrl,
           ownerLocationLongitude,
           ownerLocationLatitude,
+          availability: false,
           userId: user.uid,
          
           
