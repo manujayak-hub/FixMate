@@ -7,6 +7,7 @@ import { doc, setDoc } from 'firebase/firestore';
 
 const SignUpScreen = () => {
   const [email, setEmail] = useState('');
+  const [photo, setPhoto] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
@@ -29,6 +30,7 @@ const SignUpScreen = () => {
         mobile,
         email,
         type: userType,
+        photo,
       });
 
       // Clear form fields

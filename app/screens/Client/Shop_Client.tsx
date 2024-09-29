@@ -147,7 +147,7 @@ const Shop_Client = () => {
       </View>
 
 
-      <Text>Shops</Text>
+      
 
 <View style={styles.topics}>
 <Image style={styles.rect} source={rect}></Image>
