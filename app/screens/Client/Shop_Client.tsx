@@ -64,10 +64,6 @@ const Shop_Client = () => {
   const { width } = Dimensions.get("window");
   const navigation = useNavigation<ShopClientScreenNavigationProp>(); // Use the navigation prop type here
 
-  
-  const navigation = useNavigation();
-  const { width } = Dimensions.get("window");
-
   useEffect(() => {
     const fetchRepairShop = async () => {
       try {
