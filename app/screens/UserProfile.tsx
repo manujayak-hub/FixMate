@@ -11,15 +11,15 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-
 type RootStackParamList = {
   complainlist: undefined;
   ordertracking: undefined;
   aboutus: undefined;
+  PaymentMethods: undefined;
   // Add other routes if necessary
 };
 
-type OrderTrackNavigationProp = StackNavigationProp<RootStackParamList, 'complainlist'|'ordertracking'|'aboutus'>;
+type OrderTrackNavigationProp = StackNavigationProp<RootStackParamList, 'complainlist' | 'ordertracking' | 'aboutus' | 'PaymentMethods'>;
 
 export default function UserProfile() {
   const [userData, setUserData] = useState<any>(null);
@@ -103,17 +103,17 @@ export default function UserProfile() {
         </View>
 
         <View style={styles.infoBoxWrapper}>
-        <TouchableWithoutFeedback onPress={() => navigation.navigate('complainlist')}>
-          <View style={[styles.infoBox, { borderRightColor: '#dddddd', borderRightWidth: 1 }]}>
-            <Title>{complaintCount}</Title>
-            <Caption>Your Complaints</Caption>
-          </View>
+          <TouchableWithoutFeedback onPress={() => navigation.navigate('complainlist')}>
+            <View style={[styles.infoBox, { borderRightColor: '#dddddd', borderRightWidth: 1 }]}>
+              <Title>{complaintCount}</Title>
+              <Caption>Your Complaints</Caption>
+            </View>
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback onPress={() => navigation.navigate('ordertracking')}>
-          <View style={styles.infoBox}>
-            <Title>12</Title>
-            <Caption>Your Repairs</Caption>
-          </View>
+            <View style={styles.infoBox}>
+              <Title>12</Title>
+              <Caption>Your Repairs</Caption>
+            </View>
           </TouchableWithoutFeedback>
         </View>
 
@@ -124,7 +124,7 @@ export default function UserProfile() {
               <Text style={styles.menuItemText}>About Us</Text>
             </View>
           </TouchableRipple>
-          <TouchableRipple onPress={() => {}}>
+          <TouchableRipple onPress={() => navigation.navigate('PaymentMethods')}>
             <View style={styles.menuItem}>
               <Icon name="credit-card" color="#FF6347" size={25} />
               <Text style={styles.menuItemText}>Payment</Text>
