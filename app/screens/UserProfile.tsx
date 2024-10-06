@@ -16,10 +16,13 @@ type RootStackParamList = {
   ordertracking: undefined;
   aboutus: undefined;
   PaymentMethods: undefined;
-  // Add other routes if necessary
+  myappointments: undefined; // Added route for My Appointments
 };
 
-type OrderTrackNavigationProp = StackNavigationProp<RootStackParamList, 'complainlist' | 'ordertracking' | 'aboutus' | 'PaymentMethods'>;
+type OrderTrackNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'complainlist' | 'ordertracking' | 'aboutus' | 'PaymentMethods' | 'myappointments'
+>;
 
 export default function UserProfile() {
   const [userData, setUserData] = useState<any>(null);
@@ -118,18 +121,29 @@ export default function UserProfile() {
         </View>
 
         <View style={styles.menuWrapper}>
-          <TouchableRipple onPress={() => navigation.navigate('aboutus')}>
+         
+           {/* My Appointments Section */}
+           <TouchableRipple onPress={() => navigation.navigate('MyAppointments')}>
             <View style={styles.menuItem}>
-              <Icon name="heart-outline" color="#FF6347" size={25} />
-              <Text style={styles.menuItemText}>About Us</Text>
+              <Icon name="calendar" color="#FF6347" size={25} />
+              <Text style={styles.menuItemText}>My Appointments</Text>
             </View>
           </TouchableRipple>
+          
           <TouchableRipple onPress={() => navigation.navigate('PaymentMethods')}>
             <View style={styles.menuItem}>
               <Icon name="credit-card" color="#FF6347" size={25} />
               <Text style={styles.menuItemText}>Payment</Text>
             </View>
           </TouchableRipple>
+
+          <TouchableRipple onPress={() => navigation.navigate('aboutus')}>
+            <View style={styles.menuItem}>
+              <Icon name="heart-outline" color="#FF6347" size={25} />
+              <Text style={styles.menuItemText}>About Us</Text>
+            </View>
+          </TouchableRipple>
+
           <TouchableRipple onPress={() => {}}>
             <View style={styles.menuItem}>
               <Icon name="share-outline" color="#FF6347" size={25} />
