@@ -4,9 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Navbar from "../../Components/NavigationFor_Business";
 import Shop_Header from "../../Components/Shop_Header";
-import {usertore} from '../../Store/userStore';
-import {  FIREBASE_DB } from "../../../Firebase_Config";
-import { updateDoc,doc} from "firebase/firestore";
+import {  FIREBASE_DB,FIREBASE_AUTH } from "../../../Firebase_Config";
+import { updateDoc,collection, query, where, getDocs} from "firebase/firestore";
 import { AntDesign } from '@expo/vector-icons';
 
 
@@ -19,21 +18,37 @@ const uos = require("../../../assets/uos.png");
 const Shop_User_Home: React.FC = () => {
   const navigation: any = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
-  const [availability, setAvailability] = useState("Available");
-  const user = usertore((state) => state.user); 
+  const [availability, setAvailability] = useState<boolean>(false);
+  const user = FIREBASE_AUTH.currentUser;
 
   const updateAvailability = async () => {
-    
-
     const shopId = user.uid; // Use the user's UID as the shop ID
-
+    
     try {
-      const shopRef = doc(FIREBASE_DB, "repairShops", shopId);
-      await updateDoc(shopRef, {
-        availability,
+      // Query to find the document where userId matches the user's UID
+      const q = query(collection(FIREBASE_DB, "repairShops"), where("userId", "==", shopId));
+      
+      // Fetch documents that match the query
+      const querySnapshot = await getDocs(q);
+  
+      if (querySnapshot.empty) {
+        alert("No shop found for user ID: " + shopId);
+        return; // Exit if no documents found
+      }
+  
+      // Assuming there's only one document for the userId
+      querySnapshot.forEach(async (doc) => {
+        const shopRef = doc.ref; // Get the document reference
+        
+        // Update the availability field
+        await updateDoc(shopRef, {
+          availability,
+        });
+  
+        alert("Availability updated successfully!");
+        setModalVisible(false);
       });
-      alert("Availability updated successfully!");
-      setModalVisible(false);
+      
     } catch (error) {
       alert("Error updating availability: " + error.message);
     }
@@ -85,50 +100,50 @@ const Shop_User_Home: React.FC = () => {
       </ScrollView>
     </View>
 
-    {/* Availability Modal */}
-    <Modal
-      visible={modalVisible}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={() => setModalVisible(false)}
-    >
-      <View style={styles.modalContainer}>
-      
-        <View style={styles.modalContent}>
-        <AntDesign name="closecircle" size={24} color="#F96D2B" style={{position: 'absolute', right: 10, top: 10,} } onPress={() => setModalVisible(false)}/>
-          <Text style={styles.maintitle}>Select Your Availability</Text>
+   {/* Availability Modal */}
+   <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <AntDesign
+              name="closecircle"
+              size={24}
+              color="#F96D2B"
+              style={{ position: 'absolute', right: 10, top: 10 }}
+              onPress={() => setModalVisible(false)}
+            />
+            <Text style={styles.maintitle}>Select Your Availability</Text>
 
-          {/* Radio Buttons for Availability */}
-          <TouchableOpacity
-            style={styles.radioOption}
-            onPress={() => setAvailability("Available")}
-          >
-            <Text style={styles.radioText}>
-              {availability === "Available" ? "●" : "○"} Available
-            </Text>
-          </TouchableOpacity>
+            {/* Radio Buttons for Availability */}
+            <TouchableOpacity
+              style={styles.radioOption}
+              onPress={() => setAvailability(true)} // Set as true for available
+            >
+              <Text style={styles.radioText}>
+                {availability ? "●" : "○"} Available
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.radioOption}
-            onPress={() => setAvailability("Not Available")}
-          >
-            <Text style={styles.radioText}>
-              {availability === "Not Available" ? "●" : "○"} Not Available
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.radioOption}
+              onPress={() => setAvailability(false)} // Set as false for not available
+            >
+              <Text style={styles.radioText}>
+                {!availability ? "●" : "○"} Not Available
+              </Text>
+            </TouchableOpacity>
 
-          {/* Submit Button */}
-          <TouchableOpacity style={styles.button2} onPress={updateAvailability}>
-<Text style={styles.buttonText2}>Update</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity  onPress={() => setModalVisible(false)}>
-            
-          </TouchableOpacity>
-         
+            {/* Submit Button */}
+            <TouchableOpacity style={styles.button2} onPress={updateAvailability}>
+              <Text style={styles.buttonText2}>Update</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
 
     <Navbar />
   </SafeAreaView>

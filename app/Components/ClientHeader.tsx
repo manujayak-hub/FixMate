@@ -22,6 +22,7 @@ const ClientHeader: React.FC = () => {
             setUser({
               name: userData.name,
               email: user.email,
+              uid: user.uid
             });
           } else {
             console.log('No document found');
