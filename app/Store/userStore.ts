@@ -1,12 +1,13 @@
-import {create} from 'zustand';
+import { create } from 'zustand';
 
 // Define the shape of your user state
 interface UserState {
   user: {
+    uid: string; // Add UID
     name: string;
     email: string;
   } | null;
-  setUser: (user: { name: string; email: string } | null) => void;
+  setUser: (user: { uid: string; name: string; email: string } | null) => void;
   clearUser: () => void;
 }
 
