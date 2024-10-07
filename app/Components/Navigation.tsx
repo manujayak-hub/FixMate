@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Image, StyleSheet, View ,TouchableOpacity,Text} from 'react-native';
 
+
+
 const homeicon = require('../../assets/home.png');
 const guideicon = require('../../assets/Guide.png');
 const profileicon = require('../../assets/profile.png');
@@ -14,7 +16,7 @@ const Navigation: React.FC = () => {
     <View style={styles.container}>
 
     <TouchableOpacity 
-      onPress={() => navigation.navigate('Shop_User_Home' as never)}>
+      onPress={() => navigation.navigate('Shop_Client' as never)}>
     <Image source={homeicon} style={styles.icon}
     />
     </TouchableOpacity>
@@ -26,7 +28,7 @@ const Navigation: React.FC = () => {
     </TouchableOpacity>
 
     <TouchableOpacity 
-      onPress={() => navigation.navigate('Home' as never)}>
+      onPress={() => navigation.navigate('ToolList' as never)}>
     <Image source={shopicon} style={styles.icon}
     />
     </TouchableOpacity>
