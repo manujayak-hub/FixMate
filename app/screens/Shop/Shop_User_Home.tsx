@@ -1,21 +1,13 @@
 import React,{useState} from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Modal,
-  Button
-} from "react-native";
+import {ScrollView,View,Text,Image, TouchableOpacity,StyleSheet, Modal} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Navbar from "../../Components/NavigationFor_Business";
 import Shop_Header from "../../Components/Shop_Header";
-import useUserStore from '../../Store/userStore'
+import {usertore} from '../../Store/userStore';
 import {  FIREBASE_DB } from "../../../Firebase_Config";
 import { updateDoc,doc} from "firebase/firestore";
+import { AntDesign } from '@expo/vector-icons';
 
 
 const hero = require("../../../assets/hero.png");
@@ -26,15 +18,12 @@ const uos = require("../../../assets/uos.png");
 
 const Shop_User_Home: React.FC = () => {
   const navigation: any = useNavigation();
-  const { user } = useUserStore(); // Get the user from Zustand store
   const [modalVisible, setModalVisible] = useState(false);
   const [availability, setAvailability] = useState("Available");
+  const user = usertore((state) => state.user); 
 
   const updateAvailability = async () => {
-    if (!user) {
-      alert("User not logged in.");
-      return;
-    }
+    
 
     const shopId = user.uid; // Use the user's UID as the shop ID
 
@@ -62,7 +51,7 @@ const Shop_User_Home: React.FC = () => {
             onPress={() => navigation.navigate("AddRepairShop")}
           >
             <Image source={ayrs} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>Add Your</Text>
+            <Text style={styles.buttonText}>Add Your </Text>
             <Text style={styles.buttonText}>Repair Shop</Text>
           </TouchableOpacity>
 
@@ -104,8 +93,10 @@ const Shop_User_Home: React.FC = () => {
       onRequestClose={() => setModalVisible(false)}
     >
       <View style={styles.modalContainer}>
+      
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Update Availability</Text>
+        <AntDesign name="closecircle" size={24} color="#F96D2B" style={{position: 'absolute', right: 10, top: 10,} } onPress={() => setModalVisible(false)}/>
+          <Text style={styles.maintitle}>Select Your Availability</Text>
 
           {/* Radio Buttons for Availability */}
           <TouchableOpacity
@@ -127,12 +118,14 @@ const Shop_User_Home: React.FC = () => {
           </TouchableOpacity>
 
           {/* Submit Button */}
-          <Button title="Update" onPress={updateAvailability} />
-          <Button
-            title="Cancel"
-            onPress={() => setModalVisible(false)}
-            color="red"
-          />
+          <TouchableOpacity style={styles.button2} onPress={updateAvailability}>
+<Text style={styles.buttonText2}>Update</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity  onPress={() => setModalVisible(false)}>
+            
+          </TouchableOpacity>
+         
         </View>
       </View>
     </Modal>
@@ -199,11 +192,35 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 10,
+    alignSelf:"flex-start",
+    paddingStart:60,
   },
   radioText: {
-    fontSize: 16,
+    fontSize: 22,
     marginLeft: 10,
-    color: "#333",
+    color:"#F96D2B",
+  },
+  maintitle:{
+    color:"#F96D2B",
+    alignSelf:"center",
+    fontSize:24,
+    fontWeight:"bold",
+    padding:10
+  },
+  button2: {
+    backgroundColor: '#F96D2B', // Orange background color
+    marginTop:10,
+    paddingVertical: 12, // Vertical padding
+    paddingHorizontal: 20, // Horizontal padding
+    borderRadius: 5, // Rounded corners
+    alignItems: 'center', // Center the text
+    alignSelf:"center",
+    width:100
+  },
+  buttonText2: {
+    color: '#FFFFFF', // White text color
+    fontSize: 16, // Font size
+    fontWeight: 'bold', // Bold text
   },
 });
 
