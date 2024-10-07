@@ -7,6 +7,7 @@ import Shop_Header from "../../Components/Shop_Header";
 import {  FIREBASE_DB,FIREBASE_AUTH } from "../../../Firebase_Config";
 import { updateDoc,collection, query, where, getDocs} from "firebase/firestore";
 import { AntDesign } from '@expo/vector-icons';
+import CustomAlert from "../../Components/CustomAlert";
 
 
 const hero = require("../../../assets/hero.png");
@@ -19,6 +20,9 @@ const Shop_User_Home: React.FC = () => {
   const navigation: any = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [availability, setAvailability] = useState<boolean>(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<'error' | 'success' | undefined>(undefined);
   const user = FIREBASE_AUTH.currentUser;
 
   const updateAvailability = async () => {
@@ -45,12 +49,18 @@ const Shop_User_Home: React.FC = () => {
           availability,
         });
   
-        alert("Availability updated successfully!");
-        setModalVisible(false);
+        
+        setAlertMessage("Availability updated successfully!");
+        setAlertVisible(true);
+        setAlertType('success');
+        
       });
       
     } catch (error) {
-      alert("Error updating availability: " + error.message);
+      
+      setAlertMessage("Error updating availability: " + error.message);
+      setAlertVisible(true);
+      setAlertType('error');
     }
   };
 
@@ -78,6 +88,13 @@ const Shop_User_Home: React.FC = () => {
             <Text style={styles.buttonText}>Edit Your</Text>
             <Text style={styles.buttonText}>Shop Details</Text>
           </TouchableOpacity>
+
+          <CustomAlert
+        visible={alertVisible}
+        message={alertMessage}
+        type={alertType}
+        onClose={() => setAlertVisible(false)}
+      />
 
           <TouchableOpacity
             style={styles.gridItem}

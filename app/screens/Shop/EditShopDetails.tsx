@@ -230,7 +230,7 @@ const EditShopDetails: React.FC = () => {
       />
 
         <Text style={styles.label}>Description</Text>
-        <TextInput style={styles.input} value={Shop_Des} onChangeText={setShop_Des} placeholder="Enter Shop Description" multiline />
+        <TextInput style={[styles.input, { height: 100, textAlignVertical: 'top' }]} value={Shop_Des} onChangeText={setShop_Des} placeholder="Enter Shop Description" multiline />
 
         <Text style={styles.label}>Contact</Text>
         <TextInput style={styles.input} value={contact} onChangeText={setContact} placeholder="Enter Contact Number" keyboardType="phone-pad" />
@@ -246,7 +246,7 @@ const EditShopDetails: React.FC = () => {
         </TouchableOpacity>
 
         <Text style={styles.label}>Image URL</Text>
-        <TextInput style={styles.input} value={ImageUrl} onChangeText={setImageUrl} placeholder="Enter Image URL" keyboardType="url" />
+        <TextInput style={[styles.input, { height: 100, textAlignVertical: 'top' }]} value={ImageUrl} onChangeText={setImageUrl} placeholder="Enter Image URL" keyboardType="url" />
 
         
         <TouchableOpacity style={styles.button} onPress={handleUpdate}>

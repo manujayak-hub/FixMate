@@ -160,7 +160,7 @@ const AddRepairShop: React.FC = () => {
         setAlertMessage('Shop details added successfully!');
         setAlertVisible(true);
         setAlertType('success');  // Set alertType to 'success'
-        navigation.goBack();
+        
       } catch (error: any) {
         setAlertMessage("Error adding shop details: " + error.message);
         setAlertVisible(true);
@@ -219,7 +219,7 @@ const AddRepairShop: React.FC = () => {
 
         <Text style={styles.label}>Description *</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
           value={Shop_Des}
           onChangeText={setShop_Des}
           placeholder="Enter Shop Description"
@@ -259,7 +259,7 @@ const AddRepairShop: React.FC = () => {
 
         <Text style={styles.label}>Image URL *</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
           value={ImageUrl}
           onChangeText={setImageUrl}
           placeholder="Enter Image URL"
