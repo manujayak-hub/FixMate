@@ -21,10 +21,19 @@ import { Dimensions } from "react-native";
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"; // Import NativeStackNavigationProp
 
-
-const rect = require('../../../assets/rect56.png')
-const serachicon = require('../../../assets/searchicon.png')
-
+const rect = require("../../../assets/rect56.png");
+const serachicon = require("../../../assets/searchicon.png");
+const allico = require("../../../assets/Allico.png");
+const automotiveico = require("../../../assets/automotiveico.png");
+const applianceico = require("../../../assets/applianceico.png");
+const cloathingico = require("../../../assets/cloathingico.png");
+const computerico = require("../../../assets/computerico.png");
+const electronicico = require("../../../assets/electronicico.png");
+const furnitureico = require("../../../assets/furnitureico.png");
+const homegardenico = require("../../../assets/homegardenico.png");
+const jwelleryico = require("../../../assets/jwelleryico.png");
+const musicaliico = require("../../../assets/musicalico.png");
+const otherico = require("../../../assets/otherico.png");
 
 interface RepairShops {
   id: string;
@@ -38,6 +47,7 @@ interface RepairShops {
   ImageUrl: string;
   ownerLocationLongitude: number;
   ownerLocationLatitude: number;
+  availability: boolean;
 }
 
 // Define navigation parameters
@@ -51,8 +61,33 @@ type ShopClientScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "ShopDetails"
 >;
+const categories = [
+  "All",
+  "Electronics",
+  "Appliances",
+  "Cloathing",
+  "GardenEquipment",
+  "MusicalInstruments",
+  "JwelleryWatches",
+  "Automotive",
+  "Furniture",
+  "Computers",
+  "Other",
+];
 
-const categories = ["All", "Electronics", "Automobile", "Home Appliances"];
+const categoryImages: { [key: string]: any } = {
+  All: allico,
+  Electronics: electronicico,
+  Appliances: applianceico,
+  Cloathing: cloathingico,
+  GardenEquipment: homegardenico,
+  MusicalInstruments: musicaliico,
+  JwelleryWatches: jwelleryico,
+  Automotive: automotiveico,
+  Furniture: furnitureico,
+  Computers: computerico,
+  Other: otherico,
+};
 
 const Shop_Client = () => {
   const [repairShops, setRepairShops] = useState<RepairShops[]>([]);
@@ -63,8 +98,6 @@ const Shop_Client = () => {
 
   const { width } = Dimensions.get("window");
   const navigation = useNavigation<ShopClientScreenNavigationProp>(); // Use the navigation prop type here
-
-  
 
   useEffect(() => {
     const fetchRepairShop = async () => {
@@ -114,19 +147,18 @@ const Shop_Client = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <ClientHeader />
       <View style={styles.searchiconview}>
-  <TextInput
-    style={styles.search}
-    placeholder="Search Your Favorite Repair Shop"
-    underlineColorAndroid="transparent"
-  />
-  <Image source={serachicon} style={styles.searchIcon} />
-</View>
-
+        <TextInput
+          style={styles.search}
+          placeholder="Search Your Favorite Repair Shop"
+          underlineColorAndroid="transparent"
+        />
+        <Image source={serachicon} style={styles.searchIcon} />
+      </View>
 
       <View style={styles.topics}>
-<Image style={styles.rect} source={rect}></Image>
-<Text>Category</Text>
-</View>
+        <Image style={styles.rect} source={rect}></Image>
+        <Text>Category</Text>
+      </View>
       <View>
         <ScrollView
           horizontal
@@ -142,62 +174,75 @@ const Shop_Client = () => {
               ]}
               onPress={() => setSelectedCategory(category)}
             >
-              <Text style={styles.categoryText}>{category}</Text>
+              <Image
+                source={categoryImages[category]}
+                style={styles.categoryIcon}
+              />
             </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
 
-
-      
-
-<View style={styles.topics}>
-<Image style={styles.rect} source={rect}></Image>
-<Text>Shops</Text>
-</View>
+      <View style={styles.topics}>
+        <Image style={styles.rect} source={rect}></Image>
+        <Text>Shops</Text>
+        
+      </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.gridContainer}>
-          {filteredShops.map((shop) => {
-            // Ensure that location data is available before calculating distance
-            const distance =
-              mylatitude && mylogitude
-                ? getDistance(
-                    { latitude: mylatitude, longitude: mylogitude },
-                    {
-                      latitude: shop.ownerLocationLatitude,
-                      longitude: shop.ownerLocationLongitude,
-                    },
-                    1
-                  )
-                : null; // If location is null, set distance as null
+  <View style={styles.gridContainer}>
+    {filteredShops.map((shop) => {
+      const distance =
+        mylatitude && mylogitude
+          ? getDistance(
+              { latitude: mylatitude, longitude: mylogitude },
+              {
+                latitude: shop.ownerLocationLatitude,
+                longitude: shop.ownerLocationLongitude,
+              },
+              1
+            )
+          : null;
 
-            return (
-              <TouchableOpacity
-                style={styles.card}
-                key={shop.id}
-                onPress={() => navigation.navigate("ShopDetails", { shop })} // Pass the shop data here
-              >
-                <Image source={{ uri: shop.ImageUrl }} style={styles.image} />
-                <View style={styles.infoContainer}>
-                  <Text style={styles.shopName}>{shop.shopName}</Text>
-                  {distance !== null ? (
-                    <Text>{distance / 1000} KM</Text>
-                  ) : (
-                    <Text>Location not available</Text>
-                  )}
-                  <View style={styles.infoRow}>
-                    <Text style={styles.price}>{shop.Rph} Per Hr</Text>
-                    <View style={styles.ratingContainer}>
-                      <Text>⭐</Text>
-                    </View>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </ScrollView>
+      return (
+        <TouchableOpacity
+          style={styles.card}
+          key={shop.id}
+          onPress={() => navigation.navigate("ShopDetails", { shop })}
+        >
+          <Image source={{ uri: shop.ImageUrl }} style={styles.image} />
+          <View style={styles.infoContainer}>
+            <Text style={styles.shopName}>{shop.shopName}</Text>
+            {distance !== null ? (
+              <Text>{distance / 1000} KM</Text>
+            ) : (
+              <Text>Location not available</Text>
+            )}
+            <View style={styles.infoRow}>
+              <Text style={styles.price}>{shop.Rph} Per Hr</Text>
+              <View style={styles.ratingContainer}>
+                <Text>⭐</Text>
+              </View>
+            </View>
+            {/* Availability Indicator */}
+            <View style={styles.availabilityContainer}>
+              <View
+                style={[
+                  styles.availabilityDot,
+                  shop.availability ? styles.available : styles.notAvailable,
+                ]}
+              />
+              <Text style={styles.availabilityText}>
+                {shop.availability ? "Available" : "Not Available"}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    })}
+  </View>
+</ScrollView>
+
       <Navigation />
     </SafeAreaView>
   );
@@ -213,7 +258,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
-  
+
   gridItem: {
     width: "48%",
     backgroundColor: "#f8f8f8",
@@ -235,23 +280,25 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   categoryScroll: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    minHeight: 40,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    minHeight: 20,
   },
   categoryButton: {
-    backgroundColor: "#ddd",
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    marginRight: 10,
-    height: 40,
+    borderRadius: 10,
+    marginRight: 5,
+    height: 70, // Reduced the height of the button
+    width: 70, // You can define width for consistency
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  categoryIcon: {
+    width: 60, // Reduced size for category icons
+    height: 60, // Adjusted height
+    marginBottom: 5,
   },
   selectedCategory: {
-    backgroundColor: "#F96D2B",
-  },
-  categoryText: {
-    color: "#000",
+    backgroundColor: "#Ffffff",
   },
   card: {
     backgroundColor: "#fff",
@@ -266,13 +313,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   image: {
-    padding:10,
-    margin:10,
-    marginBottom:-2,
+    padding: 10,
+    margin: 10,
+    marginBottom: -2,
     width: "90%",
-    height: 100, 
+    height: 100,
     resizeMode: "cover",
-    borderRadius:10
+    borderRadius: 10,
   },
   infoContainer: {
     padding: 10,
@@ -302,41 +349,64 @@ const styles = StyleSheet.create({
     color: "#444",
   },
 
-
-  rect:{
-    margin:10,
-    maxWidth:20
+  rect: {
+    margin: 10,
+    maxWidth: 20,
   },
-  topics:{
-    flexDirection:'row',
-    alignItems:'center',
-    fontWeight:'bold'
+  topics: {
+    flexDirection: "row",
+    alignItems: "center",
+    fontWeight: "bold",
   },
   searchiconview: {
-    position: 'relative', // Parent container needs relative positioning
+    position: "relative", // Parent container needs relative positioning
     marginLeft: 20,
     marginRight: 20,
     marginTop: -10,
   },
-  
+
   search: {
     height: 50,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     paddingLeft: 20,
     paddingRight: 40, // Padding on the right to avoid overlap with the icon
   },
-  
+
   searchIcon: {
-    position: 'absolute',
+    position: "absolute",
     top: 15, // Adjust vertically within the TextInput
     right: 15, // Align to the right of the TextInput
     width: 20,
     height: 20,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
-  
+  locationico: {
+    width: 20,
+    height: 20,
+  },
+  availabilityContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  availabilityDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5, // Makes the dot circular
+    marginRight: 5, // Space between dot and text
+  },
+  available: {
+    backgroundColor: "green", // Green for available
+  },
+  notAvailable: {
+    backgroundColor: "grey", // Grey for not available
+  },
+  availabilityText: {
+    fontSize: 14,
+    color: "#444",
+  },
 });

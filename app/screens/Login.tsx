@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { View, TextInput, ActivityIndicator, Button, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { FIREBASE_AUTH } from '../../Firebase_Config';
+import { FIREBASE_AUTH ,FIREBASE_DB} from '../../Firebase_Config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { FIREBASE_DB } from '../../Firebase_Config';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -48,7 +47,6 @@ const LoginScreen = () => {
         <>
           <Button title='Login' onPress={signIn} />
           <Button title="Sign Up" onPress={() => navigation.navigate('SignUp')} />
-          <Button title="map" onPress={() => navigation.navigate('Client_MapView')} />
         </>
       )}
     </View>

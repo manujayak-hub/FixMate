@@ -35,30 +35,21 @@ import Payment from "./app/screens/Booking/Payment";
 import AddTools from "./app/screens/ToolShop/AddTools";
 import ToolList from "./app/screens/ToolShop/ToolList";
 import EditTool from "./app/screens/ToolShop/EditTool";
-import UserToolShop from "./app/screens/ToolShop/UserToolShop";
-import URToolShop from "./app/screens/ToolShop/URToolShop";
-import { CartProvider } from "./app/screens/ToolShop/CartContext"; // Import CartProvider
-import CartPage from "./app/screens/ToolShop/CartPage";
-import CartPayment from "./app/screens/ToolShop/CartPayment";
-import ToolView from "./app/screens/ToolShop/ToolView";
+
 
 const Stack = createNativeStackNavigator();
 
 
 export default function App() {
   return (
-    <CartProvider> 
     <NavigationContainer>
       <Stack.Navigator >
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="SignUp" component={SignUp} options={{headerShown:false}}/>
         <Stack.Screen name="Shop_User_Home" component={Shop_User_Home} options={{headerShown:false}}/>
         <Stack.Screen name="AddRepairShop" component={AddRepairShop} options={{headerShown:false}} />
-        
         <Stack.Screen name="EditShopDetails" component={EditShopDetails} options={{headerShown:false}} />
-       
         <Stack.Screen name="Shop_Client" component={Shop_Client} options={{headerShown:false}} />
-
         <Stack.Screen name="Tut" component={Tut} options={{headerShown:false}} />
         <Stack.Screen name="TutVideo" component={TutVideo} options={{headerShown:false}} />
         <Stack.Screen name="TutorialDoc" component={TutorialDoc} options={{headerShown:false}} />
@@ -67,11 +58,7 @@ export default function App() {
         <Stack.Screen name="EditTutorial" component={EditTutorial} options={{headerShown:false}} />
         <Stack.Screen name="CatTutorial" component={CatTutorial} options={{headerShown:false}} />
         <Stack.Screen name="STView" component={STView} options={{headerShown:false}} />
-
         <Stack.Screen name="Client_MapView" component={Client_MapView} options={{headerShown:false}} />
-
-
-
         <Stack.Screen name="Profile" component={UserProfile} options={{headerShown:false}} />
         <Stack.Screen name="EditProfile" component={EditProfile} options={{headerShown:false}} />
         <Stack.Screen name="complainlist" component={complainlist} options={{headerShown:false}} />
@@ -80,23 +67,16 @@ export default function App() {
         <Stack.Screen name="addcomplaint" component={addcomplaint} options={{headerShown:false}} />
         <Stack.Screen name="aboutus" component={AboutUs} options={{headerShown:false}} />
         <Stack.Screen name="shopfeedbacklist" component={shopfeedback} options={{headerShown:false}} />
-
         <Stack.Screen name="ShopDetails" component={ShopDetails} options={{headerShown:false}} />
         <Stack.Screen name="Appointment" component={Appointment} options={{headerShown:false}} />
         <Stack.Screen name="Payment" component={Payment} options={{headerShown:false}} />
-
         <Stack.Screen name="AddTools" component={AddTools} options={{headerShown:false}} />
         <Stack.Screen name="ToolList" component={ToolList} options={{headerShown:false}} />
         <Stack.Screen name="EditTool" component={EditTool} options={{headerShown:false}} />
-        <Stack.Screen name="UserToolShop" component={UserToolShop} options={{headerShown:false}} />
-        <Stack.Screen name="URToolShop" component={URToolShop} options={{headerShown:false}} />
-        <Stack.Screen name="CartPage" component={CartPage} options={{headerShown:false}} />
-        <Stack.Screen name="CartPayment" component={CartPayment} options={{headerShown:false}} />
-        <Stack.Screen name="ToolView" component={ToolView} options={{headerShown:false}} />
+
 
       </Stack.Navigator>
     </NavigationContainer>
-    </CartProvider>
   );
 }
 

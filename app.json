@@ -18,13 +18,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.manujayak.FixMate"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-video"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1f444bd3-4cb7-45cb-9b33-ec6628b782b4"
+      }
+    }
   }
 }

@@ -3,11 +3,14 @@ import { StyleSheet, Text, View, Image, ScrollView, SafeAreaView, TouchableOpaci
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from './Shop_Client'; // Ensure the path is correct
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import vector icons
+import { useNavigation } from '@react-navigation/native';
+
 
 type ShopDetailsScreenProps = NativeStackScreenProps<RootStackParamList, 'ShopDetails'>;
 
 const ShopDetails = ({ route, navigation }: ShopDetailsScreenProps) => {
   const { shop } = route.params;
+  const navigate = useNavigation()
 
   const handleBookNowPress = () => {
     navigation.navigate('Appointment', { shop });
@@ -37,10 +40,14 @@ const ShopDetails = ({ route, navigation }: ShopDetailsScreenProps) => {
           </View>
 
           {/* Display Location */}
-          <View style={styles.locationContainer}>
+          
+          <TouchableOpacity  onPress={() => navigation.navigate('Client_MapView' as never)}>
+            <View style={styles.locationContainer}>
             <Icon name="location-on" size={20} color="#FF6F00" />
             <Text style={styles.locationText}>{shop.OwnerName}'s Location</Text>
+            
           </View>
+          </TouchableOpacity>
 
           <Text style={styles.rph}>Rate: LKR {shop.Rph} Per Hour</Text>
 
