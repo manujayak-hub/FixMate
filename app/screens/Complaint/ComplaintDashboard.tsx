@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, FlatList, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView,Image  } from 'react-native';
 import { FIREBASE_DB } from '../../../Firebase_Config';
 import { collection, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
@@ -36,53 +36,56 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <FlatList
-          data={complaints}
-          renderItem={({ item }) => (
-            <View style={styles.complaintCard}>
-              <View style={styles.complaintHeader}>
-                <Text style={styles.complaintId}>Complaint ID: {item.complaintId}</Text>
-                <Text style={styles.status}>Status: {item.status}</Text>
-              </View>
-              <Text style={styles.description}>{item.description}</Text>
-              {item.reply && (
-                <Text style={styles.replyMessage}>You replied: {item.reply}</Text>
-              )}
-              <View style={styles.replyContainer}>
-                <TextInput
-                  style={styles.replyInput}
-                  placeholder="Reply..."
-                  value={replyMessages[item.id] || ''}
-                  onChangeText={(text) => handleReplyChange(item.id, text)}
-                />
-                <TouchableOpacity
-                  style={styles.replyButton}
-                  onPress={() => sendReply(item.id)}
-                >
-                  <Text style={styles.buttonText}>Send</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.actionButtons}>
-                <TouchableOpacity
-                  style={styles.resolveButton}
-                  onPress={() => updateComplaint(item.id, 'Resolved')}
-                >
-                  <Text style={styles.buttonText}>Mark as Resolved</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.deleteButton}
-                  onPress={() => deleteComplaint(item.id)}
-                >
-                  <Text style={styles.buttonText}>Delete</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+      <ScrollView style={styles.container}>
+      {complaints.map((item) => (
+        <View key={item.id} style={styles.complaintCard}>
+          <View style={styles.complaintHeader}>
+            <Text style={styles.complaintId}>Complaint ID: {item.complaintId}</Text>
+            <Text style={styles.status}>Status: {item.status}</Text>
+          </View>
+          <Text style={styles.description}>{item.description}</Text>
+          {item.image && (
+              <Image
+                source={{ uri: item.image }} // Adjust based on how you're storing the image URL
+                style={styles.complaintImage}
+                resizeMode="cover" // Use cover or contain based on your preference
+              />
+            )}
+          {item.reply && (
+            <Text style={styles.replyMessage}>You replied: {item.reply}</Text>
           )}
-          keyExtractor={(item) => item.id}
-        />
-      </View>
-    </SafeAreaView>
+          <View style={styles.replyContainer}>
+            <TextInput
+              style={styles.replyInput}
+              placeholder="Reply..."
+              value={replyMessages[item.id] || ''}
+              onChangeText={(text) => handleReplyChange(item.id, text)}
+            />
+            <TouchableOpacity
+              style={styles.replyButton}
+              onPress={() => sendReply(item.id)}
+            >
+              <Text style={styles.buttonText}>Send</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={styles.resolveButton}
+              onPress={() => updateComplaint(item.id, 'Resolved')}
+            >
+              <Text style={styles.buttonText}>Mark as Resolved</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => deleteComplaint(item.id)}
+            >
+              <Text style={styles.buttonText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ))}
+    </ScrollView>
+  </SafeAreaView>
   );
 };
 
@@ -118,6 +121,12 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     color: '#333',
+    marginBottom: 8,
+  },
+  complaintImage: {
+    width: '100%', // Make the image responsive
+    height: 200, // Adjust the height based on your preference
+    borderRadius: 8,
     marginBottom: 8,
   },
   replyMessage: {

@@ -15,6 +15,9 @@ const ShopDetails = ({ route, navigation }: ShopDetailsScreenProps) => {
   const handleBookNowPress = () => {
     navigation.navigate('Appointment', { shop });
   };
+  const handleInquirePress = () => {
+    navigation.navigate('addcomplaint', {shopName:shop.shopName});
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -52,7 +55,7 @@ const ShopDetails = ({ route, navigation }: ShopDetailsScreenProps) => {
           <Text style={styles.rph}>Rate: LKR {shop.Rph} Per Hour</Text>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.inquireButton}>
+            <TouchableOpacity style={styles.inquireButton} onPress={handleInquirePress}>
               <Text style={styles.inquireButtonText}>Inquire</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.bookNowButton} onPress={handleBookNowPress}>

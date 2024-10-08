@@ -11,6 +11,7 @@ export const styles = StyleSheet.create({
     color: '#ff6f00',
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center', // Centered the header for a better appearance
   },
   input: {
     backgroundColor: '#fff',
@@ -19,6 +20,11 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
     borderWidth: 1,
     borderColor: '#ddd',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 1,
   },
   button: {
     backgroundColor: '#ff6f00',
@@ -26,6 +32,11 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 10,
+    shadowColor: '#ff6f00',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
   buttonText: {
     color: '#fff',
@@ -47,7 +58,12 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
     borderColor: '#ddd',
     borderWidth: 1,
-    height: 150
+    height: 150,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
   },
   complaintDetails: {
     flexDirection: 'row',
@@ -89,13 +105,19 @@ export const styles = StyleSheet.create({
   label: {
     marginVertical: 10,
     fontSize: 16,
+    fontWeight: '600',
+    color: '#555',
   },
   picker: {
     height: 50,
     width: '100%',
     marginBottom: 20,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    color: '#333',
   },
-
   replyContainer: {
     marginTop: 8,
     padding: 8,
@@ -106,22 +128,48 @@ export const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: '#555',
   },
-    // Add your existing styles here
-    modalContent: {
-      backgroundColor: 'white',
-      padding: 20,
-      borderRadius: 10,
-      alignItems: 'center',
-    },
-    modalMessage: {
-      fontSize: 18,
-      marginBottom: 20,
-    },
-    modalButton: {
-      backgroundColor: '#007BFF',
-      padding: 10,
-      borderRadius: 5,
-      alignItems: 'center',
-      width: '100%',
-    },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  modalMessage: {
+    fontSize: 18,
+    marginBottom: 20,
+    color: '#333',
+  },
+  modalButton: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    width: '100%',
+  },
+  selectedImage: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'contain',
+    marginVertical: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  imageUploadButton: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 15,
+    shadowColor: '#4CAF50',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
 });

@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, Image  } from 'react-native';
 import { FIREBASE_DB, FIREBASE_AUTH } from '../../../Firebase_Config';
 import { collection, addDoc, getDoc, doc } from 'firebase/firestore';
 import { styles } from '../Complaint/ComplainStyles';
 import { Picker } from '@react-native-picker/picker';
 import { onAuthStateChanged } from 'firebase/auth';
 import Modal from 'react-native-modal';
+import * as ImagePicker from 'expo-image-picker';
+import { RootStackParamList } from '../Client/Shop_Client';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 
+type AddComplaintScreenProps = NativeStackScreenProps<RootStackParamList, 'addcomplaint'>;
 const generateComplaintId = () => {
   return Math.floor(1000 + Math.random() * 9000).toString(); // Random 4-digit number
 };
 
-const AddComplaint: React.FC = () => {
+const AddComplaint: React.FC = ({ route }: AddComplaintScreenProps) => {
+  const { shopName } = route.params; 
   const [complaintId, setComplaintId] = useState<string>('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -20,6 +25,7 @@ const AddComplaint: React.FC = () => {
   const [description, setDescription] = useState('');
   const [issueType, setIssueType] = useState('Product Issue');
   const [userId, setUserId] = useState<string | null>(null);
+  const [imageUri, setImageUri] = useState<string | null>(null); 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
@@ -77,6 +83,7 @@ const AddComplaint: React.FC = () => {
     if (validateFields() && userId) {
       try {
         await addDoc(collection(FIREBASE_DB, 'complaints'), {
+          shopName,
           complaintId,
           userId,
           name,
@@ -84,10 +91,11 @@ const AddComplaint: React.FC = () => {
           mobile,
           description,
           issueType,
+          image: imageUri || null,
           status: 'In Progress',
           createdAt: new Date().toISOString(),
         });
-        showModal('Success', `Complaint Submitted with ID: ${complaintId}`);
+        showModal('Success', `Complaint Submitted with ID: ${complaintId} to ${shopName}.`);
         resetForm();
       } catch (error) {
         showModal('Error', 'Something went wrong while submitting your complaint.');
@@ -103,6 +111,22 @@ const AddComplaint: React.FC = () => {
     setDescription('');
     setIssueType('Product Issue');
     setComplaintId(generateComplaintId());
+    setImageUri(null);
+  };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+  
+
+    if (!result.canceled) {
+
+      setImageUri(result.assets[0].uri);
+    }
   };
 
   return (
@@ -110,6 +134,7 @@ const AddComplaint: React.FC = () => {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.container}>
           <Text style={styles.headerText}>Add your complaint...</Text>
+          <Text style={styles.label}>Add Complaint for : {shopName}</Text>
           <Text style={styles.label}>Complaint ID: {complaintId}</Text>
           <Text style={styles.label}>Full Name:</Text>
           <TextInput
@@ -141,6 +166,17 @@ const AddComplaint: React.FC = () => {
             <Picker.Item label="Product Issue" value="Product Issue" />
             <Picker.Item label="Service Issue" value="Service Issue" />
           </Picker>
+
+          <Text style={styles.label}>Upload Image (optional):</Text>
+          <TouchableOpacity style={styles.imageUploadButton} onPress={pickImage}>
+            <Text style={styles.buttonText}>Select Image</Text>
+          </TouchableOpacity>
+
+          {imageUri && (
+            <Image source={{ uri: imageUri }} style={styles.selectedImage} />
+          )}
+
+
           <Text style={styles.label}>Description:</Text>
           <TextInput
             style={[styles.input, { height: 150 }]}

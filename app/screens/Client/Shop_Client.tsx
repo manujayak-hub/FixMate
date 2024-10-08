@@ -54,6 +54,7 @@ interface RepairShops {
 export type RootStackParamList = {
   ShopDetails: { shop: RepairShops };
   Appointment: { shop: RepairShops };
+  addcomplaint: { shopName:String };
 };
 
 // Navigation prop type
