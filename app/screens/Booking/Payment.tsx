@@ -32,7 +32,7 @@ const Payment = ({ route }) => {
         [
           {
             text: "OK",
-            onPress: () => navigation.navigate('Shop_Client'),
+            onPress: () => navigation.navigate('Shop_Client' as never),
           },
         ]
       );

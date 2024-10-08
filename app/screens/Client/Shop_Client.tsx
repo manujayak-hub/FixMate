@@ -96,10 +96,12 @@ const Shop_Client = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [mylogitude, setmylogitude] = useState(null);
   const [mylatitude, setmylatitude] = useState(null);
+  const [searchTerm, setSearchTerm] = useState<string>(""); 
 
   const { width } = Dimensions.get("window");
   const navigation = useNavigation<ShopClientScreenNavigationProp>(); // Use the navigation prop type here
 
+  const staricon = require('../../../assets/star.png')
   useEffect(() => {
     const fetchRepairShop = async () => {
       try {
@@ -135,14 +137,18 @@ const Shop_Client = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedCategory === "All") {
-      setFilteredShops(repairShops);
-    } else {
-      setFilteredShops(
-        repairShops.filter((shop) => shop.category === selectedCategory)
-      );
-    }
-  }, [selectedCategory, repairShops]);
+    // Filter based on selected category
+    const categoryFilteredShops = selectedCategory === "All"
+      ? repairShops
+      : repairShops.filter((shop) => shop.category === selectedCategory);
+
+    // Further filter based on search term
+    const finalFilteredShops = categoryFilteredShops.filter((shop) =>
+      shop.shopName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    setFilteredShops(finalFilteredShops);
+  }, [selectedCategory, repairShops, searchTerm]); // Add searchTerm to dependencies
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -152,6 +158,8 @@ const Shop_Client = () => {
           style={styles.search}
           placeholder="Search Your Favorite Repair Shop"
           underlineColorAndroid="transparent"
+          value={searchTerm} // Bind search term state
+          onChangeText={(text) => setSearchTerm(text)}
         />
         <Image source={serachicon} style={styles.searchIcon} />
       </View>
@@ -222,7 +230,7 @@ const Shop_Client = () => {
             <View style={styles.infoRow}>
               <Text style={styles.price}>{shop.Rph} Per Hr</Text>
               <View style={styles.ratingContainer}>
-                <Text>⭐</Text>
+                <Image source={staricon}></Image>
               </View>
             </View>
             {/* Availability Indicator */}
@@ -353,6 +361,7 @@ const styles = StyleSheet.create({
   rect: {
     margin: 10,
     maxWidth: 20,
+    backgroundColor:"#F96D2B"
   },
   topics: {
     flexDirection: "row",
