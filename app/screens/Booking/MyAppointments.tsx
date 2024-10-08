@@ -9,7 +9,8 @@ import {
   Animated,
 } from 'react-native';
 import { FIREBASE_DB } from '../../../Firebase_Config';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { FIREBASE_AUTH } from '../../../Firebase_Config'; // Import Firebase Auth
 import Navigation from '../../Components/Navigation'; // Your bottom navigation component
 
 const MyAppointments = () => {
@@ -21,15 +22,24 @@ const MyAppointments = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        // Get all appointments from Firestore
-        const appointmentsRef = collection(FIREBASE_DB, 'appointments');
-        const querySnapshot = await getDocs(appointmentsRef);
-        const appointmentList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        // Get the current user
+        const currentUser = FIREBASE_AUTH.currentUser;
+        if (currentUser) {
+          const userId = currentUser.uid; // Get the UID of the logged-in user
 
-        setAppointments(appointmentList);
+          // Query Firestore for appointments where userId matches
+          const appointmentsRef = collection(FIREBASE_DB, 'appointments');
+          const q = query(appointmentsRef, where('userId', '==', userId));
+          const querySnapshot = await getDocs(q);
+          const appointmentList = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          setAppointments(appointmentList);
+        } else {
+          console.error('No user logged in');
+        }
       } catch (error) {
         console.error('Error fetching appointments: ', error);
       } finally {
