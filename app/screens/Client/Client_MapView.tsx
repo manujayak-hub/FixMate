@@ -7,6 +7,7 @@ import Navigation from '../../Components/Navigation';
 
 const zoomin = require("../../../assets/zoomin.png")
 const zoomout = require("../../../assets/zoomout.png")
+const locico = require('../../../assets/locationico.png')
 interface RepairShops {
   id: string;
   contact: string;
@@ -83,18 +84,10 @@ const Client_MapView = () => {
           coordinate={{ latitude: shopmark.ownerLocationLatitude, longitude: shopmark.ownerLocationLongitude }} 
           title={shopmark.shopName}
           description={shopmark.category}
+          image={locico}
         />
         ))}
-        <Marker
-          coordinate={{ latitude: 6.9271, longitude: 79.8612 }} // Example marker for Colombo, Sri Lanka
-          title="Colombo"
-          description="Capital city of Sri Lanka"
-        />
-        <Marker
-          coordinate={{ latitude: 7.2906, longitude: 80.6337 }} // Example marker for Kandy
-          title="Kandy"
-          description="Famous city in the hill country"
-        />
+        
       </MapView>
 
       <View style={styles.buttonContainer}>

@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import Navbar from "../../Components/NavigationFor_Business";
 import Shop_Header from "../../Components/Shop_Header";
 import {  FIREBASE_DB,FIREBASE_AUTH } from "../../../Firebase_Config";
-import { updateDoc,collection, query, where, getDocs} from "firebase/firestore";
+import { updateDoc,collection, query, where, getDocs,deleteDoc} from "firebase/firestore";
 import { AntDesign } from '@expo/vector-icons';
 import CustomAlert from "../../Components/CustomAlert";
 
@@ -15,6 +15,7 @@ const au = require("../../../assets/au.png");
 const ayrs = require("../../../assets/ayrs.png");
 const eysd = require("../../../assets/eysd.png");
 const uos = require("../../../assets/uos.png");
+const ds = require("../../../assets/deleteshop.png")
 
 const Shop_User_Home: React.FC = () => {
   const navigation: any = useNavigation();
@@ -23,6 +24,7 @@ const Shop_User_Home: React.FC = () => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'error' | 'success' | undefined>(undefined);
+  const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
   const user = FIREBASE_AUTH.currentUser;
 
   const updateAvailability = async () => {
@@ -63,6 +65,48 @@ const Shop_User_Home: React.FC = () => {
       setAlertType('error');
     }
   };
+
+  const deleteShop = async () => {
+    const shopId = user.uid; // Use the user's UID as the shop ID
+  
+    try {
+      // Query to find the document where userId matches the user's UID
+      const q = query(collection(FIREBASE_DB, "repairShops"), where("userId", "==", shopId));
+  
+      // Fetch documents that match the query
+      const querySnapshot = await getDocs(q);
+  
+      if (querySnapshot.empty) {
+        setAlertMessage("No shop found for user ID: " + shopId);
+        setAlertVisible(true);
+        setAlertType('error');
+        return; // Exit if no documents found
+      }
+  
+      // Assuming there's only one document for the userId
+      querySnapshot.forEach(async (doc) => {
+        const shopRef = doc.ref; // Get the document reference
+  
+        // Delete the document using deleteDoc
+        await deleteDoc(shopRef);
+  
+        setAlertMessage("Repair shop deleted successfully!");
+        setAlertVisible(true);
+        setAlertType('success');
+      });
+  
+    } catch (error) {
+      setAlertMessage("Error deleting shop: " + error.message);
+      setAlertVisible(true);
+      setAlertType('error');
+    }
+  };
+
+  const handleDeleteShop = () => {
+    setConfirmDeleteVisible(true); // Show confirmation modal
+  };
+  
+  
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -113,6 +157,15 @@ const Shop_User_Home: React.FC = () => {
             <Text style={styles.buttonText}>Update Order</Text>
             <Text style={styles.buttonText}>Status</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.gridItem}
+            onPress={handleDeleteShop}
+          >
+            <Image source={ds} style={styles.buttonImage} />
+            <Text style={styles.buttonText}>Delete</Text>
+            <Text style={styles.buttonText}>Repair Shop</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -158,6 +211,41 @@ const Shop_User_Home: React.FC = () => {
             <TouchableOpacity style={styles.button2} onPress={updateAvailability}>
               <Text style={styles.buttonText2}>Update</Text>
             </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Confirmation Modal */}
+      <Modal
+        visible={confirmDeleteVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setConfirmDeleteVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <AntDesign
+              name="closecircle"
+              size={24}
+              color="#F96D2B"
+              style={{ position: 'absolute', right: 10, top: 10 }}
+              onPress={() => setConfirmDeleteVisible(false)}
+            />
+            <Text style={styles.modalTitle}>Are you sure you want to delete this repair shop?</Text>
+            <View style={styles.confirmationButtons}>
+              <TouchableOpacity
+                style={[styles.button2, { backgroundColor: 'red' ,width:150}]} // Red for delete
+                onPress={deleteShop} // Call deleteShop if confirmed
+              >
+                <Text style={styles.buttonText2}>Yes, Delete</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button2}
+                onPress={() => setConfirmDeleteVisible(false)} // Close modal if cancelled
+              >
+                <Text style={styles.buttonText2}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -219,6 +307,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 15,
     textAlign: "center",
+    color:"#F96D2B",
+    padding:10
   },
   radioOption: {
     flexDirection: "row",
@@ -253,6 +343,11 @@ const styles = StyleSheet.create({
     color: '#FFFFFF', // White text color
     fontSize: 16, // Font size
     fontWeight: 'bold', // Bold text
+  },
+  confirmationButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
   },
 });
 

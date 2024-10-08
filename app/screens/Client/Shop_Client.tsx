@@ -100,6 +100,7 @@ const Shop_Client = () => {
   const { width } = Dimensions.get("window");
   const navigation = useNavigation<ShopClientScreenNavigationProp>(); // Use the navigation prop type here
 
+  const staricon = require('../../../assets/star.png')
   useEffect(() => {
     const fetchRepairShop = async () => {
       try {
@@ -228,7 +229,7 @@ const Shop_Client = () => {
             <View style={styles.infoRow}>
               <Text style={styles.price}>{shop.Rph} Per Hr</Text>
               <View style={styles.ratingContainer}>
-                <Text>⭐</Text>
+                <Image source={staricon}></Image>
               </View>
             </View>
             {/* Availability Indicator */}
