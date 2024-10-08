@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { StatusBar, View, Text, TouchableOpacity } from 'react-native';
+import { StatusBar, View, Text, TouchableOpacity,StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../Firebase_Config';
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigation, StackActions } from '@react-navigation/native';
 import useUserStore from '../Store/userStore'; // Import Zustand store
+//tis is how use the store
 
 const ClientHeader: React.FC = () => {
   const user = FIREBASE_AUTH.currentUser;
@@ -22,6 +23,7 @@ const ClientHeader: React.FC = () => {
             setUser({
               name: userData.name,
               email: user.email,
+              uid: user.uid
             });
           } else {
             console.log('No document found');
@@ -48,17 +50,79 @@ const ClientHeader: React.FC = () => {
 
   return (
     <SafeAreaView>
-      <View style={{ padding: 20, backgroundColor: '#F96D2B' }}>
-        <Text style={{ fontSize: 8, color: '#ffffff' }}>{'Hello ' + (storedUser?.name || '')}</Text>
-        <Text style={{ fontSize: 8, color: '#ffffff' }}>{storedUser?.email || ''}</Text>
-        <StatusBar backgroundColor="#F96D2B" barStyle="light-content" />
+    <StatusBar backgroundColor="#F96D2B" barStyle="light-content" />
+    <View style={styles.headerContainer}>
+      
 
-        <TouchableOpacity onPress={logout}>
-          <Text style={{ fontSize: 8, color: '#ffffff' }}>Logout</Text>
+      {/* Center: Welcome Text */}
+      <View style={styles.centerSection}>
+        <Text style={styles.welcomeText}>Hello, {storedUser?.name || 'User'}</Text> 
+        <Text style={styles.welcomeText2}>What Do You Want to Fix?</Text>
+        {/* Fallback to 'User' if name is not available */}
+      </View>
+
+      {/* Right Side: Logout Button */}
+      <View style={styles.rightSection}>
+        <TouchableOpacity onPress={logout} style={styles.logoutButton}>
+          <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
+  </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#F96D2B',
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  leftSection: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  shopIcon: {
+    height: 30,
+    width: 30,
+    marginRight: 10,
+  },
+  shopText: {
+    fontSize: 8,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  centerSection: {
+    justifyContent: 'center',
+  },
+  welcomeText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  welcomeText2: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    fontWeight: '800',
+  },
+  rightSection: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+  },
+  logoutButton: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+  },
+  logoutText: {
+    color: '#F96D2B',
+    fontWeight: 'bold',
+  },
+});
 
 export default ClientHeader;
