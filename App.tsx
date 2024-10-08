@@ -39,8 +39,17 @@ import MyAppointments from "./app/screens/Booking/MyAppointments";
 import AddTools from "./app/screens/ToolShop/AddTools";
 import ToolList from "./app/screens/ToolShop/ToolList";
 import EditTool from "./app/screens/ToolShop/EditTool";
+import UserToolShop from "./app/screens/ToolShop/UserToolShop";
+import URToolShop from "./app/screens/ToolShop/URToolShop";
+import { CartProvider } from "./app/screens/ToolShop/CartContext"; // Import CartProvider
+import CartPage from "./app/screens/ToolShop/CartPage";
+import CartPayment from "./app/screens/ToolShop/CartPayment";
+import ToolView from "./app/screens/ToolShop/ToolView";
+import SuccessPage from "./app/screens/ToolShop/SuccessPage";
+=======
 
 import WelcomePage from "./app/screens/WelcomePage";
+
 
 
 
@@ -50,6 +59,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
+    <CartProvider> 
       <Stack.Navigator >
         <Stack.Screen name="WelcomePage" component={WelcomePage} options={{headerShown:false}}/>
         <Stack.Screen name="Login" component={Login} options={{headerShown:false}}/>
@@ -79,18 +89,28 @@ export default function App() {
         <Stack.Screen name="Appointment" component={Appointment} options={{headerShown:false}} />
         <Stack.Screen name="Payment" component={Payment} options={{headerShown:false}} />
 
+
+
         <Stack.Screen name="PaymentMethods" component={PaymentMethods} options={{headerShown:false}} />
         <Stack.Screen name="MyAppointments" component={MyAppointments} options={{headerShown:false}} />
+
 
 
 
         <Stack.Screen name="AddTools" component={AddTools} options={{headerShown:false}} />
         <Stack.Screen name="ToolList" component={ToolList} options={{headerShown:false}} />
         <Stack.Screen name="EditTool" component={EditTool} options={{headerShown:false}} />
+        <Stack.Screen name="UserToolShop" component={UserToolShop} options={{headerShown:false}} />
+        <Stack.Screen name="URToolShop" component={URToolShop} options={{headerShown:false}} />
+        <Stack.Screen name="CartPage" component={CartPage} options={{headerShown:false}} />
+        <Stack.Screen name="CartPayment" component={CartPayment} options={{headerShown:false}} />
+        <Stack.Screen name="ToolView" component={ToolView} options={{headerShown:false}} />
+        <Stack.Screen name="SuccessPage" component={SuccessPage} options={{headerShown:false}} />
 
 
 
       </Stack.Navigator>
+    </CartProvider>
     </NavigationContainer>
   );
 }
