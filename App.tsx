@@ -32,11 +32,16 @@ import ShopDetails from "./app/screens/Client/ShopDetails";
 import Appointment from "./app/screens/Booking/Appointment";
 import Payment from "./app/screens/Booking/Payment";
 
+import PaymentMethods from "./app/screens/Booking/PaymentMethods";
+import MyAppointments from "./app/screens/Booking/MyAppointments";
+
+
 import AddTools from "./app/screens/ToolShop/AddTools";
 import ToolList from "./app/screens/ToolShop/ToolList";
 import EditTool from "./app/screens/ToolShop/EditTool";
 
 import WelcomePage from "./app/screens/WelcomePage";
+
 
 
 const Stack = createNativeStackNavigator();
@@ -73,9 +78,16 @@ export default function App() {
         <Stack.Screen name="ShopDetails" component={ShopDetails} options={{headerShown:false}} />
         <Stack.Screen name="Appointment" component={Appointment} options={{headerShown:false}} />
         <Stack.Screen name="Payment" component={Payment} options={{headerShown:false}} />
+
+        <Stack.Screen name="PaymentMethods" component={PaymentMethods} options={{headerShown:false}} />
+        <Stack.Screen name="MyAppointments" component={MyAppointments} options={{headerShown:false}} />
+
+
+
         <Stack.Screen name="AddTools" component={AddTools} options={{headerShown:false}} />
         <Stack.Screen name="ToolList" component={ToolList} options={{headerShown:false}} />
         <Stack.Screen name="EditTool" component={EditTool} options={{headerShown:false}} />
+
 
 
       </Stack.Navigator>
