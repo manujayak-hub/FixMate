@@ -32,6 +32,10 @@ import ShopDetails from "./app/screens/Client/ShopDetails";
 import Appointment from "./app/screens/Booking/Appointment";
 import Payment from "./app/screens/Booking/Payment";
 
+import PaymentMethods from "./app/screens/Booking/PaymentMethods";
+import MyAppointments from "./app/screens/Booking/MyAppointments";
+
+
 import AddTools from "./app/screens/ToolShop/AddTools";
 import ToolList from "./app/screens/ToolShop/ToolList";
 import EditTool from "./app/screens/ToolShop/EditTool";
@@ -42,6 +46,12 @@ import CartPage from "./app/screens/ToolShop/CartPage";
 import CartPayment from "./app/screens/ToolShop/CartPayment";
 import ToolView from "./app/screens/ToolShop/ToolView";
 import SuccessPage from "./app/screens/ToolShop/SuccessPage";
+=======
+
+import WelcomePage from "./app/screens/WelcomePage";
+
+
+
 
 const Stack = createNativeStackNavigator();
 
@@ -51,7 +61,8 @@ export default function App() {
     <NavigationContainer>
     <CartProvider> 
       <Stack.Navigator >
-        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="WelcomePage" component={WelcomePage} options={{headerShown:false}}/>
+        <Stack.Screen name="Login" component={Login} options={{headerShown:false}}/>
         <Stack.Screen name="SignUp" component={SignUp} options={{headerShown:false}}/>
         <Stack.Screen name="Shop_User_Home" component={Shop_User_Home} options={{headerShown:false}}/>
         <Stack.Screen name="AddRepairShop" component={AddRepairShop} options={{headerShown:false}} />
@@ -79,6 +90,13 @@ export default function App() {
         <Stack.Screen name="Payment" component={Payment} options={{headerShown:false}} />
 
 
+
+        <Stack.Screen name="PaymentMethods" component={PaymentMethods} options={{headerShown:false}} />
+        <Stack.Screen name="MyAppointments" component={MyAppointments} options={{headerShown:false}} />
+
+
+
+
         <Stack.Screen name="AddTools" component={AddTools} options={{headerShown:false}} />
         <Stack.Screen name="ToolList" component={ToolList} options={{headerShown:false}} />
         <Stack.Screen name="EditTool" component={EditTool} options={{headerShown:false}} />
@@ -88,6 +106,7 @@ export default function App() {
         <Stack.Screen name="CartPayment" component={CartPayment} options={{headerShown:false}} />
         <Stack.Screen name="ToolView" component={ToolView} options={{headerShown:false}} />
         <Stack.Screen name="SuccessPage" component={SuccessPage} options={{headerShown:false}} />
+
 
 
       </Stack.Navigator>

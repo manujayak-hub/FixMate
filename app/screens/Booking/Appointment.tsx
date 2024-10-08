@@ -16,6 +16,8 @@ import { collection, addDoc } from 'firebase/firestore';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons'; // Import the icon library
 
+import { getAuth } from "firebase/auth"; // Import Firebase Auth
+
 type AppointmentScreenProps = NativeStackScreenProps<RootStackParamList, 'Appointment'>;
 
 const Appointment: React.FC<AppointmentScreenProps> = ({ route, navigation }) => {
@@ -42,9 +44,21 @@ const Appointment: React.FC<AppointmentScreenProps> = ({ route, navigation }) =>
   const confirmAppointment = async () => {
     setLoading(true);
     setConfirmationVisible(false);
-
+  
+    // Get the logged-in user's ID
+    const auth = getAuth();
+    const user = auth.currentUser;
+  
+    if (!user) {
+      Alert.alert('Error', 'No user is logged in.');
+      setLoading(false);
+      return;
+    }
+  
     try {
+      // Add the appointment to Firestore, including the userId
       const appointmentDoc = await addDoc(collection(FIREBASE_DB, 'appointments'), {
+        userId: user.uid, // Add the userId field
         shopId: shop.id,
         shopName: shop.shopName,
         date: selectedDate?.toLocaleDateString(),
@@ -52,7 +66,8 @@ const Appointment: React.FC<AppointmentScreenProps> = ({ route, navigation }) =>
         shopCategory: shop.category,
         rate: shop.Rph,
       });
-
+  
+      // Navigate to the Payment screen after appointment is successfully booked
       navigation.navigate('Payment', {
         shopName: shop.shopName,
         amount: shop.Rph,
