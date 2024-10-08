@@ -26,7 +26,7 @@ const Navigation: React.FC = () => {
     </TouchableOpacity>
 
     <TouchableOpacity 
-      onPress={() => navigation.navigate('ToolList' as never)}>
+      onPress={() => navigation.navigate('UserToolShop' as never)}>
     <Image source={shopicon} style={styles.icon}
     />
     </TouchableOpacity>

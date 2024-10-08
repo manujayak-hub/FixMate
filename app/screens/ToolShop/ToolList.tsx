@@ -6,7 +6,7 @@ import { FIREBASE_DB, FIREBASE_STORAGE } from '../../../Firebase_Config'; // Adj
 import { ref, deleteObject } from 'firebase/storage';
 import { AntDesign } from '@expo/vector-icons';
 
-// Define the structure for a tutorial
+// Define the structure for a tool
 interface Tool {
   id: string;
   name: string;
@@ -14,10 +14,11 @@ interface Tool {
   imageUrl: string;
 }
 
-// Define the type for the navigation prop (assuming you have a "RootStackParamList" defined elsewhere)
+// Define the type for the navigation prop
 type RootStackParamList = {
   EditTool: { toolId: string };
   STView: { toolId: string };
+  ToolView: { toolId: string }; // Add this line
 };
 
 const ToolList: React.FC = () => {
@@ -25,14 +26,14 @@ const ToolList: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
-    const toolssCollection = collection(FIREBASE_DB, 'Tools');
+    const toolsCollection = collection(FIREBASE_DB, 'Tools');
 
     const unsubscribe = onSnapshot(
-      toolssCollection,
+      toolsCollection,
       snapshot => {
         const toolsData = snapshot.docs.map(doc => ({
           id: doc.id,
-          ...(doc.data() as Tool), // Type assertion to Tutorial structure
+          ...(doc.data() as Tool), // Type assertion to Tool structure
         }));
         setTools(toolsData);
       },
@@ -58,24 +59,13 @@ const ToolList: React.FC = () => {
             text: 'OK',
             onPress: async () => {
               try {
-                // Log the paths being used
-               
-                console.log('Image URL:', imageUrl);
-
                 if (imageUrl) {
                   const imageRef = ref(FIREBASE_STORAGE, imageUrl);
-                  try {
-                    await deleteObject(imageRef);
-                    console.log('Image deleted successfully');
-                  } catch (error) {
-                    console.error('Error deleting image:', error);
-                    Alert.alert('Error', 'Could not delete image');
-                  }
+                  await deleteObject(imageRef); // Delete the image from storage
                 }
 
                 // Delete document from Firestore
                 await deleteDoc(doc(FIREBASE_DB, 'Tools', id));
-                console.log('Document deleted successfully');
                 Alert.alert('Success', 'Tool deleted successfully');
               } catch (error) {
                 console.error('Error during deletion process:', error);
@@ -96,37 +86,36 @@ const ToolList: React.FC = () => {
   };
 
   const handleView = (id: string) => {
-    navigation.navigate('STView', { toolId: id }); // Navigate to STView
+    navigation.navigate('ToolView', { toolId: id }); // Navigate to ToolView
   };
-
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {tools.map(tool => (
         <TouchableOpacity key={tool.id} onPress={() => handleView(tool.id)}>
-        <View key={tool.id} style={styles.tutorialCard}>
-          <Image source={{ uri: tool.imageUrl }} style={styles.image} />
-          <View style={styles.infoContainer}>
-            <Text style={styles.title}>{tool.name}</Text>
-            <Text style={styles.duration}>Price: Rs {tool.price}</Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => handleEdit(tool.id)}
-              >
-                <AntDesign name="edit" size={24} color="#FFFFFF" />
-                <Text style={styles.buttonText}>Edit</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, styles.deleteButton]}
-                onPress={() => handleDelete(tool.id,tool.imageUrl)}
-              >
-                <AntDesign name="delete" size={24} color="#FFFFFF" />
-                <Text style={styles.buttonText}>Delete</Text>
-              </TouchableOpacity>
+          <View style={styles.tutorialCard}>
+            <Image source={{ uri: tool.imageUrl }} style={styles.image} />
+            <View style={styles.infoContainer}>
+              <Text style={styles.title}>{tool.name}</Text>
+              <Text style={styles.duration}>Price: Rs {tool.price}</Text>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => handleEdit(tool.id)}
+                >
+                  <AntDesign name="edit" size={24} color="#FFFFFF" />
+                  <Text style={styles.buttonText}>Edit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.deleteButton]}
+                  onPress={() => handleDelete(tool.id, tool.imageUrl)}
+                >
+                  <AntDesign name="delete" size={24} color="#FFFFFF" />
+                  <Text style={styles.buttonText}>Delete</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
         </TouchableOpacity>
       ))}
     </ScrollView>
