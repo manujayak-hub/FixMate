@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, FlatList, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView,Image  } from 'react-native';
 import { FIREBASE_DB } from '../../../Firebase_Config';
 import { collection, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import Shop_Header from "../../Components/Shop_Header";
+import Navbar from "../../Components/NavigationFor_Business";
 
 const AdminDashboard: React.FC = () => {
   const [complaints, setComplaints] = useState<any[]>([]);
@@ -36,6 +38,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <Shop_Header/>
       <ScrollView style={styles.container}>
       {complaints.map((item) => (
         <View key={item.id} style={styles.complaintCard}>
@@ -85,6 +88,7 @@ const AdminDashboard: React.FC = () => {
         </View>
       ))}
     </ScrollView>
+      <Navbar/>
   </SafeAreaView>
   );
 };

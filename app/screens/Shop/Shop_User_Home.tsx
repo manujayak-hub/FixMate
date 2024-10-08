@@ -166,6 +166,15 @@ const Shop_User_Home: React.FC = () => {
             <Text style={styles.buttonText}>Delete</Text>
             <Text style={styles.buttonText}>Repair Shop</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.gridItem}
+            onPress={() => navigation.navigate("Complaintmanage")}
+          >
+            <Image source={uos} style={styles.buttonImage} />
+            <Text style={styles.buttonText}>Manage Complaint</Text>
+            {/* <Text style={styles.buttonText}>Status</Text> */}
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>

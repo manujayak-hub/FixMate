@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, TextInput, Text, TouchableOpacity, Alert, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, FlatList, TextInput, Text, TouchableOpacity, Alert, StyleSheet, Image, ActivityIndicator, SafeAreaView } from 'react-native';
 import { FIREBASE_DB, FIREBASE_AUTH } from '../../../Firebase_Config';
 import { collection, onSnapshot, query, where, doc, deleteDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import UserHeder from '../../Components/ClientHeader';
 
 const ComplaintList: React.FC = () => {
   const [complaints, setComplaints] = useState<any[]>([]);
@@ -64,6 +65,8 @@ const ComplaintList: React.FC = () => {
   );
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+    <UserHeder/>
     <View style={styles.container}>
       <TextInput
         style={styles.searchBar}
@@ -114,6 +117,7 @@ const ComplaintList: React.FC = () => {
         <Text style={styles.emptyState}>No complaints found.</Text> // Empty state message
       )}
     </View>
+    </SafeAreaView>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, SafeAreaView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../Firebase_Config';
@@ -8,6 +8,7 @@ import { getAuth } from 'firebase/auth';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import UserHeder from '../Components/ClientHeader';
 
 const EditProfileScreen = () => {
   const [name, setName] = useState('');
@@ -100,6 +101,8 @@ const EditProfileScreen = () => {
   };
 
   return (
+<SafeAreaView style={{ flex: 1 }}>
+  <UserHeder/>
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Icon name="arrow-left" size={30} color="#000" />
@@ -170,6 +173,7 @@ const EditProfileScreen = () => {
         </View>
       </Modal>
     </View>
+    </SafeAreaView>
   );
 };
 
