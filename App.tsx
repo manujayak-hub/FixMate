@@ -36,6 +36,8 @@ import AddTools from "./app/screens/ToolShop/AddTools";
 import ToolList from "./app/screens/ToolShop/ToolList";
 import EditTool from "./app/screens/ToolShop/EditTool";
 
+import WelcomePage from "./app/screens/WelcomePage";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -44,7 +46,8 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator >
-        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="WelcomePage" component={WelcomePage} options={{headerShown:false}}/>
+        <Stack.Screen name="Login" component={Login} options={{headerShown:false}}/>
         <Stack.Screen name="SignUp" component={SignUp} options={{headerShown:false}}/>
         <Stack.Screen name="Shop_User_Home" component={Shop_User_Home} options={{headerShown:false}}/>
         <Stack.Screen name="AddRepairShop" component={AddRepairShop} options={{headerShown:false}} />
