@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, Image, Button, StyleSheet, TouchableOpacity,Alert } from 'react-native';
+import { View, Text, FlatList, Image, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useCart } from './CartContext'; // Adjust the path accordingly
 import { Checkbox } from 'expo-checkbox'; // You can use any checkbox component
 import { doc, updateDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config'; // Import your Firestore instance
 import { useNavigation } from '@react-navigation/native'; // Import the navigation hook
 import { StackNavigationProp } from '@react-navigation/stack';
+import { getAuth } from 'firebase/auth'; // Import Firebase Auth
 
 // Define your root stack param list here as well
 type RootStackParamList = {
@@ -17,9 +18,16 @@ type RootStackParamList = {
 type CartPageNavigationProp = StackNavigationProp<RootStackParamList, 'CartPage'>;
 
 const CartPage: React.FC = () => {
-  const { cart, updateCart, removeTools } = useCart(); 
+  const { cart, updateCart } = useCart(); 
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const navigation = useNavigation<CartPageNavigationProp>(); // Use the typed navigation prop
+
+  // Get the logged-in user's ID
+  const auth = getAuth();
+  const userId = auth.currentUser?.uid; // Get the current user's ID
+
+  // Filter the cart to only include items for the logged-in user
+  const userCart = cart.filter(tool => tool.userId === userId); // Assuming each cart item has a userId field
 
   const handleCheckboxChange = (toolId: string) => {
     setSelectedTools(prevSelected => 
@@ -33,7 +41,7 @@ const CartPage: React.FC = () => {
     if (newQuantity >= 1 && newQuantity <= 5) {
       try {
         // Update the quantity in local state
-        const updatedCart = cart.map(tool =>
+        const updatedCart = userCart.map(tool =>
           tool.id === toolId ? { ...tool, quantity: newQuantity } : tool
         );
 
@@ -52,7 +60,7 @@ const CartPage: React.FC = () => {
   };
 
   const handleProceedToPay = () => {
-    const finalTools = cart.filter(tool => selectedTools.includes(tool.id));
+    const finalTools = userCart.filter(tool => selectedTools.includes(tool.id));
     const total = finalTools.reduce((sum, tool) => sum + (parseFloat(tool.price || '0') * (tool.quantity || 1)), 0);
     
     // Check if total is greater than zero before navigating
@@ -69,7 +77,7 @@ const CartPage: React.FC = () => {
     let total = 0;
 
     selectedTools.forEach(toolId => {
-      const tool = cart.find(item => item.id === toolId);
+      const tool = userCart.find(item => item.id === toolId);
       if (tool && tool.price && tool.quantity) {
         const itemSubtotal = parseFloat(tool.price) * tool.quantity; // Calculate subtotal for this item
         subtotal += itemSubtotal;
@@ -122,7 +130,7 @@ const CartPage: React.FC = () => {
     </View>
   );
 
-  if (cart.length === 0) {
+  if (userCart.length === 0) { // Check against userCart
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>Your cart is empty.</Text>
@@ -133,7 +141,7 @@ const CartPage: React.FC = () => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={cart}
+        data={userCart} // Use userCart instead of cart
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
       />
@@ -143,9 +151,7 @@ const CartPage: React.FC = () => {
       </View>
       <Button
         title="Proceed to Pay"
-        onPress={() => {
-          handleProceedToPay();
-        }}
+        onPress={handleProceedToPay}
         color="#FF6100"
       />
     </View>

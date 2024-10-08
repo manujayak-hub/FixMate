@@ -1,16 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import {
+  SafeAreaView,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+  TextInput,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { collection, onSnapshot, query, orderBy, limit, QuerySnapshot, DocumentData, DocumentSnapshot } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config'; // Adjust import according to your file structure
 import { StackNavigationProp } from '@react-navigation/stack';
+import ClientHeader from '../../Components/ClientHeader';
+import Navigation from "../../Components/Navigation";
+
+// Import images
+const rect = require("../../../assets/rect56.png");
+const searchicon = require("../../../assets/searchicon.png");
+const allico = require("../../../assets/Allico.png");
+const automotiveico = require("../../../assets/automotiveico.png");
+const applianceico = require("../../../assets/applianceico.png");
+const clothingico = require("../../../assets/cloathingico.png");
+const computerico = require("../../../assets/computerico.png");
+const electronicico = require("../../../assets/electronicico.png");
+const furnitureico = require("../../../assets/furnitureico.png");
+const homegardenico = require("../../../assets/homegardenico.png");
+const jewelryico = require("../../../assets/jwelleryico.png");
+const musicalico = require("../../../assets/musicalico.png");
+const otherico = require("../../../assets/otherico.png");
 
 // Define type for navigation
 type RootStackParamList = {
   TutorialList: { category: string };
   CatTutorial: { category: string };
   TutorialDoc: { tutorialId: string };
-  URToolShop: { toolId: string }; // Add this for the tool details screen
+  URToolShop: { toolId: string };
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'TutorialList'>;
@@ -18,16 +46,45 @@ type NavigationProp = StackNavigationProp<RootStackParamList, 'TutorialList'>;
 // Define type for tool object
 interface Shop {
   id: string;
-  title: string;
+  name: string;
   imageUrl?: string;
   timeDuration?: string;
   price?: string; // Added price field
+  category?: string; // Added category field for filtering
 }
+
+const categories = [
+  'Electronic Repair',
+  'Home and Appliance Repair',
+  'Cloathing',
+  'GardenEquipment',
+  'MusicalInstruments',
+  'JwelleryWatches',
+  'Automotive Repair',
+  'Furniture Repair',
+  'Computers',
+ 
+];
+
+const categoryImages: { [key: string]: any } = {
+  'Electronic Repair': electronicico,
+  'Home and Appliance Repair': applianceico,
+  'Automotive Repair': automotiveico,
+  'Cloathing': clothingico,
+  'Furniture Repair': furnitureico,
+  'GardenEquipment':homegardenico,
+  'MusicalInstruments':musicalico,
+  'JwelleryWatches':jewelryico,
+  'Computers':computerico,
+};
 
 const UserToolShop: React.FC = () => {
   const [tools, setTools] = useState<Shop[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>(''); // State for search input
+  const [filteredTools, setFilteredTools] = useState<Shop[]>([]); // State for filtered tools
   const navigation = useNavigation<NavigationProp>();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     const toolsCollection = collection(FIREBASE_DB, 'Tools');
@@ -44,6 +101,7 @@ const UserToolShop: React.FC = () => {
         })) as Shop[]; // Cast the result to the Shop type
         setTools(toolsData);
         setLoading(false); // Stop loading when data is fetched
+        setFilteredTools(toolsData); // Initialize filtered tools with all tools
       },
       (error) => {
         Alert.alert('Error', 'Failed to load tools');
@@ -56,6 +114,24 @@ const UserToolShop: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
+  // Filter tools based on search query (case-insensitive)
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = tools.filter(tool =>
+        tool.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredTools(filtered);
+    } else {
+      setFilteredTools(tools);
+    }
+  }, [searchQuery, tools]);
+
+  // Function to filter tools by category
+  const filterByCategory = (category: string) => {
+    const filtered = tools.filter(tool => tool.category === category);
+    setFilteredTools(filtered);
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -66,69 +142,88 @@ const UserToolShop: React.FC = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.layout}>
-      <Text style={styles.categoryText}>Tools Shop</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ClientHeader />
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search tools by name"
+          value={searchQuery}
+          onChangeText={setSearchQuery} // Update search query
+        />
+        <Image source={searchicon} style={styles.searchIcon} />
+      </View>
+
+      <View style={styles.topics}>
+        <Image style={styles.rect} source={rect}></Image>
+        <Text >Category</Text>
+      </View>
+
+      <View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.subView}
+        style={styles.categoryScroll}
       >
-        {/* Category Buttons */}
-        <TouchableOpacity
-          style={styles.rectangle1}
-          onPress={() => navigation.navigate('TutorialList', { category: 'Home and Appliance Repair' })}
-        >
-          <Text style={styles.homeApplianceText}>Home and Appliance</Text>
-          <Text style={styles.homeApplianceText1}>Repair</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.rectangle1}
-          onPress={() => navigation.navigate('CatTutorial', { category: 'Automotive Repair' })}
-        >
-          <Text style={styles.homeApplianceText}>Automotive Repair</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.rectangle1}
-          onPress={() => navigation.navigate('CatTutorial', { category: 'Electronic Repair' })}
-        >
-          <Text style={styles.homeApplianceText}>Electronic Repair</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.rectangle1}
-          onPress={() => navigation.navigate('CatTutorial', { category: 'Furniture Repair' })}
-        >
-          <Text style={styles.homeApplianceText}>Furniture Repair</Text>
-        </TouchableOpacity>
+        {categories.map((category) => (
+          <TouchableOpacity
+            key={category}
+            style={[
+              styles.categoryButton,
+              selectedCategory === category && styles.selectedCategory,
+            ]}
+            onPress={() => {
+              setSelectedCategory(category);
+              filterByCategory(category); // Filter tools by the selected category
+            }}
+          >
+            <Image
+              source={categoryImages[category]}
+              style={styles.categoryIcon}
+            />
+          
+          </TouchableOpacity>
+        ))}
       </ScrollView>
+      </View>
 
-      <Text style={styles.diyText}>Recently Added Tools</Text>
-      {tools.length === 0 ? (
-        <Text style={styles.noTutorialText}>No Tools available at the moment.</Text>
-      ) : (
-        <View style={styles.gridContainer}>
-          {tools.map((tool) => (
-            <TouchableOpacity
-              key={tool.id}
-              style={styles.toolCard}
-              onPress={() => navigation.navigate('URToolShop', { toolId: tool.id })}
-            >
-              <View style={styles.cardContainer}>
-                {tool.imageUrl ? (
-                  <Image source={{ uri: tool.imageUrl }} style={styles.img1} />
-                ) : (
-                  <View style={styles.imagePlaceholder}>
-                    <Text style={styles.imagePlaceholderText}>No Image</Text>
-                  </View>
-                )}
-                <Text style={styles.imageText}>{tool.title}</Text>
-                <Text style={styles.imagePrice}>Price: {tool.price || 'N/A'}</Text>
-                <Text style={styles.imageText1}>Duration: {tool.timeDuration || 'N/A'}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-    </ScrollView>
+      <View style={styles.topics}>
+        <Image style={styles.rect} source={rect}></Image>
+        <Text>Tools</Text>
+        
+      </View>
+
+      <ScrollView contentContainerStyle={styles.layout}>
+
+        {filteredTools.length === 0 ? (
+          <Text style={styles.noTutorialText}>No Tools available at the moment.</Text>
+        ) : (
+          <View style={styles.gridContainer}>
+            {filteredTools.map((tool) => (
+              <TouchableOpacity
+                key={tool.id}
+                style={styles.toolCard}
+                onPress={() => navigation.navigate('URToolShop', { toolId: tool.id })}
+              >
+                <View style={styles.cardContainer}>
+                  {tool.imageUrl ? (
+                    <Image source={{ uri: tool.imageUrl }} style={styles.img1} />
+                  ) : (
+                    <View style={styles.imagePlaceholder}>
+                      <Text style={styles.imagePlaceholderText}>No Image</Text>
+                    </View>
+                  )}
+                  <Text style={styles.imageText}>{tool.name}</Text>
+                  <Text style={styles.imagePrice}>Price: Rs. {tool.price || 'N/A'}</Text>
+                  
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+      <Navigation />
+    </SafeAreaView>
   );
 };
 
@@ -198,13 +293,67 @@ const styles = StyleSheet.create({
   },
   imagePrice: {
     fontSize: 16,
-    fontWeight: '600',
     color: '#FF6100',
+    marginTop: 5,
   },
   imageText1: {
     fontSize: 14,
-    color: '#666666',
+    color: '#707070',
     marginTop: 5,
+  },
+  categoryScroll: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    minHeight: 20,
+  },
+  categoryButton: {
+    borderRadius: 10,
+    marginRight: 5,
+    height: 70, 
+    width: 70,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  categoryIcon: {
+    width: 60, 
+    height: 60, 
+    marginBottom: 5,
+  },
+  selectedCategory: {
+    backgroundColor: "#Ffffff",
+  },
+  searchContainer: {
+    position: "relative", // Parent container needs relative positioning
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: -10,
+  },
+  searchInput: {
+    height: 50,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    backgroundColor: "#ffffff",
+    paddingLeft: 20,
+    paddingRight: 40, 
+  },
+  searchIcon: {
+    position: "absolute",
+    top: 15, // Adjust vertically within the TextInput
+    right: 15, // Align to the right of the TextInput
+    width: 20,
+    height: 20,
+    resizeMode: "contain",
+  },
+  topics: {
+    flexDirection: "row",
+    alignItems: "center",
+    fontWeight: "bold",
+  },
+  rect: {
+    margin: 10,
+    maxWidth: 20,
   },
   imagePlaceholder: {
     width: '100%',
@@ -217,30 +366,6 @@ const styles = StyleSheet.create({
   imagePlaceholderText: {
     fontSize: 18,
     color: '#808080',
-  },
-  rectangle1: {
-    width: 224,
-    height: 74,
-    backgroundColor: 'rgba(255, 97, 0, 0.7)',
-    borderRadius: 15,
-    marginRight: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  homeApplianceText1: {
-    fontWeight: '700',
-    fontSize: 14,
-    color: '#000000',
-  },
-  homeApplianceText: {
-    fontWeight: '700',
-    fontSize: 16,
-    color: '#000000',
-  },
-  subView: {
-    marginBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
   },
 });
 

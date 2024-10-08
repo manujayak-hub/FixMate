@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator, Alert, Button, TextInput, FlatList } from 'react-native';
+import { TouchableOpacity,View, Text, Image, StyleSheet, ActivityIndicator, Alert, Button, TextInput, FlatList, SafeAreaView } from 'react-native';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { DocumentSnapshot, doc, getDoc, setDoc, addDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { FIREBASE_DB } from '../../../Firebase_Config';
-import { useCart } from './CartContext'; // Assuming the CartContext is in a folder called context
+import { FIREBASE_DB, FIREBASE_AUTH } from '../../../Firebase_Config';
+import { useCart } from './CartContext';
 import { AntDesign } from '@expo/vector-icons';
-import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Import Firebase Auth
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import useUserStore from '../../Store/userStore';
 
 type URToolShopRouteProp = RouteProp<{ URToolShop: { toolId: string } }, 'URToolShop'>;
 
 interface Tool {
   id: string;
   title: string;
+  name:string;
   imageUrl?: string;
   description?: string;
   price?: string;
   timeDuration?: string;
+  userId: string; 
 }
 
 interface Review {
   id: string;
   userId: string;
+  userName: string;
   content: string;
   createdAt: string;
 }
@@ -29,28 +33,47 @@ const URToolShop: React.FC = () => {
   const route = useRoute<URToolShopRouteProp>();
   const { toolId } = route.params;
   const navigation = useNavigation();
+  const { user: storedUser, setUser } = useUserStore(); // Adjusted to use userStore
 
   const [tool, setTool] = useState<Tool | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const { addToCart, cart } = useCart();
   const [isInFirestoreCart, setIsInFirestoreCart] = useState<boolean>(false);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [newReview, setNewReview] = useState<string>(''); // New review content
-  const [user, setUser] = useState<any>(null); // State to hold the current user
+  const [newReview, setNewReview] = useState<string>(''); 
+  const [userName, setUserName] = useState<string>(''); // State to hold the user name
 
   // Get the currently logged-in user
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        setUser(currentUser); // Set the logged-in user
+        setUser({
+          uid: currentUser.uid,
+          name: currentUser.displayName || 'Anonymous', // Use displayName or default to 'Anonymous'
+          email: currentUser.email || '',
+        });
+        fetchUserName(currentUser.uid); // Fetch the user name when user logs in
       } else {
-        setUser(null); // User is signed out
+        setUser(null);
       }
     });
-
-    return () => unsubscribe(); // Cleanup the subscription on component unmount
+  
+    return () => unsubscribe();
   }, []);
+
+  // Fetch the user name from Firestore
+  const fetchUserName = async (uid: string) => {
+    try {
+      const userDocRef = doc(FIREBASE_DB, 'users', uid); // Assuming your user data is stored under 'Users' collection
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        setUserName(userDoc.data()?.name || 'Anonymous'); // Use name from Firestore
+      }
+    } catch (error) {
+      console.error('Error fetching user name:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchToolDetails = async () => {
@@ -104,26 +127,33 @@ const URToolShop: React.FC = () => {
   }, [toolId]);
 
   const handleAddToCart = async () => {
-    if (tool) {
-      const isToolInCart = cart.some((item) => item.id === tool.id);
-      if (isToolInCart || isInFirestoreCart) {
-        Alert.alert('Item Already Exists', 'This is already in your cart.');
-        return;
-      }
-
-      await addToCart(tool);
-      Alert.alert('Success', 'Tool added to cart');
-
+    if (tool && storedUser) {
       const cartDocRef = doc(FIREBASE_DB, 'Cart', 'shared_cart');
       try {
         const cartDoc = await getDoc(cartDocRef);
         let updatedTools = [];
-
+  
         if (cartDoc.exists()) {
           updatedTools = cartDoc.data()?.tools || [];
         }
-
-        await setDoc(cartDocRef, { tools: [...updatedTools, tool] });
+  
+        // Check if the tool already exists in the cart for the current user
+        const userToolExists = updatedTools.some(
+          (item: Tool) => item.id === tool.id && item.userId === storedUser.uid
+        );
+  
+        if (userToolExists) {
+          Alert.alert('Item Already Exists', 'This item is already in your cart.');
+          return;
+        }
+  
+        // If the tool does not exist for the user, proceed to add it
+        const cartItem = { ...tool, userId: storedUser.uid };
+        await addToCart(cartItem); // Add to local cart state
+        Alert.alert('Success', 'Tool added to cart');
+  
+        // Update Firestore cart
+        await setDoc(cartDocRef, { tools: [...updatedTools, cartItem] }, { merge: true });
         Alert.alert('Success', 'Tool added to database cart');
       } catch (error) {
         Alert.alert('Error', 'Failed to add tool to cart in database');
@@ -131,6 +161,7 @@ const URToolShop: React.FC = () => {
       }
     }
   };
+  
 
   const handleGoToCart = () => {
     navigation.navigate('CartPage' as never);
@@ -144,7 +175,8 @@ const URToolShop: React.FC = () => {
 
     const newReviewData = {
       toolId,
-      userId: user?.uid || 'anonymous', // Use the logged-in user's UID
+      userId: storedUser?.uid || 'anonymous',
+      userName: userName || 'Anonymous', // Use fetched user name
       content: newReview,
       createdAt: new Date().toISOString(),
     };
@@ -178,147 +210,176 @@ const URToolShop: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Tool Shop</Text>
-        <AntDesign name="shoppingcart" size={24} color="#FF6100" onPress={handleGoToCart} />
-      </View>
-      {tool.imageUrl ? (
-        <Image source={{ uri: tool.imageUrl }} style={styles.toolImage} />
-      ) : (
-        <View style={styles.imagePlaceholder}>
-          <Text style={styles.imagePlaceholderText}>No Image Available</Text>
-        </View>
-      )}
-      <Text style={styles.toolTitle}>{tool.title}</Text>
-      <Text style={styles.toolPrice}>Price: {tool.price || 'N/A'}</Text>
-      <Text style={styles.toolDuration}>Duration: {tool.timeDuration || 'N/A'}</Text>
-      <Text style={styles.toolDescription}>{tool.description || 'No description available'}</Text>
-      <Button title="Add to Cart" onPress={handleAddToCart} color="#FF6100" />
-
-      {/* Reviews Section */}
-      <View style={styles.reviewsContainer}>
-        <Text style={styles.reviewHeader}>Reviews:</Text>
-        <FlatList
-          data={reviews}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.reviewItem}>
-              <Text style={styles.reviewUserId}>User: {item.userId}</Text>
-              <Text style={styles.reviewContent}>{item.content}</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <FlatList
+        contentContainerStyle={styles.scrollContainer}
+        data={[tool]} // Pass tool as an array to display it
+        keyExtractor={(item) => item.id}
+        renderItem={() => (
+          <View style={styles.container}>
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>{tool.name}</Text>
+              <AntDesign name="shoppingcart" size={24} color="#FF6100" onPress={handleGoToCart} />
             </View>
-          )}
-          ListEmptyComponent={<Text>No reviews yet.</Text>}
-        />
-        <TextInput
-          placeholder="Write a review"
-          value={newReview}
-          onChangeText={setNewReview}
-          style={styles.input}
-          multiline
-        />
-        <Button title="Submit Review" onPress={handleAddReview} color="#FF6100" />
-      </View>
-    </View>
+            {tool.imageUrl ? (
+              <Image source={{ uri: tool.imageUrl }} style={styles.toolImage} />
+            ) : (
+              <View style={styles.imagePlaceholder}>
+                <Text style={styles.imagePlaceholderText}>No Image Available</Text>
+              </View>
+            )}
+            
+            <Text style={styles.toolPrice}>Price: Rs. {tool.price || 'N/A'}</Text>
+           
+            <Text style={styles.toolDescription}>{tool.description || 'No description available'}</Text>
+            
+            <TouchableOpacity style={styles.addButton} onPress={handleAddToCart}>
+              <Text style={styles.addButtonText}>Add to Cart</Text>
+            </TouchableOpacity>
+            
+            
+            <View style={styles.reviewsContainer}>
+              <Text style={styles.reviewHeader}>Reviews:</Text>
+              <FlatList
+                data={reviews}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <View style={styles.reviewItem}>
+                    <Text style={styles.reviewUser}>{item.userName}:</Text>
+                    <Text style={styles.reviewContent}>{item.content}</Text>
+                  </View>
+                )}
+              />
+              <TextInput
+                style={styles.reviewInput}
+                placeholder="Write a review..."
+                value={newReview}
+                onChangeText={setNewReview}
+              />
+              <Button title="Submit Review" onPress={handleAddReview} color="#FF6100" />
+            </View>
+          </View>
+        )}
+      />
+    </SafeAreaView>
   );
 };
 
-
 const styles = StyleSheet.create({
-  // ...existing styles
-  reviewsContainer: {
-    marginTop: 30,
-  },
-  reviewHeader: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  reviewItem: {
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-  },
-  reviewUserName: {
-    fontWeight: 'bold',
-  },
-  reviewContent: {
-    marginTop: 5,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  container: {
+  safeArea: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  toolImage: {
-    width: '100%',
-    height: 300,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  imagePlaceholder: {
-    width: '100%',
-    height: 300,
-    backgroundColor: '#E0E0E0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-  },
-  imagePlaceholderText: {
-    fontSize: 18,
-    color: '#808080',
-  },
-  toolTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  toolPrice: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#FF6100',
-    marginBottom: 10,
-  },
-  toolDuration: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  toolDescription: {
-    fontSize: 16,
-    color: '#666666',
+    backgroundColor: '#ffffff',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#EEEEEE',
   },
   loadingText: {
     marginTop: 10,
-    fontSize: 18,
-    color: '#FF6100',
+    fontSize: 16,
+    color: '#333',
+  },
+  scrollContainer: {
+    padding: 16,
+  },
+  container: {
+    padding: 16,
+    borderRadius: 8,
+    backgroundColor: '#f9f9f9',
+    elevation: 2,
+  
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#333',
   },
-  reviewUserId: {
+  toolImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginVertical: 16,
+  },
+  imagePlaceholder: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#e0e0e0',
+    marginVertical: 16,
+  },
+  imagePlaceholderText: {
+    color: '#999',
+  },
+  toolTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 8,
+  },
+  toolPrice: {
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  toolDuration: {
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  toolDescription: {
+    fontSize: 16,
+    marginBottom: 16,
+    color: '#555',
+  },
+  reviewsContainer: {
+    marginTop: 16,
+  },
+  reviewHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  reviewItem: {
+    marginBottom: 8,
+  },
+  reviewUser: {
+    fontWeight: 'bold',
+  },
+  reviewContent: {
+    color: '#555',
+  },
+  reviewInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    padding: 8,
+    marginBottom: 8,
+  },
+  addButton: {
+    width:'50%',
+    backgroundColor: '#FF6F00',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+    flex: 1,
+    justifyContent: 'center',
+    alignSelf:'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  addButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingLeft:15,
   },
 });
 
