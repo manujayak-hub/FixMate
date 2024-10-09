@@ -1,18 +1,44 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Modal, ActivityIndicator  } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { FIREBASE_AUTH ,FIREBASE_DB} from '../../Firebase_Config';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../Firebase_Config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import CustomAlert from '../Components/CustomAlert';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigation:any = useNavigation();
-  
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<'error' | 'success' | undefined>(undefined);
+  const navigation: any = useNavigation();
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password: string) => {
+    return password.length >= 6;
+  };
 
   const signIn = async () => {
+    if (!email || !validateEmail(email)) {
+      setAlertMessage('Enter a valid email address!');
+      setAlertType('error');
+      setAlertVisible(true);
+      return;
+    }
+
+    if (!password || !validatePassword(password)) {
+      setAlertMessage('Password must be at least 6 characters long!');
+      setAlertType('error');
+      setAlertVisible(true);
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
@@ -25,56 +51,64 @@ const LoginScreen = () => {
         } else {
           navigation.navigate('Shop_Client', { user: userData });
         }
+        setAlertMessage('Login successful!');
+        setAlertType('success');
       } else {
-        Alert.alert('Error', 'No user data found');
+        setAlertMessage('No user data found');
+        setAlertType('error');
       }
     } catch (error: any) {
-      Alert.alert('Sign in failed:', error.message);
+      setAlertMessage('Sign in failed: ' + error.message);
+      setAlertType('error');
     } finally {
+      setAlertVisible(true);
       setLoading(false);
     }
   };
+
   return (
     <View style={styles.container}>
-    <Text style={styles.title}>Login here</Text>
-    <Text style={styles.subtitle}>Welcome back! You've been missed!</Text>
+      <Text style={styles.title}>Login here</Text>
+      <Text style={styles.subtitle}>Welcome back! You've been missed!</Text>
 
-    <TextInput
-      style={styles.input}
-      placeholder="Email"
-      value={email}
-      onChangeText={setEmail}
-      keyboardType="email-address"
-    />
-    <TextInput
-      style={styles.input}
-      placeholder="Password"
-      value={password}
-      onChangeText={setPassword}
-      secureTextEntry
-    />
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
 
-    <TouchableOpacity style={styles.button} onPress={signIn}>
-      <Text style={styles.buttonText}>Sign In</Text>
-    </TouchableOpacity>
+      <CustomAlert
+        visible={alertVisible}
+        message={alertMessage}
+        type={alertType}
+        onClose={() => setAlertVisible(false)}
+      />
 
-    <TouchableOpacity  style={styles.buttonSecondary} onPress={() => navigation.navigate('SignUp')}>
-      <Text style={styles.linkText}>Create new account</Text>
-    </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={signIn}>
+        <Text style={styles.buttonText}>Sign In</Text>
+      </TouchableOpacity>
 
-     {/* Loading Modal */}
-     <Modal
-        transparent={true}
-        animationType="slide"
-        visible={loading}
-      >
+      <TouchableOpacity style={styles.buttonSecondary} onPress={() => navigation.navigate('SignUp')}>
+        <Text style={styles.linkText}>Create new account</Text>
+      </TouchableOpacity>
+
+      {/* Loading Modal */}
+      <Modal transparent={true} animationType="slide" visible={loading}>
         <View style={styles.modalContainer}>
           <ActivityIndicator size="large" color="#FF6A00" />
           <Text style={styles.loadingText}>Signing you in...</Text>
         </View>
       </Modal>
-  </View>
-    
+    </View>
   );
 };
 
@@ -83,7 +117,6 @@ const styles = StyleSheet.create({
     padding: 30,
     flex: 1,
     justifyContent: 'center',
-    
   },
   title: {
     fontSize: 24,
@@ -96,7 +129,7 @@ const styles = StyleSheet.create({
     color: '#7A7A7A',
     textAlign: 'center',
     marginVertical: 10,
-    marginBottom:30
+    marginBottom: 30,
   },
   input: {
     height: 50,
@@ -105,7 +138,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginVertical: 10,
-
   },
   button: {
     backgroundColor: '#FF6A00',
@@ -123,7 +155,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 16,
-    alignSelf:'center'
+    alignSelf: 'center',
   },
   linkText: {
     color: '#fff',
@@ -142,4 +174,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
+
 export default LoginScreen;
