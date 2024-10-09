@@ -8,20 +8,7 @@
       "developmentClient": true,
       "distribution": "internal"
     },
-    "local": {
-      "android": {
-        "buildType": "apk"
-      },
-      "env": {
-        "APIKEY": "AIzaSyAEpBvNjMtNuSHkwIWnyikPBExvTAi-QU8",
-        "AUTHDOMAIN": "uee-project-7e802.firebaseapp.com",
-        "PROJECTID": "uee-project-7e802",
-        "STORAGEBUCKET": "uee-project-7e802.appspot.com",
-        "MESSAGINGSENDERID": "513594411651",
-        "APPID": "1:513594411651:web:6d7a0b216431a283dc29b6",
-        "APP_NAME": "Fixmate(test)"
-      }
-    },
+   
     "preview": {
       "distribution": "internal"
     },
