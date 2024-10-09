@@ -6,7 +6,7 @@ const paymentMethods = [
   { id: '1', name: 'Visa', icon: require('../../../assets/visa.png') },
   { id: '2', name: 'MasterCard', icon: require('../../../assets/mastercard.png') },
   { id: '3', name: 'American Express', icon: require('../../../assets/amex.png') },
-  { id: '4', name: 'PayPal', icon: require('../../../assets/paypal.png') },
+  { id: '4', name: 'Cash', icon: require('../../../assets/cash.png') },
 ];
 
 const Payment = ({ route }) => {
