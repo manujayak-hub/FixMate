@@ -164,7 +164,7 @@ const MyAppointments = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalText}>
-              You lost a loyalty point because of cancelling your appointment. We are very sorry!
+              We're sorry to see you go! Unfortunately, you’ve lost a loyalty point for cancelling your appointment. 
             </Text>
             <TouchableOpacity style={styles.modalButton} onPress={closeModal}>
               <Text style={styles.modalButtonText}>OK</Text>
