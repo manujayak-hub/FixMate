@@ -29,7 +29,7 @@ const WelcomePage = () => {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.button}
+        style={styles.buttonSecondary}
         onPress={() => navigation.navigate('SignUp')}
       >
         <Text style={styles.buttonText}>Register</Text>
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
       fontSize: 16,
-      color: '#7A7A7A',
+      color: '#333',
       textAlign: 'center',
       marginVertical: 10,
       padding:30
@@ -74,6 +74,13 @@ const styles = StyleSheet.create({
     },
     button: {
       backgroundColor: '#FF6A00',
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      borderRadius: 5,
+      marginHorizontal: 10,
+    },
+    buttonSecondary: {
+      backgroundColor: '#333',
       paddingVertical: 10,
       paddingHorizontal: 20,
       borderRadius: 5,
