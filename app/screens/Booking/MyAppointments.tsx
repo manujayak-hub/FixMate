@@ -12,12 +12,37 @@ import { FIREBASE_DB } from '../../../Firebase_Config';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { FIREBASE_AUTH } from '../../../Firebase_Config'; // Import Firebase Auth
 import Navigation from '../../Components/Navigation'; // Your bottom navigation component
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+
+ export type RootStackParamList = {
+  TrackOrders: { appointment: Myappointments };
+  addcomplaint: { appointment: Myappointments };
+};
+
+// Define the type for the navigation prop
+type MyAppointmentsScreenProp = StackNavigationProp<
+  RootStackParamList,
+  'TrackOrders'
+>;
+
+interface Myappointments {
+  shopId: string;
+  shopName: string;
+  date: string;
+  rate: string;
+  status: string; 
+  estimatedTime: string; 
+}
+
 
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedCards, setExpandedCards] = useState({}); // Track expanded cards
   const [animation] = useState(new Animated.Value(0)); // Animation for expansion
+  const navigation = useNavigation<MyAppointmentsScreenProp>();
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -61,6 +86,11 @@ const MyAppointments = () => {
       duration: 300,
       useNativeDriver: true,
     }).start();
+  };
+
+  const handleTrackOrder = (appointment: Myappointments) => {
+    // Navigate to trackorders page with the appointment details
+    navigation.navigate('TrackOrders', { appointment });
   };
 
   if (loading) {
@@ -110,7 +140,7 @@ const MyAppointments = () => {
             )}
 
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.trackButton}>
+              <TouchableOpacity style={styles.trackButton} onPress={() => handleTrackOrder(item)}>
                 <Text style={styles.trackText}>Track</Text>
               </TouchableOpacity>
             </View>

@@ -17,6 +17,7 @@ const SignUpScreen = () => {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'error' | 'success' | undefined>(undefined);
   const navigation:any = useNavigation();
+  const [shopName, setShopName] = useState('');
 
 const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -70,6 +71,7 @@ const validateEmail = (email: string) => {
         email,
         type: userType,
         photo,
+        shopName: userType === 'Business' ? shopName : null 
       });
 
       // Clear form fields
@@ -78,6 +80,7 @@ const validateEmail = (email: string) => {
       setEmail('');
       setPassword('');
       setUserType('Customer');
+      setShopName('');
 
       // Display success alert
       
@@ -133,6 +136,14 @@ const validateEmail = (email: string) => {
         <Text style={userType === 'Business' ? styles.radioButtonTextSelected : styles.radioButtonText}>Business</Text>
       </TouchableOpacity>
     </View>
+    {userType === 'Business' && (
+        <TextInput
+          style={styles.input}
+          placeholder="Shop Name"
+          value={shopName}
+          onChangeText={setShopName}
+        />
+      )}
 
     <TouchableOpacity style={styles.button} onPress={handleSignUp}>
       <Text style={styles.buttonText}>Sign Up</Text>

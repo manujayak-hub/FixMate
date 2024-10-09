@@ -83,7 +83,7 @@ const ComplaintList: React.FC = () => {
             <View style={styles.complaintCard}>
               <View style={styles.complaintHeader}>
                 <View style={styles.headerLeft}>
-                  <Text style={styles.shoName}>{item.shopName ?? 'N/A'}</Text>
+                  <Text style={styles.shoName}>{item.shopN ?? 'N/A'}</Text>
                   <Text style={styles.complaintId}>#{item.complaintId ?? 'N/A'}</Text>
                 </View>
                 <Text style={styles.status}>Status: {item.status}</Text>

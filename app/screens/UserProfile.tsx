@@ -16,12 +16,12 @@ type RootStackParamList = {
   ordertracking: undefined;
   aboutus: undefined;
   PaymentMethods: undefined;
-  myappointments: undefined; // Added route for My Appointments
+  MyAppointments: undefined; // Added route for My Appointments
 };
 
 type OrderTrackNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'complainlist' | 'ordertracking' | 'aboutus' | 'PaymentMethods' | 'myappointments'
+  'complainlist' | 'ordertracking' | 'aboutus' | 'PaymentMethods' | 'MyAppointments'
 >;
 
 export default function UserProfile() {

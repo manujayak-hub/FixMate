@@ -16,7 +16,7 @@ const ShopDetails = ({ route, navigation }: ShopDetailsScreenProps) => {
     navigation.navigate('Appointment', { shop });
   };
   const handleInquirePress = () => {
-    navigation.navigate('addcomplaint', {shopName:shop.shopName});
+    navigation.navigate('addcomplaint', { shop });
   };
 
   return (

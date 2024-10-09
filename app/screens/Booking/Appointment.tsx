@@ -65,6 +65,8 @@ const Appointment: React.FC<AppointmentScreenProps> = ({ route, navigation }) =>
         time: selectedTime,
         shopCategory: shop.category,
         rate: shop.Rph,
+        status: 'Order Placed', 
+        estimatedTime: 'Processing', 
       });
   
       // Navigate to the Payment screen after appointment is successfully booked

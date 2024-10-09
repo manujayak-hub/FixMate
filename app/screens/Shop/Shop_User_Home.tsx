@@ -151,7 +151,7 @@ const Shop_User_Home: React.FC = () => {
 
           <TouchableOpacity
             style={styles.gridItem}
-            onPress={() => navigation.navigate("Complaintmanage")}
+            onPress={() => navigation.navigate("StatusManage")}
           >
             <Image source={uos} style={styles.buttonImage} />
             <Text style={styles.buttonText}>Update Order</Text>

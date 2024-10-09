@@ -9,6 +9,7 @@ interface Feedback {
   id: string;
   name: string;
   description: string;
+  shopN:string;
   rating: number;
 }
 
@@ -53,6 +54,7 @@ const ShopFeedback: React.FC = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.feedbackCard}>
+            <Text style={styles.name}>{item.shopN}</Text>
             <Text style={styles.name}>{item.name}</Text>
             <Text style={styles.description}>{item.description}</Text>
 

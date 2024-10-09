@@ -7,7 +7,7 @@ import { Picker } from '@react-native-picker/picker';
 import { onAuthStateChanged } from 'firebase/auth';
 import Modal from 'react-native-modal';
 import * as ImagePicker from 'expo-image-picker';
-import { RootStackParamList } from '../Client/Shop_Client';
+import { RootStackParamList } from '../Booking/MyAppointments';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 
@@ -17,7 +17,7 @@ const generateComplaintId = () => {
 };
 
 const AddComplaint: React.FC = ({ route }: AddComplaintScreenProps) => {
-  const { shop } = route.params; 
+  const { appointment } = route.params; 
   const [complaintId, setComplaintId] = useState<string>('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -83,7 +83,7 @@ const AddComplaint: React.FC = ({ route }: AddComplaintScreenProps) => {
     if (validateFields() && userId) {
       try {
         await addDoc(collection(FIREBASE_DB, 'complaints'), {
-          shopN:shop.shopName,
+          shopN:appointment.shopName,
           complaintId,
           userId,
           name,
@@ -95,7 +95,7 @@ const AddComplaint: React.FC = ({ route }: AddComplaintScreenProps) => {
           status: 'In Progress',
           createdAt: new Date().toISOString(),
         });
-        showModal('Success', `Complaint Submitted with ID: ${complaintId} to ${shop.shopName}.`);
+        showModal('Success', `Complaint Submitted with ID: ${complaintId} to ${appointment.shopName}.`);
         resetForm();
       } catch (error) {
         showModal('Error', 'Something went wrong while submitting your complaint.');
@@ -134,7 +134,7 @@ const AddComplaint: React.FC = ({ route }: AddComplaintScreenProps) => {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.container}>
           <Text style={styles.headerText}>Add your complaint...</Text>
-          <Text style={styles.label}>Add Complaint for : {shop.shopName}</Text>
+          <Text style={styles.label}>Add Complaint for : {appointment.shopName}</Text>
           <Text style={styles.label}>Complaint ID: {complaintId}</Text>
           <Text style={styles.label}>Full Name:</Text>
           <TextInput

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput, Alert, Modal, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
-import { collection, addDoc, getDocs, query, where, deleteDoc, doc, DocumentData, DocumentReference } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, deleteDoc, doc, DocumentData, DocumentReference, updateDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config'; // Firebase configuration
 import { getAuth } from "firebase/auth"; // Firebase Auth for user management
 
