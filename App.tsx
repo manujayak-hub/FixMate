@@ -33,6 +33,7 @@ import Appointment from "./app/screens/Booking/Appointment";
 import Payment from "./app/screens/Booking/Payment";
 
 import PaymentMethods from "./app/screens/Booking/PaymentMethods";
+import UpdateDeletePayMethods from "./app/screens/Booking/UpdateDeletePayMethods";
 import MyAppointments from "./app/screens/Booking/MyAppointments";
 
 
@@ -89,9 +90,8 @@ export default function App() {
         <Stack.Screen name="Appointment" component={Appointment} options={{headerShown:false}} />
         <Stack.Screen name="Payment" component={Payment} options={{headerShown:false}} />
 
-
-
         <Stack.Screen name="PaymentMethods" component={PaymentMethods} options={{headerShown:false}} />
+        <Stack.Screen name="UpdateDeletePayMethods" component={UpdateDeletePayMethods} options={{headerShown:false}} />
         <Stack.Screen name="MyAppointments" component={MyAppointments} options={{headerShown:false}} />
 
 
