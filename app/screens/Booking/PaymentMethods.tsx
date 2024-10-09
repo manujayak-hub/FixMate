@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput, Alert, Modal, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
-import { collection, addDoc, getDocs, query, where, deleteDoc, doc, DocumentData, DocumentReference } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config'; // Firebase configuration
-import { getAuth } from "firebase/auth"; // Firebase Auth for user management
+import { getAuth } from 'firebase/auth'; // Firebase Auth for user management
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 
-// Define the PaymentMethod interface
 interface PaymentMethod {
-  id: string;
+  pid: string; // Used for identifying card type
+  docId: string; // Added new property for document ID
   type: string;
   last4: string;
   nickname?: string;
+  expMonth?: string; // Add expiration month
+  expYear?: string;  // Add expiration year
+  cvv?: string;      // Add CVV (optional, but consider the security implications)
 }
 
-// Payment method icons mapping
 const paymentIcons = {
   Visa: require('../../../assets/visa.png'),
   Mastercard: require('../../../assets/mastercard.png'),
@@ -22,8 +24,9 @@ const paymentIcons = {
 };
 
 const PaymentMethods = () => {
+  const navigation = useNavigation<NavigationProp<any>>(); // Initialize navigation prop
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [newCard, setNewCard] = useState({ number: '', expMonth: '', expYear: '', cvv: '', nickname: '', type: 'Visa' });
   const [loading, setLoading] = useState(true);
@@ -31,7 +34,6 @@ const PaymentMethods = () => {
   const auth = getAuth();
   const user = auth.currentUser;
 
-  // Fetch the payment methods from Firebase when the component mounts
   useEffect(() => {
     if (user) {
       fetchPaymentMethods(user.uid);
@@ -46,7 +48,7 @@ const PaymentMethods = () => {
       const querySnapshot = await getDocs(q);
       const methods: PaymentMethod[] = [];
       querySnapshot.forEach((doc) => {
-        methods.push({ id: doc.id, ...doc.data() } as PaymentMethod);
+        methods.push({ pid: doc.data().pid, docId: doc.id, ...doc.data() } as PaymentMethod); // Added docId
       });
       setPaymentMethods(methods);
     } catch (error) {
@@ -56,54 +58,64 @@ const PaymentMethods = () => {
     }
   };
 
-  const handleSelect = (method: PaymentMethod) => {
-    setSelectedMethod(method);
-    setNewCard({ 
-      number: method.last4, 
-      expMonth: '', // Retrieve from your data if available
-      expYear: '', // Retrieve from your data if available
-      cvv: '', // CVV should not be stored for security reasons
-      nickname: method.nickname || '',
-      type: method.type 
-    });
-    setModalVisible(true);
+  const validateCard = () => {
+    const { number, expMonth, expYear, cvv } = newCard;
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+
+    if (!number || number.length !== 16) {
+      Alert.alert('Error', 'Please enter a valid 16-digit card number.');
+      return false;
+    }
+    if (!expMonth || parseInt(expMonth) < 1 || parseInt(expMonth) > 12) {
+      Alert.alert('Error', 'Please enter a valid expiration month (01-12).');
+      return false;
+    }
+    if (!expYear || parseInt(expYear) < currentYear) {
+      Alert.alert('Error', 'Please enter a valid expiration year.');
+      return false;
+    }
+    if (parseInt(expYear) === currentYear && parseInt(expMonth) < currentMonth) {
+      Alert.alert('Error', 'The card has already expired.');
+      return false;
+    }
+    if (!cvv || cvv.length !== 3) {
+      Alert.alert('Error', 'Please enter a valid 3-digit CVV.');
+      return false;
+    }
+    return true;
   };
 
   const handleAddPayment = async () => {
-    if (!newCard.number || newCard.number.length < 16 || !newCard.expMonth || !newCard.expYear || !newCard.cvv) {
-      Alert.alert('Error', 'Please fill in all required fields with valid data.');
-      return;
-    }
-
-    // Check expiration date validity
-    const expDate = new Date(`${newCard.expYear}-${newCard.expMonth}-01`);
-    if (expDate < new Date()) {
-      Alert.alert('Error', 'The card expiration date is invalid.');
-      return;
-    }
-
+    if (!validateCard()) return;
+  
     if (user) {
       const newPaymentMethod: PaymentMethod = {
-        id: Math.random().toString(),
+        pid: Math.random().toString(),
+        docId: '',
         type: newCard.type,
         last4: newCard.number.slice(-4),
         nickname: newCard.nickname || '',
+        expMonth: newCard.expMonth,
+        expYear: newCard.expYear,
+        cvv: newCard.cvv // Note: storing CVV is generally not recommended
       };
-
+  
+      console.log("New Card Data:", newPaymentMethod); // Log new card data
+  
       try {
-        // Save to Firebase
-        await addDoc(collection(FIREBASE_DB, 'paymentMethods'), {
-          userId: user.uid, // Associate with the logged-in user
+        const docRef = await addDoc(collection(FIREBASE_DB, 'paymentMethods'), {
+          userId: user.uid,
           ...newPaymentMethod,
         });
-
-        // Update local state
+        newPaymentMethod.docId = docRef.id; // Update the docId
+  
         setPaymentMethods([...paymentMethods, newPaymentMethod]);
         setModalVisible(false);
         Alert.alert('Success', 'Payment method added successfully!');
         setNewCard({ number: '', expMonth: '', expYear: '', cvv: '', nickname: '', type: 'Visa' });
       } catch (error) {
-        console.error('Error adding payment method: ', error);
+        console.error('Error adding payment method: ', error); // Log the error
         Alert.alert('Error', 'There was an issue adding the payment method. Please try again.');
       }
     } else {
@@ -111,62 +123,16 @@ const PaymentMethods = () => {
     }
   };
 
-  const handleUpdatePayment = async () => {
-    if (!selectedMethod) return;
-
-    try {
-      const paymentRef = doc(FIREBASE_DB, 'paymentMethods', selectedMethod.id);
-      await updateDoc(paymentRef, {
-        nickname: newCard.nickname,
-        // Update other necessary fields
-      });
-
-      setPaymentMethods(paymentMethods.map(method => method.id === selectedMethod.id ? { ...selectedMethod, nickname: newCard.nickname } : method));
-      setModalVisible(false);
-      Alert.alert('Success', 'Payment method updated successfully!');
-    } catch (error) {
-      console.error('Error updating payment method: ', error);
-      Alert.alert('Error', 'There was an issue updating the payment method. Please try again.');
-    }
+  const handlePaymentMethodClick = (paymentMethod: PaymentMethod) => {
+    // Navigate to UpdateDeletePayMethods screen with the selected payment method's details
+    navigation.navigate('UpdateDeletePayMethods', { paymentMethod });
   };
 
-  const handleDeletePayment = async () => {
-    if (!selectedMethod) {
-      console.log('No payment method selected');
-      return;
-    }
-  
-    Alert.alert('Delete Payment Method', 'Are you sure you want to delete this payment method?', [
-      {
-        text: 'Cancel',
-        onPress: () => {},
-        style: 'cancel',
-      },
-      {
-        text: 'Delete',
-        onPress: async () => {
-          try {
-            console.log('Attempting to delete payment method:', selectedMethod.id);
-            await deleteDoc(doc(FIREBASE_DB, 'paymentMethods', selectedMethod.id));
-            
-            // Ensure that paymentMethods state is updated correctly
-            setPaymentMethods(prevMethods => prevMethods.filter(method => method.id !== selectedMethod.id));
-            setModalVisible(false);
-            Alert.alert('Success', 'Payment method deleted successfully!');
-          } catch (error) {
-            console.error('Error deleting payment method: ', error);
-            Alert.alert('Error', 'There was an issue deleting the payment method. Please try again.');
-          }
-        },
-      },
-    ]);
-  };
-  
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Payment </Text>
-      <TouchableOpacity onPress={() => { setSelectedMethod(null); setModalVisible(true); }} style={styles.addButton}>
-        <Text style={styles.addButtonText}>Add payment method</Text>
+      <Text style={styles.header}>Payment Methods</Text>
+      <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.addButton}>
+        <Text style={styles.addButtonText}>Add Payment Method</Text>
       </TouchableOpacity>
 
       {loading ? (
@@ -174,19 +140,13 @@ const PaymentMethods = () => {
       ) : (
         <FlatList
           data={paymentMethods}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.docId} // Updated to use docId
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={[styles.methodContainer, selectedMethod?.id === item.id && styles.selectedMethod]}
-              onPress={() => handleSelect(item)}
+              style={[styles.methodContainer, selectedMethod === item.docId && styles.selectedMethod]} // Updated to use docId
+              onPress={() => handlePaymentMethodClick(item)} // Navigate on click
             >
-              {/* Display the relevant payment icon */}
-              {paymentIcons[item.type] && (
-                <Image
-                  source={paymentIcons[item.type]}
-                  style={styles.icon}
-                />
-              )}
+              {paymentIcons[item.type] && <Image source={paymentIcons[item.type]} style={styles.icon} />}
               <View>
                 <Text style={styles.methodType}>{item.type}</Text>
                 <Text style={styles.methodLast4}>Ending in {item.last4}</Text>
@@ -196,16 +156,10 @@ const PaymentMethods = () => {
         />
       )}
 
-      {/* Modal for adding/updating a payment method */}
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-      >
+      <Modal visible={modalVisible} transparent={true} animationType="slide" onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>{selectedMethod ? 'Edit Payment Details' : 'Add Payment Method'}</Text>
+            <Text style={styles.modalTitle}>Add Payment Method</Text>
             <TextInput
               style={styles.input}
               placeholder="Card Number"
@@ -246,28 +200,16 @@ const PaymentMethods = () => {
               value={newCard.nickname}
               onChangeText={(text) => setNewCard({ ...newCard, nickname: text })}
             />
-            <Picker
-              selectedValue={newCard.type}
-              style={styles.picker}
-              onValueChange={(itemValue) => setNewCard({ ...newCard, type: itemValue })}
-            >
+            <Picker selectedValue={newCard.type} style={styles.picker} onValueChange={(itemValue) => setNewCard({ ...newCard, type: itemValue })}>
               <Picker.Item label="Visa" value="Visa" />
               <Picker.Item label="Mastercard" value="Mastercard" />
               <Picker.Item label="Amex" value="Amex" />
             </Picker>
-
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.button} onPress={selectedMethod ? handleUpdatePayment : handleAddPayment}>
-                <Text style={styles.buttonText}>{selectedMethod ? 'Update' : 'Add'}</Text>
-              </TouchableOpacity>
-              {selectedMethod && (
-                <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={handleDeletePayment}>
-                  <Text style={styles.buttonText}>Delete</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>Close</Text>
+            <TouchableOpacity style={styles.saveButton} onPress={handleAddPayment}>
+              <Text style={styles.saveButtonText}>Save Payment Method</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -277,134 +219,25 @@ const PaymentMethods = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  addButton: {
-    backgroundColor: '#007BFF',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  methodContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  selectedMethod: {
-    backgroundColor: '#E8F5E9',
-  },
-  methodType: {
-    fontSize: 18,
-    marginLeft: 10,
-  },
-  methodLast4: {
-    fontSize: 14,
-    color: '#888',
-  },
-  modalBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContainer: {
-    width: '80%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingLeft: 10,
-    marginBottom: 15,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  picker: {
-    height: 50,
-    width: '100%',
-    marginBottom: 15,
-  },
-  saveButton: {
-    backgroundColor: '#28a745',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  cancelButton: {
-    backgroundColor: '#dc3545',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  icon: {
-    width: 40,
-    height: 40,
-    marginRight: 15,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  button: {
-    flex: 1,
-    backgroundColor: '#007BFF', // Primary button color
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginHorizontal: 5, // Adds spacing between buttons
-  },
-  buttonText: {
-    color: '#fff', // Button text color
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  deleteButton: {
-    backgroundColor: 'red', // Color for delete button
-  },
-  closeButton: {
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    color: 'blue', // Close button text color
-    fontWeight: 'bold',
-  },
+  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  addButton: { backgroundColor: '#4CAF50', padding: 10, alignItems: 'center', borderRadius: 5 },
+  addButtonText: { color: '#fff', fontSize: 18 },
+  methodContainer: { flexDirection: 'row', alignItems: 'center', padding: 15, borderBottomWidth: 1, borderBottomColor: '#ccc' },
+  selectedMethod: { backgroundColor: '#e0f7fa' },
+  icon: { width: 40, height: 40, marginRight: 10 },
+  methodType: { fontSize: 18 },
+  methodLast4: { fontSize: 16, color: '#777' },
+  modalBackground: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+  modalContainer: { width: '80%', backgroundColor: '#fff', borderRadius: 10, padding: 20 },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
+  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 10, marginBottom: 10 },
+  row: { flexDirection: 'row', justifyContent: 'space-between' },
+  picker: { height: 50, width: '100%', marginBottom: 10 },
+  saveButton: { backgroundColor: '#4CAF50', padding: 10, alignItems: 'center', borderRadius: 5 },
+  saveButtonText: { color: '#fff', fontSize: 18 },
+  cancelButton: { backgroundColor: '#f44336', padding: 10, alignItems: 'center', borderRadius: 5, marginTop: 10 },
+  cancelButtonText: { color: '#fff', fontSize: 18 },
 });
 
 export default PaymentMethods;
