@@ -22,7 +22,7 @@ const Navigation: React.FC = () => {
     </TouchableOpacity>
 
     <TouchableOpacity 
-      onPress={() => navigation.navigate('Tut' as never)}>
+      onPress={() => navigation.navigate('UserTutorial' as never)}>
     <Image source={guideicon} style={styles.icon}
     />
     </TouchableOpacity>

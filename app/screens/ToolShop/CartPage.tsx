@@ -7,7 +7,11 @@ import { FIREBASE_DB } from '../../../Firebase_Config'; // Import your Firestore
 import { useNavigation } from '@react-navigation/native'; // Import the navigation hook
 import { StackNavigationProp } from '@react-navigation/stack';
 import { getAuth } from 'firebase/auth'; // Import Firebase Auth
+import ClientHeader from "../../Components/ClientHeader";
+import Navigation from "../../Components/Navigation";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
+const bag = require("../../../assets/shopping-bag.png");
 // Define your root stack param list here as well
 type RootStackParamList = {
   CartPage: undefined;
@@ -106,8 +110,8 @@ const CartPage: React.FC = () => {
         </View>
       )}
       <View style={styles.toolDetails}>
-        <Text style={styles.toolTitle}>{item.title}</Text>
-        <Text style={styles.toolPrice}>Price: {item.price || 'N/A'}</Text>
+        <Text style={styles.toolTitle}>{item.name}</Text>
+        <Text style={styles.toolPrice}>Price: {item.price || 'N/A'}.00</Text>
 
         <View style={styles.quantityContainer}>
           <TouchableOpacity
@@ -132,29 +136,43 @@ const CartPage: React.FC = () => {
 
   if (userCart.length === 0) { // Check against userCart
     return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <ClientHeader/>
       <View style={styles.emptyContainer}>
+      <Image
+                source={bag}
+                style={styles.bagIcon}
+              />
         <Text style={styles.emptyText}>Your cart is empty.</Text>
       </View>
+      <Navigation/>
+      </SafeAreaView>
     );
   }
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <ClientHeader/>
     <View style={styles.container}>
       <FlatList
         data={userCart} // Use userCart instead of cart
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
+        
       />
       <View style={styles.totalsContainer}>
-        <Text style={styles.totalText}>Subtotal: ${subtotal.toFixed(2)}</Text>
-        <Text style={styles.totalText}>Total: ${total.toFixed(2)}</Text>
+      
+        <Text style={styles.totalText}>Total: Rs. {total.toFixed(2)}</Text>
       </View>
-      <Button
-        title="Proceed to Pay"
-        onPress={handleProceedToPay}
-        color="#FF6100"
-      />
+
+      <TouchableOpacity style={styles.addButton} onPress={handleProceedToPay}>
+              <Text style={styles.addButtonText}>Proceed to Pay</Text>
+      </TouchableOpacity>
+
+      
     </View>
+    <Navigation/>
+    </SafeAreaView>
   );
 };
 
@@ -162,15 +180,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+   
+    
   },
   toolContainer: {
     flexDirection: 'row',
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-    paddingBottom: 10,
     alignItems: 'center',
+    padding:10,
+    backgroundColor: '#f9f9f9',
+    shadowColor: '#000', // Required for iOS
+    shadowOffset: { width: -20, height: -20 },
+    shadowOpacity: 0.01,
+    shadowRadius: 10,
+    elevation: 2, // Required for Android
+    borderRadius: 15,
+    margin:5,
   },
   checkbox: {
     marginRight: 10,
@@ -183,6 +207,8 @@ const styles = StyleSheet.create({
   toolDetails: {
     flex: 1,
     justifyContent: 'space-between',
+    marginLeft:10,
+    
   },
   toolTitle: {
     fontSize: 18,
@@ -208,6 +234,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quantityButtonText: {
+   
     fontSize: 16,
   },
   quantityText: {
@@ -218,6 +245,22 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+   
+    width: 336,
+    height: 10,
+    left: '50%',
+    marginLeft: -170, // Equivalent of `calc(50% - 336px / 2 - 2px)`
+    top: 183,
+    backgroundColor: '#F9F9F9',
+    padding: 40,
+    borderRadius: 12,
+    flexDirection: 'column', // Aligns items vertically
+    marginBottom:400,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 50 }, // Mimics the shadow layout
+    shadowOpacity: 0.03,
+    shadowRadius: 80,
+    elevation: 10, // Required for Android to mimic box-shadow
   },
   emptyText: {
     fontSize: 20,
@@ -244,6 +287,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginVertical: 5,
+  },
+  addButton: {
+    flexDirection: 'row', // Aligns children horizontally
+    justifyContent: 'center', // Centers content horizontally
+    alignSelf:'center',
+    padding:15,
+    width: 200,
+    height: 60,
+    backgroundColor: '#FF6F00',
+    borderRadius: 22,
+    
+  },
+  addButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingLeft:15,
+  },
+  bagIcon: {
+    width: 60, // Reduced size for category icons
+    height: 60, // Adjusted height
+    marginBottom: 20,
   },
 });
 

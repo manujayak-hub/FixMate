@@ -15,6 +15,8 @@ import TutorialList from "./app/screens/Tutorial/TutorialList";
 import EditTutorial from "./app/screens/Tutorial/EditTutorial";
 import CatTutorial from "./app/screens/Tutorial/CatTutorial";
 import STView from "./app/screens/Tutorial/STView";
+import UserTutorial from "./app/screens/Tutorial/UserTutorial";
+import UserTutorialDoc from "./app/screens/Tutorial/UserTutorialDoc";
 
 import Client_MapView from "./app/screens/Client/Client_MapView";
 
@@ -76,6 +78,9 @@ export default function App() {
         <Stack.Screen name="EditTutorial" component={EditTutorial} options={{headerShown:false}} />
         <Stack.Screen name="CatTutorial" component={CatTutorial} options={{headerShown:false}} />
         <Stack.Screen name="STView" component={STView} options={{headerShown:false}} />
+        <Stack.Screen name="UserTutorial" component={UserTutorial} options={{headerShown:false}} />
+        <Stack.Screen name="UserTutorialDoc" component={UserTutorialDoc} options={{headerShown:false}} />
+        
         <Stack.Screen name="Client_MapView" component={Client_MapView} options={{headerShown:false}} />
         <Stack.Screen name="Profile" component={UserProfile} options={{headerShown:false}} />
         <Stack.Screen name="EditProfile" component={EditProfile} options={{headerShown:false}} />
