@@ -92,7 +92,7 @@ const Client_MapView = () => {
               title={shopmark.shopName}
               description={shopmark.category}
               image={locico}
-              onPress={() => openInGoogleMaps(shopmark.ownerLocationLatitude, shopmark.ownerLocationLongitude)} // Open Google Maps on marker press
+              
             />
           ))}
         </MapView>

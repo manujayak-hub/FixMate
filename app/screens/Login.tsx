@@ -51,8 +51,7 @@ const LoginScreen = () => {
         } else {
           navigation.navigate('Shop_Client', { user: userData });
         }
-        setAlertMessage('Login successful!');
-        setAlertType('success');
+        
       } else {
         setAlertMessage('No user data found');
         setAlertType('error');
