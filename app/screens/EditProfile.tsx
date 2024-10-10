@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, SafeAreaView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../Firebase_Config';
@@ -8,6 +8,8 @@ import { getAuth } from 'firebase/auth';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import UserHeder from '../Components/ClientHeader';
+import Navigation from '../Components/Navigation';
 
 const EditProfileScreen = () => {
   const [name, setName] = useState('');
@@ -100,6 +102,8 @@ const EditProfileScreen = () => {
   };
 
   return (
+<SafeAreaView style={{ flex: 1 }}>
+  <UserHeder/>
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Icon name="arrow-left" size={30} color="#000" />
@@ -170,6 +174,8 @@ const EditProfileScreen = () => {
         </View>
       </Modal>
     </View>
+    <Navigation/>
+    </SafeAreaView>
   );
 };
 
@@ -188,14 +194,15 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 20,
+    marginVertical: 40,
+    marginTop: -5
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#DDDDDD',
-    marginBottom: 15,
+    marginBottom: 35,
   },
   input: {
     flex: 1,
@@ -208,12 +215,12 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#ff6f00',
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center',
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 18,
   },
   imageContainer: {
     alignItems: 'center',

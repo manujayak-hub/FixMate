@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from './Shop_Client'; // Ensure the path is correct
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import vector icons
 import { useNavigation } from '@react-navigation/native';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { FIREBASE_DB } from '../../../Firebase_Config';
 
 
 type ShopDetailsScreenProps = NativeStackScreenProps<RootStackParamList, 'ShopDetails'>;
@@ -11,9 +13,35 @@ type ShopDetailsScreenProps = NativeStackScreenProps<RootStackParamList, 'ShopDe
 const ShopDetails = ({ route, navigation }: ShopDetailsScreenProps) => {
   const { shop } = route.params;
   const navigate = useNavigation()
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
+
+  useEffect(() => {
+    const feedbackQuery = query(collection(FIREBASE_DB, 'shopfeedback'), where('shopName', '==', shop.shopName));
+
+    const unsubscribe = onSnapshot(feedbackQuery, (snapshot) => {
+      const feedbackData = snapshot.docs.map((doc) => doc.data());
+      const total = feedbackData.length;
+      const avgRating = total > 0 
+        ? feedbackData.reduce((sum, feedback) => sum + (feedback.rating || 0), 0) / total 
+        : 0;
+
+      setTotalReviews(total);
+      setAverageRating(avgRating);
+    });
+
+    return () => unsubscribe();
+  }, [shop.shopName]);
+
+  const handleFeedbackPress = () => {
+    navigation.navigate('shopfeedbacklist', { shop });
+  };
 
   const handleBookNowPress = () => {
     navigation.navigate('Appointment', { shop });
+  };
+  const handleInquirePress = () => {
+    navigation.navigate('addcomplaint', { shop });
   };
 
   return (
@@ -25,12 +53,12 @@ const ShopDetails = ({ route, navigation }: ShopDetailsScreenProps) => {
           <Text style={styles.shopName}>{shop.shopName}</Text>
           <Text style={styles.category}>{shop.category}</Text>
 
-          {/* Hardcoded rating */}
           <View style={styles.ratingContainer}>
             <Icon name="star" size={20} color="#FFCC00" />
-            <Text style={styles.ratingText}>4.5</Text>
+            <Text style={styles.ratingText}  onPress={handleFeedbackPress}>{averageRating.toFixed(1)} ({totalReviews} Reviews)</Text>
           </View>
 
+          
           <Text style={styles.description}>{shop.Shop_Des}</Text>
 
           {/* Display Phone Number */}
@@ -52,7 +80,7 @@ const ShopDetails = ({ route, navigation }: ShopDetailsScreenProps) => {
           <Text style={styles.rph}>Rate: LKR {shop.Rph} Per Hour</Text>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.inquireButton}>
+            <TouchableOpacity style={styles.inquireButton} onPress={handleInquirePress}>
               <Text style={styles.inquireButtonText}>Inquire</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.bookNowButton} onPress={handleBookNowPress}>
@@ -72,6 +100,10 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
+  },
+  viewFeedback: {
+    color: '#007bff',
+    marginTop: 10,
   },
   image: {
     width: '100%',

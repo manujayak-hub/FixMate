@@ -52,10 +52,16 @@ import CartPage from "./app/screens/ToolShop/CartPage";
 import CartPayment from "./app/screens/ToolShop/CartPayment";
 import ToolView from "./app/screens/ToolShop/ToolView";
 import SuccessPage from "./app/screens/ToolShop/SuccessPage";
+
+
 import Shop_ToolShop from "./app/screens/ToolShop/Shop_ToolShop";
 
 
+
 import WelcomePage from "./app/screens/WelcomePage";
+import TrackOrders from "./app/screens/OrderTracking/TrackOrders";
+import StatusManage from "./app/screens/OrderTracking/OrderTrackDashboard";
+import addappcomplaint from "./app/screens/Complaint/AddApoComplaint";
 
 
 
@@ -94,10 +100,16 @@ export default function App() {
         <Stack.Screen name="EditProfile" component={EditProfile} options={{headerShown:false}} />
         <Stack.Screen name="complainlist" component={complainlist} options={{headerShown:false}} />
         <Stack.Screen name="ordertracking" component={ordertracking} options={{headerShown:false}} />
+        <Stack.Screen name="TrackOrders" component={TrackOrders} options={{headerShown:false}} />
         <Stack.Screen name="Complaintmanage" component={Complaintmanage} options={{headerShown:false}} />
         <Stack.Screen name="addcomplaint" component={addcomplaint} options={{headerShown:false}} />
+        <Stack.Screen name="addappcomplaint" component={addappcomplaint} options={{headerShown:false}} />
         <Stack.Screen name="aboutus" component={AboutUs} options={{headerShown:false}} />
         <Stack.Screen name="shopfeedbacklist" component={shopfeedback} options={{headerShown:false}} />
+
+        <Stack.Screen name="StatusManage" component={StatusManage} options={{headerShown:false}} />
+
+
 
         <Stack.Screen name="ShopDetails" component={ShopDetails} options={{headerShown:false}} />
         <Stack.Screen name="Appointment" component={Appointment} options={{headerShown:false}} />

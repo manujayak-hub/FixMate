@@ -11,16 +11,52 @@ import {
   Modal,
 } from 'react-native';
 import { FIREBASE_DB } from '../../../Firebase_Config';
+
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { FIREBASE_AUTH } from '../../../Firebase_Config'; // Import Firebase Auth
+import Navigation from '../../Components/Navigation'; // Your bottom navigation component
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+
+ export type RootStackParamList = {
+  TrackOrders: { appointment: Myappointments };
+  addcomplaint: { appointment: Myappointments };
+};
+
+// Define the type for the navigation prop
+type MyAppointmentsScreenProp = StackNavigationProp<
+  RootStackParamList,
+  'TrackOrders'
+>;
+
+interface Myappointments {
+  shopId: string;
+  shopName: string;
+  date: string;
+  rate: string;
+  status: string; 
+  estimatedTime: string; 
+}
+
+
 import { collection, getDocs, query, where, deleteDoc, doc } from 'firebase/firestore';
 import { FIREBASE_AUTH } from '../../../Firebase_Config';
 import Navigation from '../../Components/Navigation';
 
+
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [expandedCards, setExpandedCards] = useState({}); // Track expanded cards
+  const [animation] = useState(new Animated.Value(0)); // Animation for expansion
+  const navigation = useNavigation<MyAppointmentsScreenProp>();
+
   const [expandedCards, setExpandedCards] = useState({});
   const [animation] = useState(new Animated.Value(0));
   const [modalVisible, setModalVisible] = useState(false);
+
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -63,6 +99,11 @@ const MyAppointments = () => {
     }).start();
   };
 
+
+  const handleTrackOrder = (appointment: Myappointments) => {
+    // Navigate to trackorders page with the appointment details
+    navigation.navigate('TrackOrders', { appointment });
+
   const handleCancelAppointment = async (id) => {
     Alert.alert(
       'Cancel Appointment',
@@ -91,6 +132,7 @@ const MyAppointments = () => {
 
   const closeModal = () => {
     setModalVisible(false);
+
   };
 
   if (loading) {
@@ -139,7 +181,7 @@ const MyAppointments = () => {
             )}
 
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.trackButton}>
+              <TouchableOpacity style={styles.trackButton} onPress={() => handleTrackOrder(item)}>
                 <Text style={styles.trackText}>Track</Text>
               </TouchableOpacity>
               <TouchableOpacity

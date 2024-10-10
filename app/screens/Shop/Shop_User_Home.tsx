@@ -152,7 +152,7 @@ const Shop_User_Home: React.FC = () => {
 
           <TouchableOpacity
             style={styles.gridItem}
-            onPress={() => navigation.navigate("Complaintmanage")}
+            onPress={() => navigation.navigate("StatusManage")}
           >
             <Image source={uos} style={styles.buttonImage} />
             <Text style={styles.buttonText}>Update Order</Text>
@@ -170,11 +170,19 @@ const Shop_User_Home: React.FC = () => {
 
           <TouchableOpacity
             style={styles.gridItem}
+
+            onPress={() => navigation.navigate("Complaintmanage")}
+          >
+            <Image source={uos} style={styles.buttonImage} />
+            <Text style={styles.buttonText}>Manage Complaint</Text>
+            {/* <Text style={styles.buttonText}>Status</Text> */}
+
             onPress={() => navigation.navigate("ShopAppointments")}
           >
             <Image source={apt} style={styles.buttonImage} />
             <Text style={styles.buttonText}>View</Text>
             <Text style={styles.buttonText}>Appointments</Text>
+
           </TouchableOpacity>
         </View>
       </ScrollView>
