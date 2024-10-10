@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { FIREBASE_DB } from '../../../Firebase_Config';
 
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore';
 import { FIREBASE_AUTH } from '../../../Firebase_Config'; // Import Firebase Auth
 import Navigation from '../../Components/Navigation'; // Your bottom navigation component
 import { useNavigation } from '@react-navigation/native';
@@ -40,21 +40,13 @@ interface Myappointments {
 }
 
 
-import { collection, getDocs, query, where, deleteDoc, doc } from 'firebase/firestore';
-import { FIREBASE_AUTH } from '../../../Firebase_Config';
-import Navigation from '../../Components/Navigation';
-
 
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [expandedCards, setExpandedCards] = useState({}); // Track expanded cards
   const [animation] = useState(new Animated.Value(0)); // Animation for expansion
   const navigation = useNavigation<MyAppointmentsScreenProp>();
-
-  const [expandedCards, setExpandedCards] = useState({});
-  const [animation] = useState(new Animated.Value(0));
   const [modalVisible, setModalVisible] = useState(false);
 
 
@@ -103,6 +95,7 @@ const MyAppointments = () => {
   const handleTrackOrder = (appointment: Myappointments) => {
     // Navigate to trackorders page with the appointment details
     navigation.navigate('TrackOrders', { appointment });
+  }
 
   const handleCancelAppointment = async (id) => {
     Alert.alert(
