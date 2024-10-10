@@ -31,11 +31,8 @@ type RootStackParamList = {
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'UserTutorialDoc'>;
 
-  TutorialList: { category: string };
-  UserTutorialDoc: { tutorialId: string };
-};
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'TutorialList'>;
+
 
 
 // Define type for tutorial object

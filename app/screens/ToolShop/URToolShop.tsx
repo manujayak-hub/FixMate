@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
 
     backgroundColor: '#F9F9F9',
 
-    backgroundColor: '#f9f9f9',
+  
 
     elevation: 1,
   
