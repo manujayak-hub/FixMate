@@ -18,6 +18,9 @@ import STView from "./app/screens/Tutorial/STView";
 import UserTutorial from "./app/screens/Tutorial/UserTutorial";
 import UserTutorialDoc from "./app/screens/Tutorial/UserTutorialDoc";
 
+import Shop_Tutorial from "./app/screens/Tutorial/Shop_Tutorial";
+
+
 import Client_MapView from "./app/screens/Client/Client_MapView";
 
 
@@ -49,6 +52,7 @@ import CartPage from "./app/screens/ToolShop/CartPage";
 import CartPayment from "./app/screens/ToolShop/CartPayment";
 import ToolView from "./app/screens/ToolShop/ToolView";
 import SuccessPage from "./app/screens/ToolShop/SuccessPage";
+import Shop_ToolShop from "./app/screens/ToolShop/Shop_ToolShop";
 
 
 import WelcomePage from "./app/screens/WelcomePage";
@@ -81,6 +85,9 @@ export default function App() {
         <Stack.Screen name="STView" component={STView} options={{headerShown:false}} />
         <Stack.Screen name="UserTutorial" component={UserTutorial} options={{headerShown:false}} />
         <Stack.Screen name="UserTutorialDoc" component={UserTutorialDoc} options={{headerShown:false}} />
+
+        <Stack.Screen name="Shop_Tutorial" component={Shop_Tutorial} options={{headerShown:false}} />
+
         
         <Stack.Screen name="Client_MapView" component={Client_MapView} options={{headerShown:false}} />
         <Stack.Screen name="Profile" component={UserProfile} options={{headerShown:false}} />
@@ -111,6 +118,7 @@ export default function App() {
         <Stack.Screen name="CartPayment" component={CartPayment} options={{headerShown:false}} />
         <Stack.Screen name="ToolView" component={ToolView} options={{headerShown:false}} />
         <Stack.Screen name="SuccessPage" component={SuccessPage} options={{headerShown:false}} />
+        <Stack.Screen name="Shop_ToolShop" component={Shop_ToolShop} options={{headerShown:false}} />
 
 
 

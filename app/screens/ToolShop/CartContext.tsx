@@ -60,7 +60,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setCart([]);
       }
     }, (error) => {
-      console.error('Error fetching cart items:', error);
+      
     });
 
     // Cleanup the listener on component unmount
@@ -99,7 +99,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const cartDocRef = doc(FIREBASE_DB, 'Cart', 'shared_cart');
       try {
         await setDoc(cartDocRef, { tools: updatedCart }, { merge: true });
-        Alert.alert('Success', 'Tool added to cart in database.');
+        
       } catch (error) {
         console.error('Error adding tool to Firestore cart:', error);
         Alert.alert('Error', 'Failed to add tool to cart in database.');

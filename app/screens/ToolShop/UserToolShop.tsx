@@ -17,6 +17,7 @@ import { FIREBASE_DB } from '../../../Firebase_Config'; // Adjust import accordi
 import { StackNavigationProp } from '@react-navigation/stack';
 import ClientHeader from '../../Components/ClientHeader';
 import Navigation from "../../Components/Navigation";
+import Cart from "../../Components/Cart"
 
 // Import images
 const rect = require("../../../assets/rect56.png");
@@ -57,9 +58,9 @@ const categories = [
   'Electronic Repair',
   'Home and Appliance Repair',
   'Cloathing',
-  'GardenEquipment',
-  'MusicalInstruments',
-  'JwelleryWatches',
+  'Garden Equipment',
+  'Musical Instruments',
+  'Jwellery and Watches',
   'Automotive Repair',
   'Furniture Repair',
   'Computers',
@@ -104,8 +105,7 @@ const UserToolShop: React.FC = () => {
         setFilteredTools(toolsData); // Initialize filtered tools with all tools
       },
       (error) => {
-        Alert.alert('Error', 'Failed to load tools');
-        console.error('Error fetching tools:', error);
+        
         setLoading(false); // Stop loading on error
       }
     );
@@ -157,6 +157,7 @@ const UserToolShop: React.FC = () => {
       <View style={styles.topics}>
         <Image style={styles.rect} source={rect}></Image>
         <Text >Category</Text>
+        <Cart/>
       </View>
 
       <View>

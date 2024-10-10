@@ -156,7 +156,7 @@ const URToolShop: React.FC = () => {
   
         // Update Firestore cart
         await setDoc(cartDocRef, { tools: [...updatedTools, cartItem] }, { merge: true });
-        Alert.alert('Success', 'Tool added to database cart');
+        
       } catch (error) {
         Alert.alert('Error', 'Failed to add tool to cart in database');
         console.error('Error adding tool to cart:', error);
@@ -278,7 +278,7 @@ const URToolShop: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#F9F9F9',
   },
   loadingContainer: {
     flex: 1,
@@ -296,7 +296,11 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     borderRadius: 8,
-    backgroundColor: '#f9f9f9',
+
+    backgroundColor: '#F9F9F9',
+
+  
+
     elevation: 1,
   
   },

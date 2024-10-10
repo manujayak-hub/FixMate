@@ -40,6 +40,7 @@ const ClientHeader: React.FC = () => {
   const logout = () => {
     FIREBASE_AUTH.signOut()
       .then(() => {
+        
         clearUser(); // Clear the user data on logout
         navigation.dispatch(StackActions.replace('Login'));
       })
