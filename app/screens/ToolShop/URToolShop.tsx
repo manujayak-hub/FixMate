@@ -156,7 +156,7 @@ const URToolShop: React.FC = () => {
   
         // Update Firestore cart
         await setDoc(cartDocRef, { tools: [...updatedTools, cartItem] }, { merge: true });
-        Alert.alert('Success', 'Tool added to database cart');
+        
       } catch (error) {
         Alert.alert('Error', 'Failed to add tool to cart in database');
         console.error('Error adding tool to cart:', error);
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
 
     backgroundColor: '#F9F9F9',
 
-    backgroundColor: '#f9f9f9',
+  
 
     elevation: 1,
   

@@ -31,11 +31,8 @@ type RootStackParamList = {
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'UserTutorialDoc'>;
 
-  TutorialList: { category: string };
-  UserTutorialDoc: { tutorialId: string };
-};
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'TutorialList'>;
+
 
 
 // Define type for tutorial object
@@ -122,8 +119,7 @@ const UserTutorial: React.FC = () => {
 
         
 
-        Alert.alert('Error', 'Failed to load tutorials');
-        console.error('Error fetching tutorials:', error);
+       
 
         setLoading(false); // Stop loading on error
       }

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 
 import { Image, StyleSheet, Text, View, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native';
 
-import { Image, StyleSheet, Text, View, ScrollView, SafeAreaView, TextInput, Button } from 'react-native';
-
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { doc, getDoc, collection, addDoc, onSnapshot, query, where,serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
@@ -84,7 +82,7 @@ const UserTutorialDoc: React.FC = () => {
                 }
             } catch (error) {
 
-                console.error('Error fetching tutorial:', error);
+               
 
             }
         };
@@ -184,11 +182,8 @@ const UserTutorialDoc: React.FC = () => {
                 <View style={styles.reviewContainer}>
                 {reviews.length > 0 ? (
                     reviews.map((review) => (
-                        <View key={review.id} style={styles.reviewItem}>
-
-                {reviews.length > 0 ? (
-                    reviews.map((review) => (
-                        <View key={review.id} style={styles.reviewContainer}>
+                        
+                            <View key={review.id} style={styles.reviewItem}>
 
                             <Text style={styles.reviewUsername}>{review.username}</Text>
                             <Text style={styles.reviewText}>{review.reviewText}</Text>
@@ -201,10 +196,7 @@ const UserTutorialDoc: React.FC = () => {
                 )}
                 </View>
 
-                ) : (
-                    <Text>No reviews yet.</Text>
-                )}
-
+                
 
                 <TextInput
                     style={styles.reviewInput}
@@ -221,7 +213,7 @@ const UserTutorialDoc: React.FC = () => {
             </ScrollView>
             <Navigation/>
 
-                <Button title="Submit Review" onPress={handleAddReview} />
+                
             </ScrollView>
 
         </SafeAreaView>
@@ -277,8 +269,7 @@ const styles = StyleSheet.create({
         elevation: 2, // Required for Android
 
         marginVertical: 10,
-        padding: 10,
-        backgroundColor: '#f9f9f9',
+        
 
         borderRadius: 5,
     },
@@ -331,16 +322,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
       },
 
-        fontSize: 14,
-    },
-    reviewInput: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 5,
-        padding: 10,
-        marginTop: 10,
-    },
+        
+    
 
 });
 
