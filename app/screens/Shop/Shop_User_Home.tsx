@@ -15,7 +15,8 @@ const au = require("../../../assets/au.png");
 const ayrs = require("../../../assets/ayrs.png");
 const eysd = require("../../../assets/eysd.png");
 const uos = require("../../../assets/uos.png");
-const ds = require("../../../assets/deleteshop.png")
+const ds = require("../../../assets/deleteshop.png");
+const apt = require("../../../assets/appointment.png");
 
 const Shop_User_Home: React.FC = () => {
   const navigation: any = useNavigation();
@@ -169,11 +170,11 @@ const Shop_User_Home: React.FC = () => {
 
           <TouchableOpacity
             style={styles.gridItem}
-            onPress={handleDeleteShop}
+            onPress={() => navigation.navigate("ShopAppointments")}
           >
-            <Image source={ds} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>Delete</Text>
-            <Text style={styles.buttonText}>Repair Shop</Text>
+            <Image source={apt} style={styles.buttonImage} />
+            <Text style={styles.buttonText}>View</Text>
+            <Text style={styles.buttonText}>Appointments</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

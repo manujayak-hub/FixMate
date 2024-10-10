@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ActivityIndicator } from 'react-native';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config'; // Firebase configuration
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -20,6 +20,7 @@ const UpdateDeletePayMethods = () => {
   const navigation = useNavigation();
   const { paymentMethod } = route.params as { paymentMethod: PaymentMethod }; // Get payment method details passed via navigation
   const [nickname, setNickname] = useState(paymentMethod.nickname || '');
+  const [loading, setLoading] = useState(false); // Loading state
 
   // Function to handle updating payment method
   const handleUpdatePaymentMethod = async () => {
@@ -29,6 +30,7 @@ const UpdateDeletePayMethods = () => {
     }
 
     try {
+      setLoading(true); // Set loading to true
       // Use the correct document ID from Firestore
       const paymentMethodRef = doc(FIREBASE_DB, 'paymentMethods', paymentMethod.docId); // Using docId for Firestore document ID
       
@@ -39,12 +41,15 @@ const UpdateDeletePayMethods = () => {
     } catch (error) {
       console.error('Error updating payment method: ', error);
       Alert.alert('Error', 'There was an issue updating the payment method. Please try again.');
+    } finally {
+      setLoading(false); // Set loading to false after the operation
     }
   };
 
   // Function to handle deleting payment method
   const handleDeletePaymentMethod = async () => {
     try {
+      setLoading(true); // Set loading to true
       // Use the correct document ID for deletion
       const paymentMethodRef = doc(FIREBASE_DB, 'paymentMethods', paymentMethod.docId); // Using docId for Firestore document ID
 
@@ -55,6 +60,8 @@ const UpdateDeletePayMethods = () => {
     } catch (error) {
       console.error('Error deleting payment method: ', error);
       Alert.alert('Error', 'There was an issue deleting the payment method. Please try again.');
+    } finally {
+      setLoading(false); // Set loading to false after the operation
     }
   };
 
@@ -74,13 +81,19 @@ const UpdateDeletePayMethods = () => {
         onChangeText={setNickname}
       />
 
-      <TouchableOpacity style={styles.updateButton} onPress={handleUpdatePaymentMethod}>
-        <Text style={styles.updateButtonText}>Update Payment Method</Text>
-      </TouchableOpacity>
+      {loading ? ( // Show loading indicator while processing
+        <ActivityIndicator size="large" color="#007bff" style={styles.loading} />
+      ) : (
+        <>
+          <TouchableOpacity style={styles.updateButton} onPress={handleUpdatePaymentMethod}>
+            <Text style={styles.updateButtonText}>Update Payment Method</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity style={styles.deleteButton} onPress={handleDeletePaymentMethod}>
-        <Text style={styles.deleteButtonText}>Delete Payment Method</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDeletePaymentMethod}>
+            <Text style={styles.deleteButtonText}>Delete Payment Method</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 };
@@ -136,6 +149,9 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  loading: {
+    marginVertical: 20,
   },
 });
 

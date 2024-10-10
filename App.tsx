@@ -40,7 +40,7 @@ import Payment from "./app/screens/Booking/Payment";
 import PaymentMethods from "./app/screens/Booking/PaymentMethods";
 import UpdateDeletePayMethods from "./app/screens/Booking/UpdateDeletePayMethods";
 import MyAppointments from "./app/screens/Booking/MyAppointments";
-
+import ShopAppointments from "./app/screens/Shop/ShopAppointments";
 
 import AddTools from "./app/screens/ToolShop/AddTools";
 import ToolList from "./app/screens/ToolShop/ToolList";
@@ -98,14 +98,14 @@ export default function App() {
         <Stack.Screen name="addcomplaint" component={addcomplaint} options={{headerShown:false}} />
         <Stack.Screen name="aboutus" component={AboutUs} options={{headerShown:false}} />
         <Stack.Screen name="shopfeedbacklist" component={shopfeedback} options={{headerShown:false}} />
+
         <Stack.Screen name="ShopDetails" component={ShopDetails} options={{headerShown:false}} />
         <Stack.Screen name="Appointment" component={Appointment} options={{headerShown:false}} />
         <Stack.Screen name="Payment" component={Payment} options={{headerShown:false}} />
-
         <Stack.Screen name="PaymentMethods" component={PaymentMethods} options={{headerShown:false}} />
         <Stack.Screen name="UpdateDeletePayMethods" component={UpdateDeletePayMethods} options={{headerShown:false}} />
         <Stack.Screen name="MyAppointments" component={MyAppointments} options={{headerShown:false}} />
-
+        <Stack.Screen name="ShopAppointments" component={ShopAppointments} options={{headerShown:false}} />
 
 
 
