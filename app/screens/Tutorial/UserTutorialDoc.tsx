@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Image, StyleSheet, Text, View, ScrollView, SafeAreaView, TextInput, Button } from 'react-native';
+import { Image, StyleSheet, Text, View, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { doc, getDoc, collection, addDoc, onSnapshot, query, where,serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { FIREBASE_DB } from '../../../Firebase_Config';
 import { Video, ResizeMode } from 'expo-av';
+import ClientHeader from "../../Components/ClientHeader";
+import Navigation from "../../Components/Navigation";
+
 
 type RootStackParamList = {
     UserTutorialDoc: { tutorialId: string };
@@ -13,6 +16,7 @@ type RootStackParamList = {
 type TutorialDocRouteProp = RouteProp<RootStackParamList, 'UserTutorialDoc'>;
 
 interface TutorialData {
+    tutorialId:String;
     imageUrl: string;
     title: string;
     tools: string;
@@ -70,7 +74,7 @@ const UserTutorialDoc: React.FC = () => {
                     console.log('No such document!');
                 }
             } catch (error) {
-                console.error('Error fetching tutorial:', error);
+               
             }
         };
 
@@ -115,7 +119,7 @@ const UserTutorialDoc: React.FC = () => {
                 // Check if timestamp exists before calling toDate
                 if (review.timestamp) {
                     const reviewTimestamp = review.timestamp.toDate(); // Convert Firestore timestamp to JS date
-                    return (new Date().getTime() - reviewTimestamp.getTime()) <= 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+                    return (new Date().getTime() - reviewTimestamp.getTime()) <= 72 * 60 * 60 * 1000; // 24 hours in milliseconds
                 }
                 return false; // If there's no timestamp, exclude this review
             });
@@ -131,7 +135,8 @@ const UserTutorialDoc: React.FC = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView>
+             <ClientHeader />
+            <ScrollView style={{padding:15}}>
                 <Text style={styles.title}>{tutorial.title}</Text>
                 <Image
                     source={{ uri: tutorial.imageUrl }}
@@ -156,16 +161,19 @@ const UserTutorialDoc: React.FC = () => {
                 )}
 
                 <Text style={styles.txt}>Reviews:</Text>
+                <View style={styles.reviewContainer}>
                 {reviews.length > 0 ? (
                     reviews.map((review) => (
-                        <View key={review.id} style={styles.reviewContainer}>
+                        <View key={review.id} style={styles.reviewItem}>
                             <Text style={styles.reviewUsername}>{review.username}</Text>
                             <Text style={styles.reviewText}>{review.reviewText}</Text>
                         </View>
                     ))
+
                 ) : (
                     <Text>No reviews yet.</Text>
                 )}
+                </View>
 
                 <TextInput
                     style={styles.reviewInput}
@@ -173,15 +181,20 @@ const UserTutorialDoc: React.FC = () => {
                     value={reviewText}
                     onChangeText={setReviewText}
                 />
-                <Button title="Submit Review" onPress={handleAddReview} />
+                <TouchableOpacity style={styles.addButton} onPress={handleAddReview}>
+              <Text style={styles.addButtonText}>Submit Review</Text>
+      </TouchableOpacity>
+
+                
             </ScrollView>
+            <Navigation/>
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
+       
         backgroundColor: '#fff3e6',
         flex: 1,
     },
@@ -215,25 +228,63 @@ const styles = StyleSheet.create({
         color: '#FF6100',
     },
     reviewContainer: {
-        marginVertical: 10,
-        padding: 10,
-        backgroundColor: '#f9f9f9',
+        marginTop: 16,
+        padding:10,
+        backgroundColor: '#F3F3F3',
+        shadowColor: '#000', // Required for iOS
+        shadowOffset: { width: -20, height: -20 },
+        shadowOpacity: 0.5,
+        marginBottom:5,
+        elevation: 2, // Required for Android
         borderRadius: 5,
     },
     reviewUsername: {
         fontWeight: 'bold',
     },
     reviewText: {
-        fontSize: 14,
+        color: '#555',
     },
     reviewInput: {
-        height: 40,
-        borderColor: 'gray',
         borderWidth: 1,
-        borderRadius: 5,
-        padding: 10,
-        marginTop: 10,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    padding: 8,
+    marginBottom: 8,
     },
+    addButton: {
+        width:'50%',
+        backgroundColor: '#FF6F00',
+        paddingVertical: 12,
+        paddingHorizontal: 25,
+        borderRadius: 8,
+        flex: 1,
+        justifyContent: 'center',
+        alignSelf:'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        marginTop:10,
+        marginBottom:40,
+      },
+      addButtonText: {
+        color: '#FFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+        paddingLeft:15,
+      },
+      reviewItem: {
+        marginBottom: 8,
+        padding:10,
+        backgroundColor: '#F3F3F3',
+        shadowColor: '#000', // Required for iOS
+        shadowOffset: { width: -20, height: -20 },
+        shadowOpacity: 0.5,
+        flexDirection: 'row',
+        elevation: 10, // Required for Android
+        borderRadius: 10,
+      },
 });
 
 export default UserTutorialDoc;

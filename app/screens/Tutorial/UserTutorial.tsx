@@ -24,11 +24,11 @@ const otherico = require("../../../assets/otherico.png");
 
 // Define type for navigation
 type RootStackParamList = {
-  TutorialList: { category: string };
+  
   UserTutorialDoc: { tutorialId: string };
 };
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'TutorialList'>;
+type NavigationProp = StackNavigationProp<RootStackParamList, 'UserTutorialDoc'>;
 
 // Define type for tutorial object
 interface Tutorial {
@@ -44,9 +44,9 @@ const categories = [
   'Electronic Repair',
   'Home and Appliance Repair',
   'Cloathing',
-  'GardenEquipment',
-  'MusicalInstruments',
-  'JwelleryWatches',
+  'Garden Equipment',
+  'Musical Instruments',
+  'Jwellery and Watches',
   'Automotive Repair',
   'Furniture Repair',
   'Computers',
@@ -105,8 +105,7 @@ const UserTutorial: React.FC = () => {
         setLoading(false); // Stop loading when data is fetched
       },
       (error) => {
-        Alert.alert('Error', 'Failed to load tutorials');
-        console.error('Error fetching tutorials:', error);
+        
         setLoading(false); // Stop loading on error
       }
     );

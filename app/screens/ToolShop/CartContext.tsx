@@ -60,7 +60,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setCart([]);
       }
     }, (error) => {
-      console.error('Error fetching cart items:', error);
+      
     });
 
     // Cleanup the listener on component unmount

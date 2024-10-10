@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert, TextInput, SafeAreaView } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { collection, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
-import { FIREBASE_DB, FIREBASE_STORAGE } from '../../../Firebase_Config'; // Adjust import according to your file structure
+import { collection, query, where, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
+import { FIREBASE_DB, FIREBASE_STORAGE, FIREBASE_AUTH } from '../../../Firebase_Config';
 import { ref, deleteObject } from 'firebase/storage';
 import { AntDesign } from '@expo/vector-icons';
+import { onAuthStateChanged } from 'firebase/auth';
+import Navbar from "../../Components/NavigationFor_Business";
+import Shop_Header from "../../Components/Shop_Header";
+
+const searchicon = require("../../../assets/searchicon.png");
 
 // Define the structure for a tutorial
 interface Tutorial {
@@ -12,30 +17,64 @@ interface Tutorial {
   title: string;
   timeDuration: string;
   imageUrl: string;
-  videoUrl?: string; // Optional because a tutorial might not have a video
+  videoUrl?: string;
+  category: string; // Add category to the tutorial interface
 }
 
-// Define the type for the navigation prop (assuming you have a "RootStackParamList" defined elsewhere)
+// Define the type for the navigation prop
 type RootStackParamList = {
   EditTutorial: { tutorialId: string };
   STView: { tutorialId: string };
 };
 
+const categories = [
+  'All',
+  'Electronic Repair',
+  'Home and Appliance Repair',
+  'Cloathing',
+  'Garden Equipment',
+  'Musical Instruments',
+  'Jwellery and Watches',
+  'Automotive Repair',
+  'Furniture Repair',
+  'Computers',
+]; 
+
 const TutorialList: React.FC = () => {
   const [tutorials, setTutorials] = useState<Tutorial[]>([]);
+  const [filteredTutorials, setFilteredTutorials] = useState<Tutorial[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>(''); // State for the search query
+  const [selectedCategory, setSelectedCategory] = useState<string>('All'); // State for the selected category
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(FIREBASE_AUTH, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
+    });
+
+    return () => unsubscribeAuth();
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+
     const tutorialsCollection = collection(FIREBASE_DB, 'Tutorial');
+    const q = query(tutorialsCollection, where('userId', '==', userId)); // Filter by logged-in user's ID
 
     const unsubscribe = onSnapshot(
-      tutorialsCollection,
+      q,
       snapshot => {
         const tutorialsData = snapshot.docs.map(doc => ({
           id: doc.id,
           ...(doc.data() as Tutorial), // Type assertion to Tutorial structure
         }));
         setTutorials(tutorialsData);
+        setFilteredTutorials(tutorialsData); // Initialize filtered tutorials
       },
       error => {
         Alert.alert('Error', 'Failed to load tutorials');
@@ -43,13 +82,28 @@ const TutorialList: React.FC = () => {
       }
     );
 
-    // Cleanup listener on unmount
     return () => unsubscribe();
-  }, []);
+  }, [userId]);
+
+  useEffect(() => {
+    // Filter tutorials based on category and search query
+    let filtered = tutorials;
+    
+    if (selectedCategory !== 'All') {
+      filtered = tutorials.filter(tutorial => tutorial.category === selectedCategory);
+    }
+
+    if (searchQuery !== '') {
+      filtered = filtered.filter(tutorial =>
+        tutorial.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredTutorials(filtered);
+  }, [searchQuery, tutorials, selectedCategory]);
 
   const handleDelete = async (id: string, videoUrl?: string, imageUrl?: string) => {
     try {
-      // Confirm deletion action
       Alert.alert(
         'Confirm Delete',
         'Are you sure you want to delete this tutorial?',
@@ -59,36 +113,15 @@ const TutorialList: React.FC = () => {
             text: 'OK',
             onPress: async () => {
               try {
-                // Log the paths being used
-                console.log('Video URL:', videoUrl);
-                console.log('Image URL:', imageUrl);
-
-                // Create references to storage objects
                 if (videoUrl) {
                   const videoRef = ref(FIREBASE_STORAGE, videoUrl);
-                  try {
-                    await deleteObject(videoRef);
-                    console.log('Video deleted successfully');
-                  } catch (error) {
-                    console.error('Error deleting video:', error);
-                    Alert.alert('Error', 'Could not delete video');
-                  }
+                  await deleteObject(videoRef);
                 }
-
                 if (imageUrl) {
                   const imageRef = ref(FIREBASE_STORAGE, imageUrl);
-                  try {
-                    await deleteObject(imageRef);
-                    console.log('Image deleted successfully');
-                  } catch (error) {
-                    console.error('Error deleting image:', error);
-                    Alert.alert('Error', 'Could not delete image');
-                  }
+                  await deleteObject(imageRef);
                 }
-
-                // Delete document from Firestore
                 await deleteDoc(doc(FIREBASE_DB, 'Tutorial', id));
-                console.log('Document deleted successfully');
                 Alert.alert('Success', 'Tutorial deleted successfully');
               } catch (error) {
                 console.error('Error during deletion process:', error);
@@ -109,61 +142,107 @@ const TutorialList: React.FC = () => {
   };
 
   const handleView = (id: string) => {
-    navigation.navigate('STView', { tutorialId: id }); // Navigate to STView
+    navigation.navigate('STView', { tutorialId: id });
   };
 
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {tutorials.map(tutorial => (
-        <TouchableOpacity key={tutorial.id} onPress={() => handleView(tutorial.id)}>
-        <View key={tutorial.id} style={styles.tutorialCard}>
-          <Image source={{ uri: tutorial.imageUrl }} style={styles.image} />
-          <View style={styles.infoContainer}>
-            <Text style={styles.title}>{tutorial.title}</Text>
-            <Text style={styles.duration}>Duration: {tutorial.timeDuration}</Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => handleEdit(tutorial.id)}
-              >
-                <AntDesign name="edit" size={24} color="#FFFFFF" />
-                <Text style={styles.buttonText}>Edit</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, styles.deleteButton]}
-                onPress={() => handleDelete(tutorial.id, tutorial.videoUrl, tutorial.imageUrl)}
-              >
-                <AntDesign name="delete" size={24} color="#FFFFFF" />
-                <Text style={styles.buttonText}>Delete</Text>
-              </TouchableOpacity>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Shop_Header />
+
+      
+
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search tutorials by title"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <Image source={searchicon} style={styles.searchIcon} />
+      </View>
+
+      
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryContainer}>
+        {categories.map(category => (
+          <TouchableOpacity
+            key={category}
+            style={[styles.categoryButton, selectedCategory === category && styles.selectedCategoryButton]}
+            onPress={() => setSelectedCategory(category)}
+          >
+            <Text style={styles.categoryText}>{category}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+        {filteredTutorials.map(tutorial => (
+          <TouchableOpacity key={tutorial.id} onPress={() => handleView(tutorial.id)}>
+            <View style={styles.tutorialCard}>
+              <Image source={{ uri: tutorial.imageUrl }} style={styles.image} />
+              <View style={styles.infoContainer}>
+                <Text style={styles.title}>{tutorial.title}</Text>
+                <Text style={styles.duration}>Duration: {tutorial.timeDuration}</Text>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => handleEdit(tutorial.id)}
+                  >
+                    <AntDesign name="edit" size={24} color="#FFFFFF" />
+                    <Text style={styles.buttonText}>Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.button, styles.deleteButton]}
+                    onPress={() => handleDelete(tutorial.id, tutorial.videoUrl, tutorial.imageUrl)}
+                  >
+                    <AntDesign name="delete" size={24} color="#FFFFFF" />
+                    <Text style={styles.buttonText}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <Navbar />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#EEEEEE',
+  },
+  scrollViewContainer: {
     flexGrow: 1,
     padding: 16,
     backgroundColor: '#EEEEEE',
   },
+  searchBar: {
+    height: 50,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    backgroundColor: "#ffffff",
+    paddingLeft: 20,
+    paddingRight: 40,
+  },
   tutorialCard: {
     flexDirection: 'row',
-    marginBottom: 20,
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
     overflow: 'hidden',
     elevation: 3,
+    
   },
   image: {
     width: 120,
     height: 120,
     resizeMode: 'cover',
+    marginRight: 10,
   },
   infoContainer: {
     flex: 1,
@@ -181,11 +260,10 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   button: {
     flexDirection: 'row',
-    alignItems: 'center',
+    marginRight: 20,
     backgroundColor: '#FF6100',
     padding: 10,
     borderRadius: 5,
@@ -196,6 +274,42 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#FFFFFF',
     marginLeft: 5,
+    fontWeight: 'bold',
+  },
+  searchContainer: {
+    position: "relative",
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: -10,
+  },
+  searchIcon: {
+    position: "absolute",
+    top: 15,
+    right: 15,
+    width: 20,
+    height: 20,
+    resizeMode: "contain",
+  },
+  categoryContainer: {
+    marginVertical: 10,
+    marginLeft: 20,
+    marginBottom:-390,
+    marginTop:20,
+    backgroundColor: '#EEEEEE',
+  },
+  categoryButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#CCCCCC',
+    borderRadius: 5,
+    marginRight: 10,
+    height:40,
+  },
+  selectedCategoryButton: {
+    backgroundColor: '#FF6100',
+  },
+  categoryText: {
+    color: '#FFFFFF',
     fontWeight: 'bold',
   },
 });
