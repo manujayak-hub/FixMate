@@ -105,8 +105,7 @@ const UserToolShop: React.FC = () => {
         setFilteredTools(toolsData); // Initialize filtered tools with all tools
       },
       (error) => {
-        Alert.alert('Error', 'Failed to load tools');
-        console.error('Error fetching tools:', error);
+        
         setLoading(false); // Stop loading on error
       }
     );

@@ -82,7 +82,7 @@ const UserTutorialDoc: React.FC = () => {
                 }
             } catch (error) {
 
-                console.error('Error fetching tutorial:', error);
+               
 
             }
         };
