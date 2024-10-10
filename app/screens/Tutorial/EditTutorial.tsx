@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, Image, TouchableOpacity, Alert,SafeAreaView } from 'react-native';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
@@ -9,6 +9,8 @@ import { AntDesign } from '@expo/vector-icons';
 import { Video,ResizeMode } from 'expo-av';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Picker } from '@react-native-picker/picker';
+import Navbar from "../../Components/NavigationFor_Business";
+import Shop_Header from "../../Components/Shop_Header";
 
 
 // Define all route names and their params
@@ -168,7 +170,11 @@ const EditTutorial: React.FC = () => {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <Shop_Header/>
     <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.scontainer}>
+    <Text style={styles.title}>Edit Tutorial</Text>
       <Text style={styles.label}>Title</Text>
       <TextInput
         style={styles.input}
@@ -183,11 +189,14 @@ const EditTutorial: React.FC = () => {
               style={styles.picker}
               onValueChange={(text) => setTutorialData({ ...tutorialData, category: text })}
             >
-              <Picker.Item label="Select Category" value="" />
-              <Picker.Item label="Home and Appliance Repair" value="Home and Appliance Repair" />
-              <Picker.Item label="Automotive Repair" value="Automotive Repair" />
+              <Picker.Item label="Category" value="" />
               <Picker.Item label="Electronic Repair" value="Electronic Repair" />
+              <Picker.Item label="Garden Equipment" value="Garden Equipment" />
+              <Picker.Item label="Musical Instruments" value="Musical Instruments" />
+              <Picker.Item label="Jwellery and Watches" value="Jwellery and Watches" />
+              <Picker.Item label="Automotive Repair" value="Automotive Repair" />
               <Picker.Item label="Furniture Repair" value="Furniture Repair" />
+              <Picker.Item label="Computers" value="Computers" />
             </Picker>
           </View>
 
@@ -249,14 +258,18 @@ const EditTutorial: React.FC = () => {
       <TouchableOpacity onPress={handleUpdate} style={styles.uploadButton}>
         <Text style={styles.uploadButtonText}>Update Tutorial</Text>
       </TouchableOpacity>
+      </View>
     </ScrollView>
+    <Navbar/>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
+    flexGrow: 1,
+    padding: 16,
+    backgroundColor: '#EEEEEE',
   },
   label: {
     fontSize: 16,
@@ -266,7 +279,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#DDDDDD',
+    borderColor: '#FF6100',
     borderRadius: 5,
     padding: 10,
     marginBottom: 20,
@@ -280,7 +293,7 @@ const styles = StyleSheet.create({
   },
   uploadButton: {
     backgroundColor: '#FF6F00',
-    paddingVertical: 15,
+    paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center',
     marginTop: 20,
@@ -303,7 +316,7 @@ const styles = StyleSheet.create({
   pickerContainer: {
     width: '99%',
     borderWidth: 1,
-    borderColor: '#DDDDDD',
+    borderColor: '#FF6100',
     borderRadius: 4,
     alignSelf: 'center',
     marginBottom: 15,
@@ -312,6 +325,23 @@ const styles = StyleSheet.create({
   picker: {
     height: 50,
     width: '100%',
+  },
+  scontainer: {
+    width: 367,
+    height:'100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    
+    padding:10,            // Equivalent to `z-index: 0`
+    // `isolation` isn't a direct property in React Native, but it doesn't impact layout here
+  },
+  title: {
+    fontWeight: '700',
+    fontSize: 24,
+    color: '#FF6100',
+    left: 10,
+    marginBottom: 10,
+    textAlign:'center',
   },
 });
 

@@ -7,6 +7,8 @@ import { useCart } from './CartContext';
 import { AntDesign } from '@expo/vector-icons';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import useUserStore from '../../Store/userStore';
+import ClientHeader from "../../Components/ClientHeader";
+import Navigation from "../../Components/Navigation";
 
 type URToolShopRouteProp = RouteProp<{ URToolShop: { toolId: string } }, 'URToolShop'>;
 
@@ -154,7 +156,7 @@ const URToolShop: React.FC = () => {
   
         // Update Firestore cart
         await setDoc(cartDocRef, { tools: [...updatedTools, cartItem] }, { merge: true });
-        Alert.alert('Success', 'Tool added to database cart');
+        
       } catch (error) {
         Alert.alert('Error', 'Failed to add tool to cart in database');
         console.error('Error adding tool to cart:', error);
@@ -211,6 +213,7 @@ const URToolShop: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <ClientHeader />
       <FlatList
         contentContainerStyle={styles.scrollContainer}
         data={[tool]} // Pass tool as an array to display it
@@ -229,7 +232,8 @@ const URToolShop: React.FC = () => {
               </View>
             )}
             
-            <Text style={styles.toolPrice}>Price: Rs. {tool.price || 'N/A'}</Text>
+            <Text style={styles.toolPrice}>Rs. {tool.price || 'N/A'}</Text>
+            <Text style={styles.reviewHeader}>Description</Text>
            
             <Text style={styles.toolDescription}>{tool.description || 'No description available'}</Text>
             
@@ -239,13 +243,13 @@ const URToolShop: React.FC = () => {
             
             
             <View style={styles.reviewsContainer}>
-              <Text style={styles.reviewHeader}>Reviews:</Text>
+              <Text style={styles.reviewHeader}>Reviews</Text>
               <FlatList
                 data={reviews}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <View style={styles.reviewItem}>
-                    <Text style={styles.reviewUser}>{item.userName}:</Text>
+                    <Text style={styles.reviewUser}>{item.userName}: </Text>
                     <Text style={styles.reviewContent}>{item.content}</Text>
                   </View>
                 )}
@@ -256,11 +260,17 @@ const URToolShop: React.FC = () => {
                 value={newReview}
                 onChangeText={setNewReview}
               />
-              <Button title="Submit Review" onPress={handleAddReview} color="#FF6100" />
+
+            <TouchableOpacity style={styles.addButton} onPress={handleAddReview}>
+              <Text style={styles.addButtonText}>Add Review</Text>
+            </TouchableOpacity>
+
+              
             </View>
           </View>
         )}
       />
+       <Navigation />
     </SafeAreaView>
   );
 };
@@ -268,7 +278,7 @@ const URToolShop: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#F9F9F9',
   },
   loadingContainer: {
     flex: 1,
@@ -286,8 +296,12 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     borderRadius: 8,
-    backgroundColor: '#f9f9f9',
-    elevation: 2,
+
+    backgroundColor: '#F9F9F9',
+
+  
+
+    elevation: 1,
   
   },
   header: {
@@ -338,6 +352,14 @@ const styles = StyleSheet.create({
   },
   reviewsContainer: {
     marginTop: 16,
+    padding:10,
+    backgroundColor: '#F3F3F3',
+    shadowColor: '#000', // Required for iOS
+    shadowOffset: { width: -20, height: -20 },
+    shadowOpacity: 0.5,
+    
+    elevation: 2, // Required for Android
+    borderRadius: 5,
   },
   reviewHeader: {
     fontSize: 18,
@@ -346,6 +368,14 @@ const styles = StyleSheet.create({
   },
   reviewItem: {
     marginBottom: 8,
+    padding:10,
+    backgroundColor: '#F3F3F3',
+    shadowColor: '#000', // Required for iOS
+    shadowOffset: { width: -20, height: -20 },
+    shadowOpacity: 0.5,
+    flexDirection: 'row',
+    elevation: 10, // Required for Android
+    borderRadius: 10,
   },
   reviewUser: {
     fontWeight: 'bold',

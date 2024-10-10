@@ -1,25 +1,40 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet,Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { FIREBASE_AUTH, FIREBASE_DB } from '../../Firebase_Config';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import CustomAlert from '../Components/CustomAlert';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../Firebase_Config";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import CustomAlert from "../Components/CustomAlert";
 
 const SignUpScreen = () => {
-  const [email, setEmail] = useState('');
-  const [photo, setPhoto] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [mobile, setMobile] = useState('');
-  const [userType, setUserType] = useState('Customer');
+  const [email, setEmail] = useState("");
+  const [photo, setPhoto] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [userType, setUserType] = useState("Customer");
   const [alertVisible, setAlertVisible] = useState(false);
+
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'error' | 'success' | undefined>(undefined);
   const navigation:any = useNavigation();
   const [shopName, setShopName] = useState('');
 
-const validateEmail = (email: string) => {
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState<"error" | "success" | undefined>(
+    undefined
+  );
+  const navigation: any = useNavigation();
+
+
+  const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
@@ -30,42 +45,44 @@ const validateEmail = (email: string) => {
 
   const handleSignUp = async () => {
     if (!name) {
-    
-      setAlertMessage('Name is required!');
+      setAlertMessage("Name is required!");
       setAlertVisible(true);
-      setAlertType('error'); 
+      setAlertType("error");
       return;
     }
 
     if (!mobile || !validateMobile(mobile)) {
-      
-      setAlertMessage('Enter a valid 10-digit mobile number!');
+      setAlertMessage("Enter a valid 10-digit mobile number!");
       setAlertVisible(true);
-      setAlertType('error'); 
+      setAlertType("error");
       return;
     }
 
     if (!email || !validateEmail(email)) {
-      setAlertMessage('Enter a valid email address!');
+      setAlertMessage("Enter a valid email address!");
       setAlertVisible(true);
-      setAlertType('error'); 
+      setAlertType("error");
       return;
     }
 
     if (!password || password.length < 6) {
-      setAlertMessage('Password must be at least 6 characters long!');
+      setAlertMessage("Password must be at least 6 characters long!");
       setAlertVisible(true);
-      setAlertType('error'); 
+      setAlertType("error");
       return;
     }
 
     try {
       // Create user with email and password
-      const userCredential = await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        FIREBASE_AUTH,
+        email,
+        password
+      );
       const user = userCredential.user;
 
       // Save additional user information to Firestore
-      await setDoc(doc(FIREBASE_DB, 'users', user.uid), {
+      await setDoc(doc(FIREBASE_DB, "users", user.uid), {
         name,
         mobile,
         email,
@@ -75,6 +92,7 @@ const validateEmail = (email: string) => {
       });
 
       // Clear form fields
+
       setName('');
       setMobile('');
       setEmail('');
@@ -82,60 +100,111 @@ const validateEmail = (email: string) => {
       setUserType('Customer');
       setShopName('');
 
+      setName("");
+      setMobile("");
+      setEmail("");
+      setPassword("");
+      setUserType("Customer");
+
+
       // Display success alert
-      
-      setAlertMessage('Account created successfully!');
+
+      setAlertMessage("Account created successfully!");
       setAlertVisible(true);
-      setAlertType('success'); 
-    } catch (error:any) {
-      
-      setAlertMessage('Error'+ error.message);
+      setAlertType("success");
+    } catch (error: any) {
+      setAlertMessage("Error" + error.message);
       setAlertVisible(true);
-      setAlertType('error'); 
+      setAlertType("error");
     }
   };
 
   return (
     <View style={styles.container}>
-       <Text style={styles.title}>Create Account</Text>
-       <Text style={styles.subtitle}>Create an account so you can explore trusted repair experts</Text>
-    <TextInput
-      style={styles.input}
-      placeholder="Name"
-      value={name}
-      onChangeText={setName}
-    />
-    <TextInput
-      style={styles.input}
-      placeholder="Mobile"
-      keyboardType="phone-pad"
-      value={mobile}
-      onChangeText={setMobile}
-    />
-    <TextInput
-      style={styles.input}
-      placeholder="Email"
-      keyboardType="email-address"
-      value={email}
-      onChangeText={setEmail}
-    />
-    <TextInput
-      style={styles.input}
-      placeholder="Password"
-      secureTextEntry
-      value={password}
-      onChangeText={setPassword}
-    />
+      <Text style={styles.title}>Create Account</Text>
+      <Text style={styles.subtitle}>
+        Create an account so you can explore trusted repair experts
+      </Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        value={name}
+        onChangeText={setName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Mobile"
+        keyboardType="phone-pad"
+        value={mobile}
+        onChangeText={setMobile}
+      />
 
-    <Text style={styles.label}>Select User Type:</Text>
-    <View style={styles.radioGroup}>
-      <TouchableOpacity style={styles.radioButton} onPress={() => setUserType('Customer')}>
-        <Text style={userType === 'Customer' ? styles.radioButtonTextSelected : styles.radioButtonText}>Customer</Text>
+      <CustomAlert
+        visible={alertVisible}
+        message={alertMessage}
+        type={alertType}
+        onClose={() => setAlertVisible(false)}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        keyboardType="email-address"
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+      />
+
+      <Text style={styles.label}>Select User Type:</Text>
+      <View style={styles.radioGroup}>
+        <TouchableOpacity
+          style={styles.radioButton}
+          onPress={() => setUserType("Customer")}
+        >
+          <Text
+            style={
+              userType === "Customer"
+                ? styles.radioButtonTextSelected
+                : styles.radioButtonText
+            }
+          >
+            Customer
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.radioButton}
+          onPress={() => setUserType("Business")}
+        >
+          <Text
+            style={
+              userType === "Business"
+                ? styles.radioButtonTextSelected
+                : styles.radioButtonText
+            }
+          >
+            Business
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+        <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.radioButton} onPress={() => setUserType('Business')}>
-        <Text style={userType === 'Business' ? styles.radioButtonTextSelected : styles.radioButtonText}>Business</Text>
+
+      <TouchableOpacity
+        style={styles.buttonSecondary}
+        onPress={() => navigation.navigate("Login")}
+      >
+        <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
     </View>
+
     {userType === 'Business' && (
         <TextInput
           style={styles.input}
@@ -154,6 +223,8 @@ const validateEmail = (email: string) => {
     </TouchableOpacity>
   </View>
     
+
+
   );
 };
 
@@ -161,11 +232,11 @@ const styles = StyleSheet.create({
   container: {
     padding: 30,
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   input: {
     height: 40,
-    borderColor: '#F96D2B',
+    borderColor: "#F96D2B",
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 15,
@@ -176,8 +247,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   radioGroup: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 20,
   },
   radioButton: {
@@ -188,38 +259,38 @@ const styles = StyleSheet.create({
   },
   radioButtonTextSelected: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FF6A00',
-    textAlign: 'center',
+    fontWeight: "bold",
+    color: "#FF6A00",
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
-    color: '#7A7A7A',
-    textAlign: 'center',
+    color: "#7A7A7A",
+    textAlign: "center",
     marginVertical: 10,
-    marginBottom:20
+    marginBottom: 20,
   },
   button: {
-    backgroundColor: '#F96D2B',
+    backgroundColor: "#F96D2B",
     padding: 15,
     borderRadius: 5,
     marginBottom: 15,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonSecondary: {
-    backgroundColor: '#333',
+    backgroundColor: "#333",
     paddingVertical: 15,
     borderRadius: 8,
     marginVertical: 10,
   },
   buttonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    alignSelf:'center'
+    alignSelf: "center",
   },
 });
 
