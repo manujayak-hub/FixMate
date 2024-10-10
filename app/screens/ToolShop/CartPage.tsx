@@ -12,6 +12,7 @@ import Navigation from "../../Components/Navigation";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const bag = require("../../../assets/shopping-bag.png");
+
 // Define your root stack param list here as well
 type RootStackParamList = {
   CartPage: undefined;
@@ -22,7 +23,7 @@ type RootStackParamList = {
 type CartPageNavigationProp = StackNavigationProp<RootStackParamList, 'CartPage'>;
 
 const CartPage: React.FC = () => {
-  const { cart, updateCart } = useCart(); 
+  const { cart, updateCart } = useCart();
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const navigation = useNavigation<CartPageNavigationProp>(); // Use the typed navigation prop
 
@@ -66,7 +67,7 @@ const CartPage: React.FC = () => {
   const handleProceedToPay = () => {
     const finalTools = userCart.filter(tool => selectedTools.includes(tool.id));
     const total = finalTools.reduce((sum, tool) => sum + (parseFloat(tool.price || '0') * (tool.quantity || 1)), 0);
-    
+
     // Check if total is greater than zero before navigating
     if (total > 0) {
       navigation.navigate('CartPayment', { total, selectedTools: finalTools });
@@ -74,26 +75,23 @@ const CartPage: React.FC = () => {
       Alert.alert('No Items Selected', 'Please select at least one tool to proceed with payment.'); // Optional: Alert user
     }
   };
-  
+
   // Calculate subtotal and total for selected tools
   const calculateTotals = () => {
     let subtotal = 0;
-    let total = 0;
 
     selectedTools.forEach(toolId => {
       const tool = userCart.find(item => item.id === toolId);
       if (tool && tool.price && tool.quantity) {
-        const itemSubtotal = parseFloat(tool.price) * tool.quantity; // Calculate subtotal for this item
-        subtotal += itemSubtotal;
+        const itemSubtotal = parseFloat(tool.price) * tool.quantity; // Multiply price by quantity
+        subtotal += itemSubtotal; // Add this item's total to the subtotal
       }
     });
 
-    total = subtotal; // Update total as subtotal (can include tax/shipping if needed)
-
-    return { subtotal, total };
+    return { subtotal }; // You can adjust total to include tax or other fees if needed
   };
 
-  const { subtotal, total } = calculateTotals(); // Get totals for rendering
+  const { subtotal } = calculateTotals(); // Get totals for rendering
 
   const renderItem = ({ item }) => (
     <View style={styles.toolContainer}>
@@ -137,41 +135,34 @@ const CartPage: React.FC = () => {
   if (userCart.length === 0) { // Check against userCart
     return (
       <SafeAreaView style={{ flex: 1 }}>
-        <ClientHeader/>
-      <View style={styles.emptyContainer}>
-      <Image
-                source={bag}
-                style={styles.bagIcon}
-              />
-        <Text style={styles.emptyText}>Your cart is empty.</Text>
-      </View>
-      <Navigation/>
+        <ClientHeader />
+        <View style={styles.emptyContainer}>
+          <Image source={bag} style={styles.bagIcon} />
+          <Text style={styles.emptyText}>Your cart is empty.</Text>
+        </View>
+        <Navigation />
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ClientHeader/>
-    <View style={styles.container}>
-      <FlatList
-        data={userCart} // Use userCart instead of cart
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        
-      />
-      <View style={styles.totalsContainer}>
-      
-        <Text style={styles.totalText}>Total: Rs. {total.toFixed(2)}</Text>
+      <ClientHeader />
+      <View style={styles.container}>
+        <FlatList
+          data={userCart} // Use userCart instead of cart
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+        />
+        <View style={styles.totalsContainer}>
+          <Text style={styles.totalText}>Total: Rs. {subtotal.toFixed(2)}</Text>
+        </View>
+
+        <TouchableOpacity style={styles.addButton} onPress={handleProceedToPay}>
+          <Text style={styles.addButtonText}>Proceed to Pay</Text>
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity style={styles.addButton} onPress={handleProceedToPay}>
-              <Text style={styles.addButtonText}>Proceed to Pay</Text>
-      </TouchableOpacity>
-
-      
-    </View>
-    <Navigation/>
+      <Navigation />
     </SafeAreaView>
   );
 };
@@ -180,21 +171,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-   
-    
   },
   toolContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding:10,
+    padding: 10,
     backgroundColor: '#f9f9f9',
-    shadowColor: '#000', // Required for iOS
+    shadowColor: '#000',
     shadowOffset: { width: -20, height: -20 },
     shadowOpacity: 0.01,
     shadowRadius: 10,
-    elevation: 2, // Required for Android
+    elevation: 2,
     borderRadius: 15,
-    margin:5,
+    margin: 5,
   },
   checkbox: {
     marginRight: 10,
@@ -207,8 +196,7 @@ const styles = StyleSheet.create({
   toolDetails: {
     flex: 1,
     justifyContent: 'space-between',
-    marginLeft:10,
-    
+    marginLeft: 10,
   },
   toolTitle: {
     fontSize: 18,
@@ -234,7 +222,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quantityButtonText: {
-   
     fontSize: 16,
   },
   quantityText: {
@@ -245,70 +232,69 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-   
     width: 336,
     height: 10,
     left: '50%',
-    marginLeft: -170, // Equivalent of `calc(50% - 336px / 2 - 2px)`
+    marginLeft: -170,
     top: 183,
     backgroundColor: '#F9F9F9',
     padding: 40,
     borderRadius: 12,
-    flexDirection: 'column', // Aligns items vertically
-    marginBottom:400,
+    flexDirection: 'column',
+    marginBottom: 400,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 50 }, // Mimics the shadow layout
+    shadowOffset: { width: 0, height: 50 },
     shadowOpacity: 0.03,
-    shadowRadius: 80,
-    elevation: 10, // Required for Android to mimic box-shadow
+    shadowRadius: 100,
+    elevation: 10,
   },
   emptyText: {
-    fontSize: 20,
-    color: '#808080',
-  },
-  imagePlaceholder: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#E0E0E0',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  imagePlaceholderText: {
-    fontSize: 14,
-    color: '#808080',
+    fontSize: 18,
+    color: '#888',
+    fontWeight: '500',
+    bottom: 20,
   },
   totalsContainer: {
-    marginVertical: 20,
-    paddingVertical: 10,
+    padding: 10,
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderColor: '#ccc',
   },
   totalText: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginVertical: 5,
-  },
-  addButton: {
-    flexDirection: 'row', // Aligns children horizontally
-    justifyContent: 'center', // Centers content horizontally
-    alignSelf:'center',
-    padding:15,
-    width: 200,
-    height: 60,
-    backgroundColor: '#FF6F00',
-    borderRadius: 22,
+    textAlign:'left',
     
   },
+  addButton: {
+    backgroundColor: '#FF6100',
+    paddingVertical: 15,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
   addButtonText: {
-    color: '#FFF',
-    fontSize: 16,
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
-    paddingLeft:15,
   },
   bagIcon: {
-    width: 60, // Reduced size for category icons
-    height: 60, // Adjusted height
-    marginBottom: 20,
+    width: 80,
+    height: 80,
+    left: 0,
+    top: -10,
+    marginBottom:40,
+  },
+  imagePlaceholder: {
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ccc',
+    marginRight: 20,
+  },
+  imagePlaceholderText: {
+    color: '#fff',
   },
 });
 
