@@ -17,6 +17,7 @@ import CatTutorial from "./app/screens/Tutorial/CatTutorial";
 import STView from "./app/screens/Tutorial/STView";
 import UserTutorial from "./app/screens/Tutorial/UserTutorial";
 import UserTutorialDoc from "./app/screens/Tutorial/UserTutorialDoc";
+
 import Shop_Tutorial from "./app/screens/Tutorial/Shop_Tutorial";
 
 
@@ -84,7 +85,9 @@ export default function App() {
         <Stack.Screen name="STView" component={STView} options={{headerShown:false}} />
         <Stack.Screen name="UserTutorial" component={UserTutorial} options={{headerShown:false}} />
         <Stack.Screen name="UserTutorialDoc" component={UserTutorialDoc} options={{headerShown:false}} />
+
         <Stack.Screen name="Shop_Tutorial" component={Shop_Tutorial} options={{headerShown:false}} />
+
         
         <Stack.Screen name="Client_MapView" component={Client_MapView} options={{headerShown:false}} />
         <Stack.Screen name="Profile" component={UserProfile} options={{headerShown:false}} />

@@ -296,7 +296,11 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     borderRadius: 8,
+
     backgroundColor: '#F9F9F9',
+
+    backgroundColor: '#f9f9f9',
+
     elevation: 1,
   
   },
