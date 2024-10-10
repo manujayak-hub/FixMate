@@ -9,6 +9,8 @@ import Modal from 'react-native-modal';
 import * as ImagePicker from 'expo-image-picker';
 import { RootStackParamList } from '../Client/Shop_Client';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import ClientHeader from '../../Components/ClientHeader';
+import Navigation from '../../Components/Navigation';
 
 
 type AddComplaintScreenProps = NativeStackScreenProps<RootStackParamList, 'addcomplaint'>;
@@ -131,6 +133,7 @@ const AddComplaint: React.FC = ({ route }: AddComplaintScreenProps) => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <ClientHeader/>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.container}>
           <Text style={styles.headerText}>Add your complaint...</Text>
@@ -200,6 +203,7 @@ const AddComplaint: React.FC = ({ route }: AddComplaintScreenProps) => {
           </TouchableOpacity>
         </View>
       </Modal>
+      <Navigation/>
     </SafeAreaView>
   );
 };

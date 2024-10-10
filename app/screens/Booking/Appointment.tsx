@@ -12,7 +12,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from "../../Client/Shop_Client";
 import { FIREBASE_DB } from '../../../Firebase_Config';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc } from 'firebase/firestore';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons'; // Import the icon library
 
@@ -54,11 +54,20 @@ const Appointment: React.FC<AppointmentScreenProps> = ({ route, navigation }) =>
       setLoading(false);
       return;
     }
-  
+    
+
+
     try {
+      const userRef = doc(FIREBASE_DB, 'users', user.uid);
+      const userDoc = await getDoc(userRef);
+      const userData = userDoc.data();
+  
+      // If you are storing the user's name in Firestore
+      const userName = userData ? userData.name : user.displayName; 
       // Add the appointment to Firestore, including the userId
       const appointmentDoc = await addDoc(collection(FIREBASE_DB, 'appointments'), {
-        userId: user.uid, // Add the userId field
+        userId: user.uid,
+        userName: userName, 
         shopId: shop.id,
         shopName: shop.shopName,
         date: selectedDate?.toLocaleDateString(),

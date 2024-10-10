@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, TouchableOpacity, TouchableWithoutFeedback, View, Text, StyleSheet, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { Modal, TouchableOpacity, TouchableWithoutFeedback, View, Text, StyleSheet, ScrollView, Image, ActivityIndicator, Alert, TextInput, SafeAreaView } from 'react-native';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons'; // Import additional icons here
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { FontAwesome } from '@expo/vector-icons';
 import { doc, getDoc, collection, addDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config';
+import UserHeder from '../../Components/ClientHeader';
+import Navigation from '../../Components/Navigation';
 
 const TrackOrders = ({ route }) => {
   const { appointment } = route.params;
@@ -37,6 +39,11 @@ const TrackOrders = ({ route }) => {
 
     fetchOrderStatus();
   }, [appointment.id]);
+  
+
+  const getCurrentStepStyle = (status: string) => {
+    return status === orderStatus ? styles.currentStep : styles.statusStep;
+  };
 
   const showRatingModal = () => {
     setRatingVisible(true);
@@ -63,7 +70,7 @@ const TrackOrders = ({ route }) => {
         });
         Alert.alert('Success', 'Feedback submitted!');
         setFeedbackVisible(false);
-        navigation.navigate('shopfeedbacklist');
+        
       } else {
         Alert.alert('Error', 'Please fill all fields and select a rating.');
       }
@@ -93,23 +100,59 @@ const TrackOrders = ({ route }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Order Tracking</Text>
-      <View style={styles.detailsContainer}>
-        <Text style={styles.details}>Shop Name: <Text style={styles.highlight}>{appointment.shopName}</Text></Text>
-        <Text style={styles.details}>Date: <Text style={styles.highlight}>{appointment.date}</Text></Text>
-        <Text style={styles.details}>Rate: <Text style={styles.highlight}>LKR {appointment.rate}</Text></Text>
-        <Text style={styles.status}>Status: <Text style={styles.highlight}>{orderStatus}</Text></Text>
-        <Text style={styles.estimatedTime}>Estimated Time: <Text style={styles.highlight}>{estimatedTime}</Text></Text>
+    <SafeAreaView style={{ flex: 1 }}>
+    <UserHeder /><ScrollView contentContainerStyle={styles.container}>
+      {/* Header Section */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Track My Repairs</Text>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={showRatingModal}>
-        <Text style={styles.buttonText}>Shop Feedback</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={yourComplaint}>
-        <Text style={styles.buttonText}>Add Complaint</Text>
-      </TouchableOpacity>
+      {/* Order Information Section */}
+      <View style={styles.orderInfo}>
+        <Text style={styles.orderText}>{appointment.shopName}</Text>
+        <Text style={styles.orderDetails}>Date : {appointment.date}</Text>
+        <Text style={styles.orderDetails}>Repair ID: #{appointment.id}</Text>
+        <Text style={styles.price}>Rs. {appointment.rate}</Text>
+      </View>
 
+      {/* ETA Section */}
+
+
+      {/* Order Status */}
+      <View style={styles.statusContainer}>
+        <Text style={styles.etaText}>ETA: {estimatedTime}</Text>
+        <View style={getCurrentStepStyle('Ready to Pick Up')}>
+          <MaterialIcons name="check-circle" size={24} color="#FF5733" />
+          <View>
+            <Text style={styles.statusText}>Ready to pick</Text>
+            <Text style={styles.statusSubText}>Your item is ready to pickup.</Text>
+          </View>
+        </View>
+        <View style={getCurrentStepStyle('In Progress')}>
+          <MaterialIcons name="autorenew" size={24} color="#FF5733" />
+          <View>
+            <Text style={styles.statusText}>Order Processed</Text>
+            <Text style={styles.statusSubText}>We have started repairing your item.</Text>
+          </View>
+        </View>
+        <View style={getCurrentStepStyle('Order Placed')}>
+          <MaterialIcons name="receipt" size={24} color="#FF5733" />
+          <View>
+            <Text style={styles.statusText}>Order Placed</Text>
+            <Text style={styles.statusSubText}>We received your order.</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Feedback and Complaint Buttons */}
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity style={styles.feedbackButton} onPress={showRatingModal}>
+          <Text style={styles.buttonText}>Feedback</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.complaintButton} onPress={yourComplaint}>
+          <Text style={styles.buttonText}>Complaint</Text>
+        </TouchableOpacity>
+      </View>
       {/* Star Rating Modal */}
       <Modal visible={isRatingVisible} animationType="slide" transparent>
         <TouchableWithoutFeedback onPress={closeModal}>
@@ -123,8 +166,7 @@ const TrackOrders = ({ route }) => {
                       <FontAwesome
                         name={star <= selectedStars ? 'star' : 'star-o'}
                         size={40}
-                        color={star <= selectedStars ? '#FFD700' : '#ccc'}
-                      />
+                        color={star <= selectedStars ? '#FFD700' : '#ccc'} />
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -148,106 +190,188 @@ const TrackOrders = ({ route }) => {
 
       {/* Feedback Form Modal */}
       <Modal visible={isFeedbackVisible} animationType="slide" transparent>
+      <TouchableWithoutFeedback onPress={closeModal}>
         <View style={styles.modalContainer}>
+        <TouchableWithoutFeedback>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Provide your feedback for {appointment.shopName}</Text>
             <TextInput
               style={styles.input}
               placeholder="Name"
               value={name}
-              onChangeText={setName}
-            />
+              onChangeText={setName} />
             <TextInput
               style={styles.textArea}
               placeholder="Description..."
               multiline
               numberOfLines={4}
               value={description}
-              onChangeText={setDescription}
-            />
+              onChangeText={setDescription} />
 
             <TouchableOpacity style={styles.addButton} onPress={submitFeedback}>
               <Text style={styles.addButtonText}>Add</Text>
             </TouchableOpacity>
           </View>
+          </TouchableWithoutFeedback>
         </View>
+        </TouchableWithoutFeedback>
       </Modal>
-    </View>
+    </ScrollView>
+    <Navigation />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
+    flexGrow: 1,
     backgroundColor: '#F4F4F9',
+    padding: 20,
   },
-  heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 20,
-    color: '#37474F',
-    textAlign: 'center',
   },
-  detailsContainer: {
+  title: {
+    fontSize: 24, // Increased font size for the title
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  orderInfo: {
     backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 10,
-    elevation: 2,
+    padding: 20, // Increased padding for better spacing
+    borderRadius: 12, // Slightly more rounded corners for a modern look
     marginBottom: 20,
+    shadowColor: '#000', // Added shadow for a card effect
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  details: {
-    fontSize: 16,
-    color: '#757575',
-    marginBottom: 10,
-  },
-  highlight: {
+  orderText: {
+    fontSize: 20, // Increased font size
     fontWeight: 'bold',
-    color: '#FF5733',
+    marginBottom: 10, // More space below the title
+    color: '#333',
   },
-  status: {
+  orderDetails: {
+    fontSize: 16, // Slightly larger text for better readability
+    color: '#555',
+    marginBottom: 5,
+  },
+  price: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FF6F00',
+    marginTop: 10, // Added more space above the price
+  },
+  etaText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF7043',
-    marginBottom: 10,
-  },
-  estimatedTime: {
-    fontSize: 16,
     color: '#FF6F00',
+    marginBottom: 15,
+  },
+  statusContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  statusStep: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // justifyContent: 'space-between',
+    marginBottom: 20,
+    opacity: 0.5,
+  },
+  currentStep: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start', // Align items to the left
+    marginBottom: 20,
+    opacity: 1,
+    backgroundColor: '#FFEFD5',
+    padding: 15,
+    borderRadius: 8,
+    borderColor: '#FF6F00', 
+    borderWidth: 1,
+  },
+  statusText: {
+    fontSize: 18, // Increased font size for better visibility
+    fontWeight: 'bold',
+    marginLeft: 10, // Add space between icon and text
+    color: '#333',
+    padding: 3,
+  },
+  statusSubText: {
+    fontSize: 14,
+    color: '#757575',
+    marginLeft: 10, // Add space between icon and subtext
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // Spread buttons evenly
+    marginTop: 20,
+  },
+  feedbackButton: {
+    backgroundColor: '#FF6F00',
+    paddingVertical: 12,
+    paddingHorizontal: 40, // Increased padding for more clickable area
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  complaintButton: {
+    backgroundColor: '#FF6F00',
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16, // Slightly larger button text
   },
   loader: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  button: {
-    backgroundColor: '#FF5733',
-    paddingVertical: 15,
-    borderRadius: 25,
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
   modalContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'center', // Center modals vertically
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     backgroundColor: '#fff',
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    padding: 25,
+    borderRadius: 15,
     alignItems: 'center',
+    marginHorizontal: 20, // Added margin to avoid touching edges
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 15,
   },
   starsContainer: {
     flexDirection: 'row',
@@ -257,38 +381,37 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 16,
     color: '#333',
-    marginBottom: 20,
+    marginBottom: 15,
   },
   addButton: {
     backgroundColor: '#FF5733',
-    paddingVertical: 10,
-    paddingHorizontal: 40,
-    borderRadius: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 50, // Increased padding for a more significant button
+    borderRadius: 25,
   },
   addButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 8,
+    borderRadius: 10,
     width: '100%',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginBottom: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginBottom: 15,
   },
   textArea: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 8,
+    borderRadius: 10,
     width: '100%',
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    marginBottom: 10,
-    height: 100,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+    marginBottom: 15,
+    height: 120, 
   },
 });
-
 export default TrackOrders;

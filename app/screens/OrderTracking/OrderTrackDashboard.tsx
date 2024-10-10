@@ -1,140 +1,195 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet, FlatList } from 'react-native';
-import { collection, getDocs, doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import {
+  View,
+  Text,
+  Button,
+  Alert,
+  StyleSheet,
+  FlatList,
+  Modal,
+  TouchableOpacity,
+  TextInput,
+  SafeAreaView,
+
+} from 'react-native';
+import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config';
 import { getAuth } from 'firebase/auth';
+import { Picker } from '@react-native-picker/picker';
+import Shop_Header from '../../Components/Shop_Header';
+import Navigation from '../../Components/Navigation';
 
-// Define interfaces for Appointment and User
 interface Appointment {
+  userName: string;
   id: string;
-  status: string;
+  date: string;
+  time: string;
+  status: string; // This remains as a string to hold descriptive status
   estimatedTime: string;
-  shopName: string; // Ensure this matches your Firestore structure
+  shopName: string;
 }
 
 interface User {
-  shopName: string; // Adjust according to your user structure
+  shopName: string;
 }
 
 const AdminPanel: React.FC = () => {
-  const [appointments, setAppointments] = useState<Appointment[]>([]); // Store all appointments
-  const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>([]); // Store filtered appointments
-  const [status, setStatus] = useState('');
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [estimatedTime, setEstimatedTime] = useState('');
-  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null); // Track selected appointment
-  const [shopName, setShopName] = useState<string>(''); // Store the shopName of the logged-in user
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [shopName, setShopName] = useState<string>('');
+  const [status, setStatus] = useState('');
 
-  // Function to fetch all appointments
-  const fetchAppointments = async () => {
+  const fetchAppointments = async (shopName: string) => {
     try {
-      const appointmentsCollection = collection(FIREBASE_DB, 'appointments');
-      const appointmentSnapshot = await getDocs(appointmentsCollection);
-      const appointmentList = appointmentSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Appointment[]; // Cast to Appointment type
-
-      // Filter appointments based on the user's shopName
-      const filteredList = appointmentList.filter(appointment => appointment.shopName === shopName);
-      setFilteredAppointments(filteredList); // Set filtered appointments in state
+      const appointmentsQuery = query(collection(FIREBASE_DB, 'appointments'), where('shopName', '==', shopName));
+      const unsubscribe = onSnapshot(appointmentsQuery, (snapshot) => {
+        const appointmentList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Appointment[];
+        setAppointments(appointmentList);
+      });
+      return () => unsubscribe();
     } catch (error) {
       console.error('Error fetching appointments:', error);
       Alert.alert('Error', 'Failed to fetch appointments data.');
     }
   };
 
-  // Fetch user and appointments when component mounts
   useEffect(() => {
     const auth = getAuth();
     const user = auth.currentUser;
-
     if (user) {
-      // Fetch user details from the users collection
-      const userRef = doc(FIREBASE_DB, 'users', user.uid); // Assuming user ID is used as the document ID
+      const userRef = doc(FIREBASE_DB, 'users', user.uid);
       const unsubscribeUser = onSnapshot(userRef, (doc) => {
-        const userData = doc.data() as User; // Cast to User type
+        const userData = doc.data() as User;
         if (userData) {
-          setShopName(userData.shopName); // Set the shop name from user data
-          fetchAppointments(); // Call fetchAppointments after setting shopName
+          setShopName(userData.shopName);
+          fetchAppointments(userData.shopName);
         }
       });
-
-      return () => {
-        unsubscribeUser(); // Cleanup on unmount
-      };
+      return () => unsubscribeUser();
     }
-  }, []); // Empty dependency array to run once when component mounts
+  }, []);
 
-  // Update appointment status
   const updateOrderStatus = async () => {
-    if (!selectedAppointmentId || !status || !estimatedTime) {
-      Alert.alert('Error', 'Please select an appointment and enter both status and estimated time.');
+    if (!selectedAppointment || !estimatedTime || !status) {
+      Alert.alert('Error', 'Please select an appointment, enter estimated time, and choose a status.');
       return;
     }
 
     try {
-      const orderRef = doc(FIREBASE_DB, 'appointments', selectedAppointmentId);
-      await updateDoc(orderRef, {
-        status: status,
-        estimatedTime: estimatedTime,
+      const appointmentRef = doc(FIREBASE_DB, 'appointments', selectedAppointment.id);
+      await updateDoc(appointmentRef, {
+        status, // This should now be the string value from the Picker
+        estimatedTime,
       });
       Alert.alert('Success', 'Order status updated successfully.');
-      // Refresh appointments list after update
-      setStatus('');
-      setEstimatedTime('');
-      setSelectedAppointmentId(null);
-      fetchAppointments(); // Re-fetch appointments after update
+      setEstimatedTime(''); // Reset estimated time
+      setStatus(''); // Reset status
+      setSelectedAppointment(null); // Clear selected appointment
     } catch (error) {
       console.error('Error updating order status:', error);
       Alert.alert('Error', 'Failed to update order status.');
     }
   };
 
-  // Handle selecting an appointment
   const selectAppointment = (appointment: Appointment) => {
-    setSelectedAppointmentId(appointment.id);
-    setStatus(appointment.status); // Set status for the selected appointment
-    setEstimatedTime(appointment.estimatedTime); // Set estimated time for the selected appointment
+    setSelectedAppointment(appointment);
+    setEstimatedTime(appointment.estimatedTime);
+    setStatus(appointment.status); // Initialize status based on selected appointment
   };
 
-  // Render appointment item
   const renderItem = ({ item }: { item: Appointment }) => (
-    <View style={styles.appointmentItem}>
-      <Text style={styles.appointmentText}>ID: {item.id}</Text>
+    <TouchableOpacity style={styles.appointmentItem} onPress={() => selectAppointment(item)}>
+      <Text style={styles.appointmentText}>Name: {item.userName}</Text>
+      <Text style={styles.appointmentText}>Booked Date: {item.date}</Text>
+      <Text style={styles.appointmentText}>Time: {item.time}</Text>
       <Text style={styles.appointmentText}>Status: {item.status}</Text>
       <Text style={styles.appointmentText}>Estimated Time: {item.estimatedTime}</Text>
-      <Button title="Select" onPress={() => selectAppointment(item)} />
-    </View>
+    </TouchableOpacity>
   );
 
+  // Calculate counts based on descriptive status strings
+  const inProgressCount = appointments.filter(app => app.status === 'In Progress').length;
+  const readyToPickUpCount = appointments.filter(app => app.status === 'Ready to Pick Up').length;
+
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <Shop_Header/>
     <View style={styles.container}>
-      <Text style={styles.heading}>Appointments</Text>
+      <Text style={styles.heading}>Recent Orders</Text>
+      <View style={styles.orderCounts}>
+        <View style={styles.countCard}>
+          <Text style={styles.countNumber}>{inProgressCount}</Text>
+          <Text style={styles.countLabel}>In Progress</Text>
+        </View>
+        <View style={styles.countCard}>
+          <Text style={styles.countNumber}>{readyToPickUpCount}</Text>
+          <Text style={styles.countLabel}>Ready to Pick Up</Text>
+        </View>
+      </View>
 
       <FlatList
-        data={filteredAppointments}
+        data={appointments}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
       />
 
-      <Text style={styles.label}>Update Status</Text>
-      <TextInput
-        style={styles.input}
-        value={status}
-        onChangeText={setStatus}
-        placeholder="e.g., Processing, Ready"
-      />
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={!!selectedAppointment}
+        onRequestClose={() => setSelectedAppointment(null)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{selectedAppointment?.userName}</Text>
+            <Text style={styles.modalText}>Date: {selectedAppointment?.date}</Text>
+            <Text style={styles.modalText}>Time: {selectedAppointment?.time}</Text>
+            <Text style={styles.modalText}>Current Status: {selectedAppointment?.status}</Text>
 
-      <Text style={styles.label}>Estimated Time</Text>
-      <TextInput
-        style={styles.input}
-        value={estimatedTime}
-        onChangeText={setEstimatedTime}
-        placeholder="e.g., 30 minutes"
-      />
+            <Text style={styles.label}>Estimated Time</Text>
+            <TextInput
+              style={styles.input}
+              value={estimatedTime}
+              onChangeText={setEstimatedTime}
+              placeholder="e.g., 30 minutes"
+            />
 
-      <Button title="Update Status" onPress={updateOrderStatus} />
+            <Text style={styles.label}>Update Status</Text>
+            <Picker
+              selectedValue={status}
+              style={styles.picker}
+              onValueChange={(itemValue) => setStatus(itemValue)}
+            >
+              <Picker.Item label="Select Status" value="" />
+              <Picker.Item label="Order Placed" value="Order Placed" />
+              <Picker.Item label="In Progress" value="In Progress" />
+              <Picker.Item label="Ready to Pick Up" value="Ready to Pick Up" />
+            </Picker>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.button, styles.closeButton]}
+                onPress={() => setSelectedAppointment(null)}
+              >
+                <Text style={styles.buttonText}>Close</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.updateButton]}
+                onPress={updateOrderStatus}
+              >
+                <Text style={styles.buttonText}>Update</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
+    <Navigation/>
+    </SafeAreaView>
   );
 };
 
@@ -150,10 +205,63 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#37474F',
   },
+  orderCounts: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  countCard: {
+    backgroundColor: '#F96D2B',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  countNumber: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  countLabel: {
+    color: '#fff',
+  },
+  appointmentItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginVertical: 5,
+  },
+  appointmentText: {
+    fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 8,
+    margin: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
   label: {
     fontSize: 16,
     color: '#757575',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   input: {
     height: 40,
@@ -163,13 +271,36 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 20,
   },
-  appointmentItem: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+  picker: {
+    height: 50,
+    width: '100%',
+    borderColor: '#FF7043',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 20,
   },
-  appointmentText: {
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  button: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 10, // Add border radius
+    marginHorizontal: 5,
+    alignItems: 'center',
+  },
+  closeButton: {
+    backgroundColor: '#F96D2B', // Background color
+  },
+  updateButton: {
+    backgroundColor: '#F96D2B', // Background color
+  },
+  buttonText: {
+    color: '#FFFFFF', // Text color
     fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

@@ -9,6 +9,7 @@ import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import UserHeder from '../Components/ClientHeader';
+import Navigation from '../Components/Navigation';
 
 const EditProfileScreen = () => {
   const [name, setName] = useState('');
@@ -173,6 +174,7 @@ const EditProfileScreen = () => {
         </View>
       </Modal>
     </View>
+    <Navigation/>
     </SafeAreaView>
   );
 };
@@ -192,14 +194,15 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 20,
+    marginVertical: 40,
+    marginTop: -5
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#DDDDDD',
-    marginBottom: 15,
+    marginBottom: 35,
   },
   input: {
     flex: 1,
@@ -212,12 +215,12 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#ff6f00',
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center',
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 18,
   },
   imageContainer: {
     alignItems: 'center',

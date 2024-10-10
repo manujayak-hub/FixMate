@@ -4,6 +4,7 @@ import { FIREBASE_DB, FIREBASE_AUTH } from '../../../Firebase_Config';
 import { collection, onSnapshot, query, where, doc, deleteDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import UserHeder from '../../Components/ClientHeader';
+import Navigation from '../../Components/Navigation';
 
 const ComplaintList: React.FC = () => {
   const [complaints, setComplaints] = useState<any[]>([]);
@@ -117,6 +118,7 @@ const ComplaintList: React.FC = () => {
         <Text style={styles.emptyState}>No complaints found.</Text> // Empty state message
       )}
     </View>
+    <Navigation/>
     </SafeAreaView>
   );
 };
