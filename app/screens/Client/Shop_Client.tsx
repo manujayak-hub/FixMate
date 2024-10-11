@@ -231,9 +231,7 @@ const Shop_Client = () => {
             )}
             <View style={styles.infoRow}>
               <Text style={styles.price}>{shop.Rph} Per Hr</Text>
-              <View style={styles.ratingContainer}>
-                <Image source={staricon}></Image>
-              </View>
+              
             </View>
             {/* Availability Indicator */}
             <View style={styles.availabilityContainer}>
