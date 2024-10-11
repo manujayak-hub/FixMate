@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TextInput, Alert } from 'react-native';
+import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useCart } from './CartContext'; // Import your CartContext
 import { Picker } from '@react-native-picker/picker'; // Correct import for Picker
+import { SafeAreaView } from 'react-native-safe-area-context';
+import ClientHeader from "../../Components/ClientHeader";
+import Navigation from "../../Components/Navigation";
 
 // Define the Tool type
 interface Tool {
@@ -17,6 +20,7 @@ interface Tool {
 type RootStackParamList = {
   CartPage: undefined;
   CartPayment: { total: number; selectedTools: Tool[] }; // Include selectedTools
+  SuccessPage: undefined;
 };
 
 type CartPaymentRouteProp = RouteProp<RootStackParamList, 'CartPayment'>;
@@ -40,20 +44,18 @@ const CartPayment: React.FC<CartPaymentProps> = ({ route, navigation }) => {
 
     console.log('Processing payment of $', total, 'with method:', paymentMethod);
     console.log('Shipping Address:', address);
-    // Add your payment processing logic here
-
-    // After successful payment, remove tools from the cart
+    
     const toolIds = selectedTools.map(tool => tool.id);
-    removeTools(toolIds); // Remove from context
-    // Also, remove from Firestore if needed
-
-    // Navigate back to CartPage or another page
-    navigation.navigate('CartPage');
+    removeTools(toolIds); 
+    
+    navigation.navigate('SuccessPage');
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <ClientHeader/>
     <View style={styles.container}>
-      <Text style={styles.text}>Total: ${total.toFixed(2)}</Text>
+      <Text style={styles.text}>Total: Rs.{total.toFixed(2)}</Text>
       <Text style={styles.instructions}>Please proceed with your payment.</Text>
 
       <Text style={styles.label}>Select Payment Method:</Text>
@@ -67,26 +69,39 @@ const CartPayment: React.FC<CartPaymentProps> = ({ route, navigation }) => {
         <Picker.Item label="Bank Transfer" value="Bank Transfer" />
       </Picker>
 
-      <Text style={styles.label}>Shipping Address:</Text>
+      <Text style={styles.label}>Delivery Address:</Text>
       <TextInput
         style={styles.input}
         value={address}
         onChangeText={setAddress}
-        placeholder="Enter your shipping address"
+        placeholder="Enter your delivery address"
       />
 
-      <Button title="Pay Now" onPress={handlePayment} color="#FF6100" />
+
+<TouchableOpacity style={styles.addButton} onPress={handlePayment}>
+              <Text style={styles.addButtonText}>Proceed to Pay</Text>
+      </TouchableOpacity>
+      
     </View>
+    <Navigation/>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex:1,
+    marginTop:50,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
+    
+    padding: 15,
+    alignSelf:'center',
+    width: 340,
+    height: 500,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    marginBottom:100,
   },
   text: {
     fontSize: 24,
@@ -118,6 +133,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: '100%',
     marginBottom: 20,
+  },
+  addButton: {
+    flexDirection: 'row', // Aligns children horizontally
+    justifyContent: 'center', // Centers content horizontally
+    alignSelf:'center',
+    padding:15,
+    width: 200,
+    height: 60,
+    backgroundColor: '#FF6F00',
+    borderRadius: 22,
+    marginTop:20,
+    
+  },
+  addButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingLeft:15,
   },
 });
 

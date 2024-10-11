@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image, Alert, ActivityIndicator, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const paymentMethods = [
   { id: '1', name: 'Visa', icon: require('../../../assets/visa.png') },
   { id: '2', name: 'MasterCard', icon: require('../../../assets/mastercard.png') },
   { id: '3', name: 'American Express', icon: require('../../../assets/amex.png') },
-  { id: '4', name: 'PayPal', icon: require('../../../assets/paypal.png') },
+  { id: '4', name: 'Fixmate Points', icon: require('../../../assets/cash.png') },
 ];
 
 const Payment = ({ route }) => {
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
   const { amount, tax, total } = route.params; 
   const navigation = useNavigation();
 
@@ -32,11 +33,18 @@ const Payment = ({ route }) => {
         [
           {
             text: "OK",
-            onPress: () => navigation.navigate('Shop_Client' as never),
+            onPress: () => {
+              setModalVisible(true); // Show the modal after the alert
+            },
           },
         ]
       );
-    }, 2000);
+    }, 2000); // Keep this delay if you want to simulate processing time
+  };
+
+  const handleViewAppointments = () => {
+    setModalVisible(false); // Hide the modal
+    navigation.navigate('MyAppointments'); // Navigate to the View All Appointments screen
   };
 
   return (
@@ -90,6 +98,28 @@ const Payment = ({ route }) => {
           <Text style={styles.payButtonText}>Pay Now</Text>
         )}
       </TouchableOpacity>
+
+      {/* Modal for Loyalty Points */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Image source={require('../../../assets/loyalty.png')} style={styles.modalImage} />
+            <Text style={styles.modalText}>🎉 Congratulations!</Text>
+            <Text style={styles.modalSubText}>You've earned <Text style={styles.boldText}>3 loyalty points!</Text> Thank you for being a loyal customer!</Text>
+            <TouchableOpacity
+              style={styles.viewAppointmentsButton}
+              onPress={handleViewAppointments}
+            >
+              <Text style={styles.buttonText}>View All Appointments</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -199,6 +229,57 @@ const styles = StyleSheet.create({
   payButtonText: {
     color: '#FFF',
     fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  modalContent: {
+    width: '80%',
+    padding: 20,
+    backgroundColor: '#FFF',
+    borderRadius: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  modalImage: {
+    width: 80,
+    height: 80,
+    marginBottom: 20,
+  },
+  modalText: {
+    fontSize: 22,
+    marginBottom: 10,
+    textAlign: 'center',
+    color: '#40AE4F',
+  },
+  modalSubText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#666',
+  },
+  boldText: {
+    fontWeight: 'bold',
+    color: '#40AE4F',
+  },
+  viewAppointmentsButton: {
+    backgroundColor: '#FF6F00',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });

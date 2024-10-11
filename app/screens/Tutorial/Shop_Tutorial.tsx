@@ -10,15 +10,13 @@ import { AntDesign } from '@expo/vector-icons';
 import CustomAlert from "../../Components/CustomAlert";
 
 
-const hero = require("../../../assets/hero.png");
-const au = require("../../../assets/au.png");
-const ayrs = require("../../../assets/ayrs.png");
-const eysd = require("../../../assets/eysd.png");
-const uos = require("../../../assets/uos.png");
-const ds = require("../../../assets/deleteshop.png");
-const apt = require("../../../assets/appointment.png");
+const tuti = require("../../../assets/tutii.png");
 
-const Shop_User_Home: React.FC = () => {
+const add = require("../../../assets/add.png");
+const tutorial = require("../../../assets/tutorial.png");
+
+
+const Shop_Tutorial: React.FC = () => {
   const navigation: any = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [availability, setAvailability] = useState<boolean>(false);
@@ -113,162 +111,35 @@ const Shop_User_Home: React.FC = () => {
     <SafeAreaView style={{ flex: 1 }}>
     <Shop_Header />
     <View style={{ flex: 1, margin: 20 }}>
-      <Image source={hero} style={styles.topImage} />
+    <Text style={styles.title}>Repair DIY Tutorials</Text>
+      <Image source={tuti} style={styles.topImage} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.gridContainer}>
           <TouchableOpacity
             style={styles.gridItem}
-            onPress={() => navigation.navigate("AddRepairShop")}
+            onPress={() => navigation.navigate("AddTutorial")}
           >
-            <Image source={ayrs} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>Add Your </Text>
-            <Text style={styles.buttonText}>Repair Shop</Text>
+            <Image source={add} style={styles.buttonImage} />
+            
+            <Text style={styles.buttonText}>Add Tutorial</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.gridItem}
-            onPress={() => navigation.navigate("EditShopDetails")}
+            onPress={() => navigation.navigate("TutorialList")}
           >
-            <Image source={eysd} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>Edit Your</Text>
-            <Text style={styles.buttonText}>Shop Details</Text>
+            <Image source={tutorial} style={styles.buttonImage} />
+            
+            <Text style={styles.buttonText}>View Tutorial</Text>
           </TouchableOpacity>
 
-          <CustomAlert
-        visible={alertVisible}
-        message={alertMessage}
-        type={alertType}
-        onClose={() => setAlertVisible(false)}
-      />
-
-          <TouchableOpacity
-            style={styles.gridItem}
-            onPress={() => setModalVisible(true)} // Show modal on press
-          >
-            <Image source={au} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>Availability</Text>
-            <Text style={styles.buttonText}>Update</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.gridItem}
-            onPress={() => navigation.navigate("StatusManage")}
-          >
-            <Image source={uos} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>Update Order</Text>
-            <Text style={styles.buttonText}>Status</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.gridItem}
-            onPress={handleDeleteShop}
-          >
-            <Image source={ds} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>Delete</Text>
-            <Text style={styles.buttonText}>Repair Shop</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.gridItem}
-            onPress={() => navigation.navigate("Complaintmanage")}
-          >
-            <Image source={uos} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>Manage Complaint</Text>
-            {/* <Text style={styles.buttonText}>Status</Text> */}
-          </TouchableOpacity>
           
-          <TouchableOpacity
-            style={styles.gridItem}
-            onPress={() => navigation.navigate("ShopAppointments")}
-          >
-            <Image source={apt} style={styles.buttonImage} />
-            <Text style={styles.buttonText}>View</Text>
-            <Text style={styles.buttonText}>Appointments</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
 
-   {/* Availability Modal */}
-   <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <AntDesign
-              name="closecircle"
-              size={24}
-              color="#F96D2B"
-              style={{ position: 'absolute', right: 10, top: 10 }}
-              onPress={() => setModalVisible(false)}
-            />
-            <Text style={styles.maintitle}>Select Your Availability</Text>
-
-            {/* Radio Buttons for Availability */}
-            <TouchableOpacity
-              style={styles.radioOption}
-              onPress={() => setAvailability(true)} // Set as true for available
-            >
-              <Text style={styles.radioText}>
-                {availability ? "●" : "○"} Available
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.radioOption}
-              onPress={() => setAvailability(false)} // Set as false for not available
-            >
-              <Text style={styles.radioText}>
-                {!availability ? "●" : "○"} Not Available
-              </Text>
-            </TouchableOpacity>
-
-            {/* Submit Button */}
-            <TouchableOpacity style={styles.button2} onPress={updateAvailability}>
-              <Text style={styles.buttonText2}>Update</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Confirmation Modal */}
-      <Modal
-        visible={confirmDeleteVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setConfirmDeleteVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <AntDesign
-              name="closecircle"
-              size={24}
-              color="#F96D2B"
-              style={{ position: 'absolute', right: 10, top: 10 }}
-              onPress={() => setConfirmDeleteVisible(false)}
-            />
-            <Text style={styles.modalTitle}>Are you sure you want to delete this repair shop?</Text>
-            <View style={styles.confirmationButtons}>
-              <TouchableOpacity
-                style={[styles.button2, { backgroundColor: 'red' ,width:150}]} // Red for delete
-                onPress={deleteShop} // Call deleteShop if confirmed
-              >
-                <Text style={styles.buttonText2}>Yes, Delete</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.button2}
-                onPress={() => setConfirmDeleteVisible(false)} // Close modal if cancelled
-              >
-                <Text style={styles.buttonText2}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
+   
+      
     <Navbar />
   </SafeAreaView>
   );
@@ -277,8 +148,10 @@ const Shop_User_Home: React.FC = () => {
 const styles = StyleSheet.create({
   topImage: {
     width: "100%",
-    height: 320, // Adjust height as needed
+    height: 350, // Adjust height as needed
     marginBottom: 20,
+    marginTop:15,
+    borderRadius:10,
   },
   gridContainer: {
     flexDirection: "row",
@@ -293,6 +166,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#ffffff",
     borderRadius: 10,
+    marginTop:30,
   },
   buttonImage: {
     width: 60,
@@ -302,7 +176,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#F96D2B",
+    color: "#000000",
   },
   modalContainer: {
     flex: 1,
@@ -368,6 +242,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 20,
   },
+  title: {
+    fontWeight: '700',
+    fontSize: 24,
+    color: '#FF6100',
+    left: 10,
+    marginBottom: 10,
+    textAlign:'center',
+  },
 });
 
-export default Shop_User_Home;
+export default Shop_Tutorial;

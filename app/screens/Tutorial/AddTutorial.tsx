@@ -11,16 +11,16 @@ import {
   Image 
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { FIREBASE_DB, FIREBASE_STORAGE } from '../../../Firebase_Config';
+import { FIREBASE_DB, FIREBASE_STORAGE, FIREBASE_AUTH } from '../../../Firebase_Config'; // Import FIREBASE_AUTH
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Picker } from '@react-native-picker/picker'; // Import Picker
-import { DocumentReference } from 'firebase/firestore';
+import { Picker } from '@react-native-picker/picker';
 import { StackNavigationProp } from '@react-navigation/stack';
+import Navbar from "../../Components/NavigationFor_Business";
+import Shop_Header from "../../Components/Shop_Header";
 
-// Define types for your state variables
 interface Tutorial {
   title: string;
   category: string;
@@ -32,13 +32,10 @@ interface Tutorial {
   uploadTime: string;
 }
 
-// Define your stack parameter list
 type RootStackParamList = {
   TutorialList: undefined;
-  // Add other routes if necessary
 };
 
-// Type for navigation prop
 type AddTutorialNavigationProp = StackNavigationProp<RootStackParamList, 'TutorialList'>;
 
 const AddTutorial = () => {
@@ -95,6 +92,13 @@ const AddTutorial = () => {
   };
 
   const uploadTutorial = async () => {
+    const user = FIREBASE_AUTH.currentUser; // Get the current user
+    if (!user) {
+      Alert.alert('Authentication Error', 'User not logged in.');
+      return;
+    }
+    const userId = user.uid; // Get the user ID
+
     if (!title) {
       Alert.alert('Missing Data', 'Please enter the tutorial title.');
       return;
@@ -133,11 +137,9 @@ const AddTutorial = () => {
       const imageBlob = await imageResponse.blob();
       const imageRef = ref(FIREBASE_STORAGE, `tutorials/images/${Date.now()}.jpg`);
 
-      // Start both uploads in parallel
       const videoUploadTask = uploadBytesResumable(videoRef, videoBlob);
       const imageUploadTask = uploadBytesResumable(imageRef, imageBlob);
 
-      // Handle video upload
       const videoUploadPromise = new Promise<string>((resolve, reject) => {
         videoUploadTask.on(
           'state_changed',
@@ -158,7 +160,6 @@ const AddTutorial = () => {
         );
       });
 
-      // Handle image upload
       const imageUploadPromise = new Promise<string>((resolve, reject) => {
         imageUploadTask.on(
           'state_changed',
@@ -179,39 +180,32 @@ const AddTutorial = () => {
         );
       });
 
-      // Wait for both uploads to finish
       const [videoUrl, imageUrl] = await Promise.all([videoUploadPromise, imageUploadPromise]);
 
-      // Save to Firestore
-      try {
-        await addDoc(collection(FIREBASE_DB, 'Tutorial'), {
-          title,
-          category,
-          timeDuration,
-          tools,
-          description,
-          videoUrl,
-          imageUrl,
-          uploadTime: new Date().toISOString(),
-        });
+      await addDoc(collection(FIREBASE_DB, 'Tutorial'), {
+        title,
+        category,
+        timeDuration,
+        tools,
+        description,
+        videoUrl,
+        imageUrl,
+        uploadTime: new Date().toISOString(),
+        userId, // Add the logged-in user's ID
+      });
 
-        Alert.alert('Upload successful!', 'Tutorial has been saved to Firestore.');
-        navigation.navigate('TutorialList');
+      Alert.alert('Upload successful!', 'Tutorial has been saved to Firestore.');
+      navigation.navigate('TutorialList');
 
-        // Reset form
-        setVideoUri(null);
-        setImageUri(null);
-        setIsVideoSelected(false);
-        setIsImageSelected(false);
-        setTitle('');
-        setCategory('');
-        setTimeDuration('');
-        setTools('');
-        setDescription('');
-      } catch (error) {
-        console.error('Firestore save failed:', error);
-        Alert.alert('Save failed', error.message);
-      }
+      setVideoUri(null);
+      setImageUri(null);
+      setIsVideoSelected(false);
+      setIsImageSelected(false);
+      setTitle('');
+      setCategory('');
+      setTimeDuration('');
+      setTools('');
+      setDescription('');
     } catch (error) {
       console.error('Video or image conversion failed:', error);
       Alert.alert('Conversion failed', error.message);
@@ -220,30 +214,39 @@ const AddTutorial = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <Shop_Header/>
       <ScrollView contentContainerStyle={styles.container}>
+        
+        <View style={styles.scontainer}>
         <Text style={styles.title}>Add Tutorial</Text>
         <View style={styles.form}>
+        <Text style={styles.label}>Tutorial Title</Text>
           <TextInput
             style={styles.input}
             placeholder="Enter Tutorial Title"
             value={title}
             onChangeText={setTitle}
           />
-
+          <Text style={styles.label}>Category</Text>
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={category}
               style={styles.picker}
               onValueChange={(itemValue) => setCategory(itemValue)}
+              
             >
-              <Picker.Item label="Select Category" value="" />
-              <Picker.Item label="Home and Appliance Repair" value="Home and Appliance Repair" />
-              <Picker.Item label="Automotive Repair" value="Automotive Repair" />
+              <Picker.Item label="Category" value="" />
               <Picker.Item label="Electronic Repair" value="Electronic Repair" />
+              <Picker.Item label="Garden Equipment" value="Garden Equipment" />
+              <Picker.Item label="Musical Instruments" value="Musical Instruments" />
+              <Picker.Item label="Jwellery and Watches" value="Jwellery and Watches" />
+              <Picker.Item label="Automotive Repair" value="Automotive Repair" />
               <Picker.Item label="Furniture Repair" value="Furniture Repair" />
+              <Picker.Item label="Computers" value="Computers" />
             </Picker>
           </View>
           
+          <Text style={styles.label}>Tutorial Description</Text>
           <TextInput
             style={styles.input1}
             placeholder="Enter Tutorial Description"
@@ -251,12 +254,13 @@ const AddTutorial = () => {
             onChangeText={setDescription}
             multiline={true}
             numberOfLines={6}
-            textAlignVertical="top"
+            textAlignVertical="center"
           />
 
+          <Text style={styles.label}>Recommended Tools</Text>
           <TextInput
             style={styles.input}
-            placeholder="Recommended Tools"
+            placeholder="Tools"
             value={tools}
             onChangeText={setTools}
           />
@@ -271,6 +275,7 @@ const AddTutorial = () => {
             <Text style={styles.videoUri}>No video selected</Text>
           )}
 
+          <Text style={styles.label}>Tutorial Time Duration </Text>
           <TextInput
             style={styles.input}
             placeholder="Time Duration"
@@ -293,7 +298,9 @@ const AddTutorial = () => {
             <Text style={styles.uploadButtonText}>Submit Tutorial</Text>
           </TouchableOpacity>
         </View>
+        </View>
       </ScrollView>
+      <Navbar/>
     </SafeAreaView>
   );
 };
@@ -311,16 +318,18 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: '#FF6100',
     left: 10,
-    marginBottom: 20,
+    marginBottom: 10,
+    textAlign:'center',
   },
   form: {
     justifyContent: 'center',
+    
   },
   input: {
     marginBottom: 15,
     width: '95%',
     height: 50,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F9F9F9',
     borderWidth: 1,
     borderColor: '#FF6100',
     borderRadius: 4,
@@ -355,6 +364,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     fontSize: 16,
     color: 'gray',
+    marginLeft:7,
+    marginTop:10,
   },
   svideo: {
     fontWeight: '700',
@@ -363,22 +374,37 @@ const styles = StyleSheet.create({
     color: '#FF6100',
   },
   uploadButton: {
-    backgroundColor: '#FF6100',
-    paddingVertical: 15,
+   
+    backgroundColor: '#FF6F00',
     borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 20,
-    width: 200,
-    alignSelf: 'center',
+    marginTop:20,
+    paddingVertical: 10,
   },
   uploadButtonText: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
+    textAlign:'center',
   },
   imagePreview: {
     width: '100%',
     height: 200,
     marginVertical: 10,
+  },
+  scontainer: {
+    width: 367,
+    height:'100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    
+    padding:10,            // Equivalent to `z-index: 0`
+    // `isolation` isn't a direct property in React Native, but it doesn't impact layout here
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: '#333',
+    fontWeight: 'bold',
+    marginLeft:7,
   },
 });

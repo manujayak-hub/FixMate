@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, Alert, FlatList } from 'react-native';
+import { View, Text, Image, StyleSheet, Alert, SafeAreaView } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config'; // Adjust import according to your file structure
+import Navbar from "../../Components/NavigationFor_Business";
+import Shop_Header from "../../Components/Shop_Header";
 
-interface Review {
-  id: string;
-  content: string;
-  rating: number;
-}
+
+
 
 const ToolView: React.FC = () => {
   const route = useRoute();
   const { toolId } = route.params as { toolId: string };
   const [tool, setTool] = useState<any>(null); // Adjust to your Tool type if needed
-  const [reviews, setReviews] = useState<Review[]>([]); // State to hold reviews
+ 
 
   useEffect(() => {
     const fetchTool = async () => {
@@ -33,58 +32,38 @@ const ToolView: React.FC = () => {
       }
     };
 
-    const fetchReviews = () => {
-      const reviewsCollection = collection(FIREBASE_DB, 'Reviews');
-      const reviewsQuery = query(reviewsCollection, where('toolId', '==', toolId)); // Assuming reviews have a 'toolId' field
-
-      const unsubscribe = onSnapshot(
-        reviewsQuery,
-        snapshot => {
-          const reviewsData = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...(doc.data() as Review), // Type assertion to Review structure
-          }));
-          setReviews(reviewsData);
-        },
-        error => {
-          console.error('Error fetching reviews:', error);
-        }
-      );
-
-      return unsubscribe; // Return the unsubscribe function
-    };
+    
 
     fetchTool();
-    const unsubscribeReviews = fetchReviews();
+    
 
-    // Cleanup function to unsubscribe from reviews listener
-    return () => unsubscribeReviews();
+    
   }, [toolId]);
 
   if (!tool) {
     return <Text>Loading...</Text>; // You can add a loading indicator here
   }
 
-  const renderReview = ({ item }: { item: Review }) => (
-    <View style={styles.reviewCard}>
-      <Text style={styles.reviewText}>Comment: {item.content}</Text>
-    </View>
-  );
+  
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <Shop_Header/>
     <View style={styles.container}>
       <Image source={{ uri: tool.imageUrl }} style={styles.image} />
+      <Text style={styles.txt}>Tool Name :</Text>
       <Text style={styles.title}>{tool.name}</Text>
-      <Text style={styles.price}>Price: Rs {tool.price}</Text>
+      <Text style={styles.txt}>Tool Category :</Text>
+      <Text style={styles.title}>{tool.category}</Text>
+      <Text style={styles.txt}>Tool Price :</Text>
+      <Text style={styles.title}>Rs {tool.price}</Text>
+      <Text style={styles.txt}>Tool Description :</Text>
+      <Text style={styles.title}>{tool.description}</Text>
 
-      <Text style={styles.reviewsTitle}>Reviews:</Text>
-      <FlatList
-        data={reviews}
-        renderItem={renderReview}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.reviewsContainer}
-      />
+      
     </View>
+    <Navbar/>
+    </SafeAreaView>
   );
 };
 
@@ -92,8 +71,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
+   
+    backgroundColor: '#fff3e6',
+    
   },
   image: {
     width: '100%',
@@ -101,9 +81,10 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   title: {
-    fontWeight: '700',
-    fontSize: 24,
-    marginVertical: 10,
+    fontWeight: '500',
+    fontSize: 18,
+    marginVertical: 5,
+    marginLeft:30,
   },
   price: {
     fontSize: 18,
@@ -126,6 +107,20 @@ const styles = StyleSheet.create({
   reviewText: {
     fontSize: 16,
     color: '#333',
+  },
+  txt: {
+    fontWeight: '700',
+    fontSize: 16,
+    marginTop:20,
+    color: '#FF6100',
+  },
+  sscontainer: {
+    width: 367,
+    
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    margin:15,
+    padding:18,            
   },
 });
 

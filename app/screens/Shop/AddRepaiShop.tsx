@@ -13,7 +13,7 @@ import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../../Firebase_Config";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDoc, doc } from "firebase/firestore";
 import * as Location from "expo-location";
 import Navbar from "../../Components/NavigationFor_Business";
 import Shop_Header from "../../Components/Shop_Header";
@@ -47,6 +47,29 @@ const AddRepairShop: React.FC = () => {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'error' | 'success' | undefined>(undefined);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchShopDetails = async () => {
+      const user = FIREBASE_AUTH.currentUser;
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(FIREBASE_DB, "users", user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            if (userData?.shopName) {
+              setShopName(userData.shopName); // Set the shop name from the user's document
+            }
+          }
+        } catch (error) {
+          setAlertMessage("Error fetching user data: " + error.message);
+          setAlertVisible(true);
+          setAlertType("error");
+        }
+      }
+    };
+
+    fetchShopDetails();
+  }, []);
 
   const getLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -206,6 +229,7 @@ const AddRepairShop: React.FC = () => {
           value={shopName}
           onChangeText={setShopName}
           placeholder="Enter Shop Name"
+          readOnly
         />
 
         <Text style={styles.label}>Category *</Text>

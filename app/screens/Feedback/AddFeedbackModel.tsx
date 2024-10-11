@@ -4,7 +4,10 @@ import Modal from 'react-native-modal';
 import { collection, addDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config';
 
-const AddFeedbackModal = ({ isVisible, onClose, onFeedbackAdded  }) => {
+
+
+
+const AddFeedbackModal = ({ isVisible, onClose, onFeedbackAdded }) => {
   const [name, setName] = useState('');
   const [feedback, setFeedback] = useState('');
 
@@ -40,7 +43,7 @@ const AddFeedbackModal = ({ isVisible, onClose, onFeedbackAdded  }) => {
 
         <TextInput
           style={styles.input}
-          placeholder="Name"
+          placeholder="Your Name"
           value={name}
           onChangeText={setName}
         />

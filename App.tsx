@@ -15,6 +15,11 @@ import TutorialList from "./app/screens/Tutorial/TutorialList";
 import EditTutorial from "./app/screens/Tutorial/EditTutorial";
 import CatTutorial from "./app/screens/Tutorial/CatTutorial";
 import STView from "./app/screens/Tutorial/STView";
+import UserTutorial from "./app/screens/Tutorial/UserTutorial";
+import UserTutorialDoc from "./app/screens/Tutorial/UserTutorialDoc";
+
+import Shop_Tutorial from "./app/screens/Tutorial/Shop_Tutorial";
+
 
 import Client_MapView from "./app/screens/Client/Client_MapView";
 
@@ -33,8 +38,9 @@ import Appointment from "./app/screens/Booking/Appointment";
 import Payment from "./app/screens/Booking/Payment";
 
 import PaymentMethods from "./app/screens/Booking/PaymentMethods";
+import UpdateDeletePayMethods from "./app/screens/Booking/UpdateDeletePayMethods";
 import MyAppointments from "./app/screens/Booking/MyAppointments";
-
+import ShopAppointments from "./app/screens/Shop/ShopAppointments";
 
 import AddTools from "./app/screens/ToolShop/AddTools";
 import ToolList from "./app/screens/ToolShop/ToolList";
@@ -48,7 +54,14 @@ import ToolView from "./app/screens/ToolShop/ToolView";
 import SuccessPage from "./app/screens/ToolShop/SuccessPage";
 
 
+import Shop_ToolShop from "./app/screens/ToolShop/Shop_ToolShop";
+
+
+
 import WelcomePage from "./app/screens/WelcomePage";
+import TrackOrders from "./app/screens/OrderTracking/TrackOrders";
+import StatusManage from "./app/screens/OrderTracking/OrderTrackDashboard";
+import addappcomplaint from "./app/screens/Complaint/AddApoComplaint";
 
 
 
@@ -76,24 +89,35 @@ export default function App() {
         <Stack.Screen name="EditTutorial" component={EditTutorial} options={{headerShown:false}} />
         <Stack.Screen name="CatTutorial" component={CatTutorial} options={{headerShown:false}} />
         <Stack.Screen name="STView" component={STView} options={{headerShown:false}} />
+        <Stack.Screen name="UserTutorial" component={UserTutorial} options={{headerShown:false}} />
+        <Stack.Screen name="UserTutorialDoc" component={UserTutorialDoc} options={{headerShown:false}} />
+
+        <Stack.Screen name="Shop_Tutorial" component={Shop_Tutorial} options={{headerShown:false}} />
+
+        
         <Stack.Screen name="Client_MapView" component={Client_MapView} options={{headerShown:false}} />
         <Stack.Screen name="Profile" component={UserProfile} options={{headerShown:false}} />
         <Stack.Screen name="EditProfile" component={EditProfile} options={{headerShown:false}} />
         <Stack.Screen name="complainlist" component={complainlist} options={{headerShown:false}} />
         <Stack.Screen name="ordertracking" component={ordertracking} options={{headerShown:false}} />
+        <Stack.Screen name="TrackOrders" component={TrackOrders} options={{headerShown:false}} />
         <Stack.Screen name="Complaintmanage" component={Complaintmanage} options={{headerShown:false}} />
         <Stack.Screen name="addcomplaint" component={addcomplaint} options={{headerShown:false}} />
+        <Stack.Screen name="addappcomplaint" component={addappcomplaint} options={{headerShown:false}} />
         <Stack.Screen name="aboutus" component={AboutUs} options={{headerShown:false}} />
         <Stack.Screen name="shopfeedbacklist" component={shopfeedback} options={{headerShown:false}} />
+
+        <Stack.Screen name="StatusManage" component={StatusManage} options={{headerShown:false}} />
+
+
+
         <Stack.Screen name="ShopDetails" component={ShopDetails} options={{headerShown:false}} />
         <Stack.Screen name="Appointment" component={Appointment} options={{headerShown:false}} />
         <Stack.Screen name="Payment" component={Payment} options={{headerShown:false}} />
-
-
-
         <Stack.Screen name="PaymentMethods" component={PaymentMethods} options={{headerShown:false}} />
+        <Stack.Screen name="UpdateDeletePayMethods" component={UpdateDeletePayMethods} options={{headerShown:false}} />
         <Stack.Screen name="MyAppointments" component={MyAppointments} options={{headerShown:false}} />
-
+        <Stack.Screen name="ShopAppointments" component={ShopAppointments} options={{headerShown:false}} />
 
 
 
@@ -106,6 +130,7 @@ export default function App() {
         <Stack.Screen name="CartPayment" component={CartPayment} options={{headerShown:false}} />
         <Stack.Screen name="ToolView" component={ToolView} options={{headerShown:false}} />
         <Stack.Screen name="SuccessPage" component={SuccessPage} options={{headerShown:false}} />
+        <Stack.Screen name="Shop_ToolShop" component={Shop_ToolShop} options={{headerShown:false}} />
 
 
 

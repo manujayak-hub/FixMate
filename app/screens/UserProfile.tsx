@@ -16,17 +16,18 @@ type RootStackParamList = {
   ordertracking: undefined;
   aboutus: undefined;
   PaymentMethods: undefined;
-  myappointments: undefined; // Added route for My Appointments
+  MyAppointments: undefined; // Added route for My Appointments
 };
 
 type OrderTrackNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'complainlist' | 'ordertracking' | 'aboutus' | 'PaymentMethods' | 'myappointments'
+  'complainlist' | 'ordertracking' | 'aboutus' | 'PaymentMethods' | 'MyAppointments'
 >;
 
 export default function UserProfile() {
   const [userData, setUserData] = useState<any>(null);
   const [complaintCount, setComplaintCount] = useState<number>(0);
+  const [appointmentCount, setAppointmentCount] = useState<number>(0);
   const auth = getAuth();
   const user = auth.currentUser;
   const navigation = useNavigation<OrderTrackNavigationProp>();
@@ -36,6 +37,7 @@ export default function UserProfile() {
       if (user) {
         fetchUserData(user.uid);
         fetchComplaintCount(user.uid);
+        fetchAppointmentCount(user.uid);
       }
     }, [user])
   );
@@ -60,6 +62,15 @@ export default function UserProfile() {
       setComplaintCount(querySnapshot.size); // Get the count of complaints
     } catch (error) {
       console.error('Error fetching complaints count:', error);
+    }
+  };
+  const fetchAppointmentCount = async (userId: string) => {
+    try {
+      const q = query(collection(FIREBASE_DB, 'appointments'), where('userId', '==', userId)); // Assuming 'appointments' collection exists
+      const querySnapshot = await getDocs(q);
+      setAppointmentCount(querySnapshot.size); // Get the count of appointments
+    } catch (error) {
+      console.error('Error fetching appointment count:', error);
     }
   };
 
@@ -105,28 +116,23 @@ export default function UserProfile() {
           </View>
         </View>
 
-        <View style={styles.infoBoxWrapper}>
-          <TouchableWithoutFeedback onPress={() => navigation.navigate('complainlist')}>
-            <View style={[styles.infoBox, { borderRightColor: '#dddddd', borderRightWidth: 1 }]}>
-              <Title>{complaintCount}</Title>
-              <Caption>Your Complaints</Caption>
-            </View>
-          </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPress={() => navigation.navigate('ordertracking')}>
-            <View style={styles.infoBox}>
-              <Title>12</Title>
-              <Caption>Your Repairs</Caption>
-            </View>
-          </TouchableWithoutFeedback>
-        </View>
+        <View style={styles.separator} />
 
         <View style={styles.menuWrapper}>
          
-           {/* My Appointments Section */}
            <TouchableRipple onPress={() => navigation.navigate('MyAppointments')}>
             <View style={styles.menuItem}>
               <Icon name="calendar" color="#FF6347" size={25} />
               <Text style={styles.menuItemText}>My Appointments</Text>
+              <Text style={styles.menuItemCount}>{appointmentCount}</Text>
+            </View>
+          </TouchableRipple>
+
+          <TouchableRipple onPress={() => navigation.navigate('complainlist')}>
+            <View style={styles.menuItem}>
+              <Icon name="alert-decagram-outline" color="#FF6347" size={25} />
+              <Text style={styles.menuItemText}>My Complaint</Text>
+              <Text style={styles.menuItemCount}>{complaintCount}</Text>
             </View>
           </TouchableRipple>
           
@@ -181,6 +187,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
+  separator: {
+    height: 1,
+    backgroundColor: '#dddddd',
+    marginVertical: 10,
+  },
   caption: {
     fontSize: 14,
     lineHeight: 14,
@@ -217,5 +228,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
     lineHeight: 26,
+    flex: 1, 
+  },
+  menuItemCount: {
+    color: '#FF6347',
+    fontWeight: '600',
+    fontSize: 16,
+    width: 20,
   },
 });

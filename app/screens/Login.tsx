@@ -51,7 +51,7 @@ const LoginScreen = () => {
         } else {
           navigation.navigate('Shop_Client', { user: userData });
         }
-        
+        //no need message
       } else {
         setAlertMessage('No user data found');
         setAlertType('error');
@@ -60,7 +60,6 @@ const LoginScreen = () => {
       setAlertMessage('Sign in failed: ' + error.message);
       setAlertType('error');
     } finally {
-      setAlertVisible(true);
       setLoading(false);
     }
   };

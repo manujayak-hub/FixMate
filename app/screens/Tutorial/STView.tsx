@@ -4,6 +4,8 @@ import { useRoute, RouteProp } from '@react-navigation/native';
 import { doc, getDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config'; // Adjust import according to your file structure
 import { Video ,ResizeMode } from 'expo-av';
+import Navbar from "../../Components/NavigationFor_Business";
+import Shop_Header from "../../Components/Shop_Header";
 
 // Define the types for the route params
 type RootStackParamList = {
@@ -53,7 +55,9 @@ const STView: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-    <ScrollView>
+      <Shop_Header/>
+    <ScrollView contentContainerStyle={styles.scontainer}>
+    <View style={styles.sscontainer}>
       <Text style={styles.title}>{tutorial.title}</Text>
       <Image
         source={{ uri: tutorial.imageUrl }} // Ensure `imageUrl` is a valid URL string
@@ -82,15 +86,16 @@ const STView: React.FC = () => {
 
         <Text style={styles.txt}>Time Duartion:</Text>
         <Text style={styles.description}>{tutorial.timeDuration}</Text>
-
+    </View>
     </ScrollView>
+    <Navbar/>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    
     backgroundColor: '#fff3e6',
     flex: 1,
   },
@@ -103,6 +108,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginVertical: 10,
+    alignSelf:'center',
   },
   duration: {
     fontSize: 18,
@@ -127,6 +133,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop:20,
     color: '#FF6100',
+  },
+  scontainer: {
+    flexGrow: 1,
+    
+    
+  },
+  sscontainer: {
+    width: 367,
+    
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    margin:15,
+    padding:18,            
   },
 });
 

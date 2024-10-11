@@ -21,11 +21,10 @@ const SignUpScreen = () => {
   const [mobile, setMobile] = useState("");
   const [userType, setUserType] = useState("Customer");
   const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertType, setAlertType] = useState<"error" | "success" | undefined>(
-    undefined
-  );
-  const navigation: any = useNavigation();
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<'error' | 'success' | undefined>(undefined);
+  const navigation:any = useNavigation();
+  const [shopName, setShopName] = useState('');
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -81,14 +80,18 @@ const SignUpScreen = () => {
         email,
         type: userType,
         photo,
+        shopName: userType === 'Business' ? shopName : null 
       });
 
       // Clear form fields
-      setName("");
-      setMobile("");
-      setEmail("");
-      setPassword("");
-      setUserType("Customer");
+
+      setName('');
+      setMobile('');
+      setEmail('');
+      setPassword('');
+      setUserType('Customer');
+      setShopName('');
+
 
       // Display success alert
 
@@ -176,17 +179,26 @@ const SignUpScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+    {userType === 'Business' && (
+        <TextInput
+          style={styles.input}
+          placeholder="Shop Name"
+          value={shopName}
+          onChangeText={setShopName}
+        />
+      )}
 
-      <TouchableOpacity
-        style={styles.buttonSecondary}
-        onPress={() => navigation.navigate("Login")}
-      >
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+      <Text style={styles.buttonText}>Sign Up</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.buttonSecondary} onPress={() => navigation.navigate('Login')}>
+      <Text style={styles.buttonText}>Login</Text>
+    </TouchableOpacity>
+  </View>
+    
+
+
   );
 };
 
