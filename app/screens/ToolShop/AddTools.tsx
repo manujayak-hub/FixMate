@@ -67,7 +67,7 @@ const AddTools = () => {
 
   const uploadTool = async () => {
     if (!name || !category || !price || !description || !imageUri) {
-      Alert.alert('Missing Data', 'Please fill all fields and select an image.');
+      Alert.alert('Missing Data', 'Please fill all fields.');
       return;
     }
   

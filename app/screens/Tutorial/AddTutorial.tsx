@@ -100,7 +100,7 @@ const AddTutorial = () => {
     const userId = user.uid; // Get the user ID
   
     if (!title || !category || !timeDuration || !tools || !description || !videoUri || !imageUri) {
-      Alert.alert('Missing Data', 'Please fill in all fields and select both video and image.');
+      Alert.alert('Missing Data', 'Please fill in all fields.');
       return;
     }
   
