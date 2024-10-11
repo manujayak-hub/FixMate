@@ -2,7 +2,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
 
-const hero = require('../../assets/hero.jpg')
+const hero = require('../../assets/welcomehero.jpg')
 
 const WelcomePage = () => {
     
