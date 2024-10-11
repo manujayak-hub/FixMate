@@ -32,7 +32,7 @@ const Navigation: React.FC = () => {
         
         </TouchableOpacity>
         <TouchableOpacity 
-          onPress={() => navigation.navigate('Home' as never)}>
+          onPress={() => navigation.navigate('Profile' as never)}>
         <Image source={profileicon} style={styles.icon}
         />
         </TouchableOpacity>
