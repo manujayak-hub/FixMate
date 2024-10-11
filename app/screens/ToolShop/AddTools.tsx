@@ -65,92 +65,73 @@ const AddTools = () => {
     }
   };
 
-  const uploadTutorial = async () => {
-    if (!name) {
-      Alert.alert('Missing Data', 'Please enter the Tool Name.');
+  const uploadTool = async () => {
+    if (!name || !category || !price || !description || !imageUri) {
+      Alert.alert('Missing Data', 'Please fill all fields and select an image.');
       return;
     }
-    if (!category) {
-      Alert.alert('Missing Data', 'Please select a category.');
-      return;
-    }
-    if (!price) {
-      Alert.alert('Missing Data', 'Please enter the tool price.');
-      return;
-    }
-    if (!description) {
-      Alert.alert('Missing Data', 'Please enter the tool description.');
-      return;
-    }
-    if (!imageUri) {
-      Alert.alert('Missing Data', 'Please select an image.');
-      return;
-    }
-
+  
     try {
-      const auth = getAuth(); // Get the authentication instance
-      const userId = auth.currentUser?.uid; // Get the logged-in user's ID
-
+      const auth = getAuth(); 
+      const userId = auth.currentUser?.uid; 
+  
       if (!userId) {
         Alert.alert('Error', 'User not logged in. Please log in to upload a tool.');
         return;
       }
-
+  
       const imageResponse = await fetch(imageUri);
       const imageBlob = await imageResponse.blob();
-
+  
       const imageRef = ref(FIREBASE_STORAGE, `tools/images/${Date.now()}.jpg`);
-
       const imageUploadTask = uploadBytesResumable(imageRef, imageBlob);
-
-      const imageUploadPromise = new Promise<string>((resolve, reject) => {
-        imageUploadTask.on(
-          'state_changed',
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log('Image upload is ' + progress + '% done');
-          },
-          (error) => {
-            console.error('Image upload failed:', error);
-            Alert.alert('Image upload failed', error.message);
-            reject(error);
-          },
-          async () => {
-            const imageUrl = await getDownloadURL(imageUploadTask.snapshot.ref);
-            console.log('Image file available at', imageUrl);
-            resolve(imageUrl);
+  
+      imageUploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log('Image upload is ' + progress + '% done');
+        },
+        (error) => {
+          console.error('Image upload failed:', error);
+          if (error.code === 'storage/unauthorized') {
+            Alert.alert('Permission Denied', 'You do not have permission to upload this file.');
+          } else {
+            Alert.alert('Upload Failed', 'An error occurred while uploading the file.');
           }
-        );
-      });
-
-      const imageUrl = await imageUploadPromise;
-
-      // Save to Firestore including userId
-      await addDoc(collection(FIREBASE_DB, 'Tools'), {
-        name,
-        category,
-        price,
-        description,
-        imageUrl,
-        userId, // Add the user's ID here
-        uploadTime: new Date().toISOString(),
-      });
-
-      Alert.alert('Upload successful!', 'Tool has been added successfully.');
-      navigation.navigate('ToolList');
-
-      // Reset form
-      setImageUri(null);
-      setIsImageSelected(false);
-      setName('');
-      setCategory('');
-      setPrice('');
-      setDescription('');
+        },
+        async () => {
+          const imageUrl = await getDownloadURL(imageUploadTask.snapshot.ref);
+  
+          // Save to Firestore
+          await addDoc(collection(FIREBASE_DB, 'Tools'), {
+            name,
+            category,
+            price,
+            description,
+            imageUrl,
+            userId, 
+            uploadTime: new Date().toISOString(),
+          });
+  
+          Alert.alert('Upload successful!', 'Tool has been added successfully.');
+          navigation.navigate('ToolList');
+  
+          // Reset form
+          setImageUri(null);
+          setIsImageSelected(false);
+          setName('');
+          setCategory('');
+          setPrice('');
+          setDescription('');
+        }
+      );
     } catch (error) {
       console.error('Error:', error);
       Alert.alert('Error', error.message);
     }
   };
+  
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -216,7 +197,7 @@ const AddTools = () => {
             <Text style={styles.videoUri}>No image selected</Text>
           )}
 
-          <TouchableOpacity onPress={uploadTutorial} style={styles.uploadButton}>
+          <TouchableOpacity onPress={uploadTool} style={styles.uploadButton}>
             <Text style={styles.uploadButtonText}>Add Tool</Text>
           </TouchableOpacity>
         </View>

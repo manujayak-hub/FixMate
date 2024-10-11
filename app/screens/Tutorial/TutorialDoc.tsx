@@ -4,6 +4,8 @@ import { useRoute, RouteProp } from '@react-navigation/native';
 import { doc, getDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../../Firebase_Config'; // Adjust import according to your file structure
 import { Video ,ResizeMode } from 'expo-av';
+import Navbar from "../../Components/NavigationFor_Business";
+import Shop_Header from "../../Components/Shop_Header";
 
 // Define the types for the route params
 type RootStackParamList = {
@@ -51,7 +53,8 @@ const TutorialDoc: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-    <ScrollView>
+      <Shop_Header/>
+    <ScrollView style={{padding: 20,flexGrow:1}}>
       <Text style={styles.title}>{tutorial.title}</Text>
       <Image
         source={{ uri: tutorial.imageUrl }} // Ensure `imageUrl` is a valid URL string
@@ -74,14 +77,17 @@ const TutorialDoc: React.FC = () => {
           isLooping
         />
       )}
+      <Text></Text>
+      <Text></Text>
     </ScrollView>
+    <Navbar/>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    
     backgroundColor: '#fff3e6',
     flex: 1,
   },

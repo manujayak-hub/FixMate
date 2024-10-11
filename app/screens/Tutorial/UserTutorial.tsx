@@ -54,9 +54,9 @@ const categories = [
   'Musical Instruments',
   'Jwellery and Watches',
 
-  'GardenEquipment',
-  'MusicalInstruments',
-  'JwelleryWatches',
+  
+  
+ 
 
   'Automotive Repair',
   'Furniture Repair',
@@ -70,9 +70,9 @@ const categoryImages: { [key: string]: any } = {
   'Automotive Repair': automotiveico,
   'Cloathing': clothingico,
   'Furniture Repair': furnitureico,
-  'GardenEquipment': homegardenico,
-  'MusicalInstruments': musicalico,
-  'JwelleryWatches': jewelryico,
+  'Garden Equipment': homegardenico,
+  'Musical Instruments': musicalico,
+  'Jwellery and Watches': jewelryico,
   'Computers': computerico,
 };
 

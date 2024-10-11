@@ -161,20 +161,26 @@ const TutorialList: React.FC = () => {
         <Image source={searchicon} style={styles.searchIcon} />
       </View>
 
-      
+<View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryContainer}>
-        {categories.map(category => (
+        {categories.map((category, index) => (
           <TouchableOpacity
-            key={category}
-            style={[styles.categoryButton, selectedCategory === category && styles.selectedCategoryButton]}
+            key={index}
+            style={[
+              styles.categoryButton,
+              selectedCategory === category && styles.selectedCategoryButton
+            ]}
             onPress={() => setSelectedCategory(category)}
           >
             <Text style={styles.categoryText}>{category}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
+      
+      </View>
 
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+     
         {filteredTutorials.map(tutorial => (
           <TouchableOpacity key={tutorial.id} onPress={() => handleView(tutorial.id)}>
             <View style={styles.tutorialCard}>
@@ -236,7 +242,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     elevation: 3,
-    
+    marginTop:10,
   },
   image: {
     width: 120,
@@ -293,9 +299,10 @@ const styles = StyleSheet.create({
   categoryContainer: {
     marginVertical: 10,
     marginLeft: 20,
-    marginBottom:-390,
+    height: 50,
     marginTop:20,
-    backgroundColor: '#EEEEEE',
+     flexWrap: 'wrap',
+    
   },
   categoryButton: {
     paddingHorizontal: 20,
