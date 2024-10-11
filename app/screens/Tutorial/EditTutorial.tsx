@@ -117,8 +117,7 @@ const EditTutorial: React.FC = () => {
             console.log(`Video upload is ${progress}% done`);
           },
           (error) => {
-            console.error('Video upload failed:', error);
-            Alert.alert('Error', 'Video upload failed');
+            
           },
           async () => {
             updatedVideoUrl = await getDownloadURL(videoUploadTask.snapshot.ref);
@@ -140,8 +139,7 @@ const EditTutorial: React.FC = () => {
             console.log(`Image upload is ${progress}% done`);
           },
           (error) => {
-            console.error('Image upload failed:', error);
-            Alert.alert('Error', 'Image upload failed');
+           
           },
           async () => {
             updatedImageUrl = await getDownloadURL(imageUploadTask.snapshot.ref);

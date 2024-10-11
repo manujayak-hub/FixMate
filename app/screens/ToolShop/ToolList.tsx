@@ -96,10 +96,18 @@ const ToolList: React.FC = () => {
             onPress: async () => {
               try {
                 if (imageUrl) {
-                  const imageRef = ref(FIREBASE_STORAGE, imageUrl);
-                  await deleteObject(imageRef); // Delete the image from storage
+                  // Validate the URL format
+                  const isValidUrl = (url: string) => {
+                    return url.startsWith('https://') || url.startsWith('gs://');
+                  };
+                  if (isValidUrl(imageUrl)) {
+                    const imageRef = ref(FIREBASE_STORAGE, imageUrl);
+                    await deleteObject(imageRef); // Delete the image from storage
+                  } else {
+                    
+                  }
                 }
-
+  
                 // Delete document from Firestore
                 await deleteDoc(doc(FIREBASE_DB, 'Tools', id));
                 Alert.alert('Success', 'Tool deleted successfully');
@@ -116,6 +124,7 @@ const ToolList: React.FC = () => {
       Alert.alert('Error', 'Could not delete tool');
     }
   };
+  
 
   const handleEdit = (id: string) => {
     navigation.navigate('EditTool', { toolId: id });
@@ -139,7 +148,7 @@ const ToolList: React.FC = () => {
         <Image source={searchicon} style={styles.searchIcon} />
       </View>
 
-      {/* Horizontal ScrollView for Categories */}
+      <View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryContainer}>
         {categories.map((category, index) => (
           <TouchableOpacity
@@ -154,7 +163,7 @@ const ToolList: React.FC = () => {
           </TouchableOpacity>
         ))}
       </ScrollView>
-
+      </View>
       <ScrollView contentContainerStyle={styles.container}>
         {filteredTools.map(tool => (
           <TouchableOpacity key={tool.id} onPress={() => handleView(tool.id)}>
@@ -266,7 +275,7 @@ const styles = StyleSheet.create({
   categoryContainer: {
     marginVertical: 10,
     marginLeft: 20,
-    marginBottom:-360,
+    
     marginTop:20,
     backgroundColor: '#EEEEEE',
   },
