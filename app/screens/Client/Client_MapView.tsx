@@ -1,27 +1,26 @@
-import React, { useState,useEffect} from 'react';
-import MapView, {  Marker } from 'react-native-maps';
-import { StyleSheet, View, Button ,SafeAreaView,TouchableOpacity,Image} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import MapView, { Marker } from 'react-native-maps';
+import { StyleSheet, View, Button, SafeAreaView, TouchableOpacity, Image } from 'react-native';
 import { FIREBASE_DB } from "../../../Firebase_Config";
-import { getDocs,collection } from 'firebase/firestore';
+import { getDocs, collection } from 'firebase/firestore';
 import Navigation from '../../Components/Navigation';
+import { Linking } from 'react-native'; // Import Linking
 
-const zoomin = require("../../../assets/zoomin.png")
-const zoomout = require("../../../assets/zoomout.png")
-const locico = require('../../../assets/locationico.png')
+const zoomin = require("../../../assets/zoomin.png");
+const zoomout = require("../../../assets/zoomout.png");
+const locico = require('../../../assets/locationico.png');
+
 interface RepairShops {
   id: string;
   contact: string;
   location: string;
   shopName: string;
-  category: string; 
+  category: string;
   ownerLocationLongitude: number;
   ownerLocationLatitude: number;
 }
 
-
-
 const Client_MapView = () => {
-
   const [repairShops, setRepairShops] = useState<RepairShops[]>([]);
 
   useEffect(() => {
@@ -50,7 +49,6 @@ const Client_MapView = () => {
     longitudeDelta: 4.0, // Increased delta to zoom out and show whole Sri Lanka
   });
 
-  
   // Function to zoom in by reducing the latitude and longitude delta
   const zoomIn = () => {
     setRegion((prevRegion) => ({
@@ -69,38 +67,46 @@ const Client_MapView = () => {
     }));
   };
 
+  // Function to open Google Maps
+  const openInGoogleMaps = (latitude: number, longitude: number) => {
+    const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    Linking.openURL(url);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-    <View style={styles.container}>
-      <MapView
-        initialRegion={region}
-        region={region}
-        style={styles.map}
-        onRegionChangeComplete={(newRegion) => setRegion(newRegion)}
-      >
-        {repairShops.map((shopmark) => (
-          <Marker
-          key={shopmark.id} 
-          coordinate={{ latitude: shopmark.ownerLocationLatitude, longitude: shopmark.ownerLocationLongitude }} 
-          title={shopmark.shopName}
-          description={shopmark.category}
-          image={locico}
-        />
-        ))}
-        
-      </MapView>
+      <View style={styles.container}>
+        <MapView
+          initialRegion={region}
+          region={region}
+          style={styles.map}
+          onRegionChangeComplete={(newRegion) => setRegion(newRegion)}
+        >
+          {repairShops.map((shopmark) => (
+            <Marker
+              key={shopmark.id}
+              coordinate={{
+                latitude: shopmark.ownerLocationLatitude,
+                longitude: shopmark.ownerLocationLongitude,
+              }}
+              title={shopmark.shopName}
+              description={shopmark.category}
+              image={locico}
+              
+            />
+          ))}
+        </MapView>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={zoomOut}>
-          <Image source={zoomout} style={styles.image} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={zoomIn}>
-          <Image source={zoomin} style={styles.image}/>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={zoomOut}>
+            <Image source={zoomout} style={styles.image} />
           </TouchableOpacity>
-        
+          <TouchableOpacity onPress={zoomIn}>
+            <Image source={zoomin} style={styles.image} />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-    <Navigation/>
+      <Navigation />
     </SafeAreaView>
   );
 };
@@ -131,4 +137,3 @@ const styles = StyleSheet.create({
     marginVertical: 10, // Space between the zoom in and zoom out buttons
   },
 });
-

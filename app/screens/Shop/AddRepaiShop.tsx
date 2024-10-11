@@ -81,7 +81,9 @@ const AddRepairShop: React.FC = () => {
     const currentLocation = await Location.getCurrentPositionAsync({});
     setOwnerLocationLatitude(currentLocation.coords.latitude)
     setOwnerLocationLongitude(currentLocation.coords.longitude)
-    Alert.alert("Done");
+    setAlertMessage("Your Location save as Your Shop Location!");
+    setAlertVisible(true);
+    setAlertType("success");
 
   };
 
@@ -180,9 +182,20 @@ const AddRepairShop: React.FC = () => {
           userId: user.uid,
         });
   
-        setAlertMessage('Shop details added successfully!');
+        setAlertMessage('Shop details added successfully! Please Go Back !');
         setAlertVisible(true);
         setAlertType('success');  // Set alertType to 'success'
+
+        setShopName("");
+        setContact("");
+        setCategory("Select Category");
+        setShop_Des("");
+        setOwnerName("");
+        setRph("");
+        setShopTag("");
+        setImageUrl("");
+        setOwnerLocationLongitude(null);
+        setOwnerLocationLatitude(null);
         
       } catch (error: any) {
         setAlertMessage("Error adding shop details: " + error.message);
