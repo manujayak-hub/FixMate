@@ -1,5 +1,4 @@
 import React from 'react';
-import { TabBar } from 'antd-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { Image, StyleSheet, View ,TouchableOpacity,Text} from 'react-native';
 
@@ -21,23 +20,24 @@ const Navigation: React.FC = () => {
         </TouchableOpacity>
 
         <TouchableOpacity 
-          onPress={() => navigation.navigate('Home' as never)}>
+          onPress={() => navigation.navigate('Shop_Tutorial' as never)}>
         <Image source={guideicon} style={styles.icon}
         />
         </TouchableOpacity>
 
         <TouchableOpacity 
-          onPress={() => navigation.navigate('Home' as never)}>
-        <Image source={profileicon} style={styles.icon}
-        />
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Home' as never)}>
+          onPress={() => navigation.navigate('Shop_ToolShop' as never)}>
         <Image source={shopicon} style={styles.icon}
         />
         
         </TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Profile' as never)}>
+        <Image source={profileicon} style={styles.icon}
+        />
+        </TouchableOpacity>
+
+       
 
     </View>
   );
