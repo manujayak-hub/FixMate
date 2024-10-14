@@ -3,9 +3,6 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput, Alert, M
 import { Picker } from '@react-native-picker/picker';
 
 import { collection, addDoc, getDocs, query, where, deleteDoc, doc, DocumentData, DocumentReference, updateDoc } from 'firebase/firestore';
-
-import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
-
 import { FIREBASE_DB } from '../../../Firebase_Config'; // Firebase configuration
 import { getAuth } from 'firebase/auth'; // Firebase Auth for user management
 import { NavigationProp, useNavigation } from '@react-navigation/native';

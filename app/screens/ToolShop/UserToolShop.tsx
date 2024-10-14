@@ -22,7 +22,7 @@ import Cart from "../../Components/Cart"
 // Import images
 const rect = require("../../../assets/rect56.png");
 const searchicon = require("../../../assets/searchicon.png");
-const allico = require("../../../assets/Allico.png");
+
 const automotiveico = require("../../../assets/automotiveico.png");
 const applianceico = require("../../../assets/applianceico.png");
 const clothingico = require("../../../assets/cloathingico.png");
@@ -32,7 +32,6 @@ const furnitureico = require("../../../assets/furnitureico.png");
 const homegardenico = require("../../../assets/homegardenico.png");
 const jewelryico = require("../../../assets/jwelleryico.png");
 const musicalico = require("../../../assets/musicalico.png");
-const otherico = require("../../../assets/otherico.png");
 
 // Define type for navigation
 type RootStackParamList = {
@@ -70,12 +69,14 @@ const categories = [
 const categoryImages: { [key: string]: any } = {
   'Electronic Repair': electronicico,
   'Home and Appliance Repair': applianceico,
-  'Automotive Repair': automotiveico,
   'Cloathing': clothingico,
+  'Garden Equipment':homegardenico,
+  'Automotive Repair': automotiveico,
+  
   'Furniture Repair': furnitureico,
-  'GardenEquipment':homegardenico,
-  'MusicalInstruments':musicalico,
-  'JwelleryWatches':jewelryico,
+  
+  'Musical Instruments':musicalico,
+  'Jwellery and Watches':jewelryico,
   'Computers':computerico,
 };
 

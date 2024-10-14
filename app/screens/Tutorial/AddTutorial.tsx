@@ -11,7 +11,7 @@ import {
   Image 
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { FIREBASE_DB, FIREBASE_STORAGE, FIREBASE_AUTH } from '../../../Firebase_Config'; // Import FIREBASE_AUTH
+import { FIREBASE_DB, FIREBASE_STORAGE, FIREBASE_AUTH } from '../../../Firebase_Config'; 
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { AntDesign } from '@expo/vector-icons';
@@ -98,48 +98,24 @@ const AddTutorial = () => {
       return;
     }
     const userId = user.uid; // Get the user ID
-
-    if (!title) {
-      Alert.alert('Missing Data', 'Please enter the tutorial title.');
+  
+    if (!title || !category || !timeDuration || !tools || !description || !videoUri || !imageUri) {
+      Alert.alert('Missing Data', 'Please fill in all fields.');
       return;
     }
-    if (!category) {
-      Alert.alert('Missing Data', 'Please select a category.');
-      return;
-    }
-    if (!timeDuration) {
-      Alert.alert('Missing Data', 'Please enter the time duration.');
-      return;
-    }
-    if (!tools) {
-      Alert.alert('Missing Data', 'Please enter the recommended tools.');
-      return;
-    }
-    if (!description) {
-      Alert.alert('Missing Data', 'Please enter the tutorial description.');
-      return;
-    }
-    if (!videoUri) {
-      Alert.alert('Missing Data', 'Please select a video.');
-      return;
-    }
-    if (!imageUri) {
-      Alert.alert('Missing Data', 'Please select an image.');
-      return;
-    }
-
+  
     try {
       const videoResponse = await fetch(videoUri);
       const videoBlob = await videoResponse.blob();
-      const videoRef = ref(FIREBASE_STORAGE, `tutorials/videos/${Date.now()}.mp4`);
-
+      const videoRef = ref(FIREBASE_STORAGE, `tutorials/videos/${userId}/${Date.now()}.mp4`);
+  
       const imageResponse = await fetch(imageUri);
       const imageBlob = await imageResponse.blob();
-      const imageRef = ref(FIREBASE_STORAGE, `tutorials/images/${Date.now()}.jpg`);
-
+      const imageRef = ref(FIREBASE_STORAGE, `tutorials/images/${userId}/${Date.now()}.jpg`);
+  
       const videoUploadTask = uploadBytesResumable(videoRef, videoBlob);
       const imageUploadTask = uploadBytesResumable(imageRef, imageBlob);
-
+  
       const videoUploadPromise = new Promise<string>((resolve, reject) => {
         videoUploadTask.on(
           'state_changed',
@@ -159,7 +135,7 @@ const AddTutorial = () => {
           }
         );
       });
-
+  
       const imageUploadPromise = new Promise<string>((resolve, reject) => {
         imageUploadTask.on(
           'state_changed',
@@ -179,9 +155,9 @@ const AddTutorial = () => {
           }
         );
       });
-
+  
       const [videoUrl, imageUrl] = await Promise.all([videoUploadPromise, imageUploadPromise]);
-
+  
       await addDoc(collection(FIREBASE_DB, 'Tutorial'), {
         title,
         category,
@@ -193,10 +169,10 @@ const AddTutorial = () => {
         uploadTime: new Date().toISOString(),
         userId, // Add the logged-in user's ID
       });
-
-      Alert.alert('Upload successful!', 'Tutorial has been saved to Firestore.');
+  
+      Alert.alert('Upload successful!', 'Tutorial has been uploaded.');
       navigation.navigate('TutorialList');
-
+  
       setVideoUri(null);
       setImageUri(null);
       setIsVideoSelected(false);
@@ -211,6 +187,7 @@ const AddTutorial = () => {
       Alert.alert('Conversion failed', error.message);
     }
   };
+  
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

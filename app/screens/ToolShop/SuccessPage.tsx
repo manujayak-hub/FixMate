@@ -1,21 +1,35 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Image } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, Image, TouchableOpacity } from 'react-native';
 import ClientHeader from "../../Components/ClientHeader";
 import Navigation from "../../Components/Navigation";
+import { useNavigation } from '@react-navigation/native';
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 
 const check = require("../../../assets/check.png");
 
+
+type RootStackParamList = {
+  YourComponent: undefined; // No params for this screen
+  CartPage: undefined; // No params for CartPage
+};
+
+// Create the Stack Navigator
+const Stack = createStackNavigator<RootStackParamList>();
+
 const SuccessPage: React.FC = () => {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'CartPage'>>();
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ClientHeader />
+      <TouchableOpacity onPress={() => navigation.navigate('CartPage')}>
       <View style={styles.container}>
         <Image source={check} style={styles.icon} />
         <View style={styles.modal}>
           <Text style={styles.successMessage}>Success! Continue with Tool Shopping.</Text>
         </View>
       </View>
-      <Navigation />
+      </TouchableOpacity>
+      
     </SafeAreaView>
   );
 };

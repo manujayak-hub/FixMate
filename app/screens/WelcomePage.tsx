@@ -2,7 +2,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
 
-const hero = require('../../assets/hero.jpg')
+const hero = require('../../assets/welcomehero.jpg')
 
 const WelcomePage = () => {
     
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
       marginTop: 20,
     },
     button: {
-      backgroundColor: '#FF6A00',
+      backgroundColor: '#F96D2B',
       paddingVertical: 10,
       paddingHorizontal: 20,
       borderRadius: 5,
